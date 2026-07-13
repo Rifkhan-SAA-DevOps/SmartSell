@@ -13,6 +13,18 @@ import {
   AccountStatus,
 } from "../components/CustomerAccountUi.jsx";
 import useSmartPagination from "../hooks/useSmartPagination.js";
+import {
+  AdminEmptyState,
+  AdminIcon,
+  AdminModal,
+  AdminPageHeader,
+  AdminPagination,
+  AdminSearchToolbar,
+  AdminStatusBadge,
+  useAdminPagination,
+} from "../components/AdminWorkspaceUi.jsx";
+import "../styles/pages/admin/AdminWorkspaceV2.css";
+import "../styles/pages/admin/AdminInbox.css";
 
 function formatDate(value) {
   if (!value) return "";
@@ -71,6 +83,7 @@ export default function Inbox() {
     });
   }, [threads, contextFilter, search, user]);
   const pagination = useSmartPagination(visibleThreads, { initialPageSize: 10, resetKey: `${contextFilter}-${search}` });
+  const adminPagination = useAdminPagination(visibleThreads, 10, [contextFilter, search]);
 
   async function loadThreads() {
     const { data } = await api.get("/communication/threads");
@@ -130,6 +143,107 @@ export default function Inbox() {
     setThreads((current) => [incomingThread, ...current.filter((thread) => thread.id !== incomingThread.id)]);
     if (incomingThread.id === selectedId) setSelectedThread(incomingThread);
   }, [lastMessageEvent, lastThreadEvent, selectedId]);
+
+  if (isAdmin) {
+    const currentParticipant = selectedThread ? participantName(selectedThread, user) : "";
+    return (
+      <section className="admin-workspace-v2 admin-inbox-workspace-v2">
+        <AdminPageHeader
+          eyebrow="Platform communication"
+          title="Admin Inbox"
+          description="Manage customer, seller, provider, delivery, order, request, and support conversations from one focused workspace."
+          actions={<><span className={`admin-inbox-live-v2 ${connected ? "is-live" : ""}`}><i />{connected ? "Realtime connected" : "Realtime offline"}</span><button className="admin-primary-button-v2" type="button" onClick={() => setComposeOpen(true)}><AdminIcon name="inbox" size={17} /> New conversation</button></>}
+          meta={<><span>{threads.length} total conversations</span><span>{unreadTotal} unread messages</span><span>{visibleThreads.length} in current view</span></>}
+        />
+
+        <div className="admin-inbox-metrics-v2">
+          <article><span className="tone-blue"><AdminIcon name="inbox" /></span><div><small>All conversations</small><strong>{threads.length}</strong><p>Across customers and operational teams</p></div></article>
+          <article><span className="tone-rose"><AdminIcon name="alert" /></span><div><small>Unread messages</small><strong>{unreadTotal}</strong><p>Conversations that need attention</p></div></article>
+          <article><span className="tone-emerald"><AdminIcon name="activity" /></span><div><small>Realtime status</small><strong>{connected ? "Live" : "Offline"}</strong><p>{connected ? "New messages arrive instantly" : "Messages refresh when the page reloads"}</p></div></article>
+        </div>
+
+        {error && <div className="admin-inbox-alert-v2"><AdminIcon name="alert" size={18} />{error}</div>}
+
+        <AdminSearchToolbar
+          value={search}
+          onChange={setSearch}
+          placeholder="Search subject, participant, or message..."
+          filters={<label className="admin-inbox-context-filter-v2"><span>Conversation type</span><select value={contextFilter} onChange={(event) => setContextFilter(event.target.value)}>{contextTypes.map((type) => <option key={type} value={type}>{type === "all" ? "All conversations" : contextLabel({ contextType: type })}</option>)}</select></label>}
+          actions={<span className="admin-inbox-result-count-v2"><strong>{visibleThreads.length}</strong> matching</span>}
+        />
+
+        <div className="admin-inbox-layout-v2">
+          <aside className="admin-inbox-directory-v2">
+            <header><div><span>Conversation directory</span><h2>Messages</h2></div><b>{unreadTotal} unread</b></header>
+            {loading ? (
+              <div className="admin-inbox-loading-v2">Loading conversations...</div>
+            ) : visibleThreads.length === 0 ? (
+              <AdminEmptyState icon="inbox" title="No matching conversations" description="Try another search or start a new message with a SmartSell user." />
+            ) : (
+              <>
+                <div className="admin-inbox-thread-list-v2">
+                  {adminPagination.items.map((thread) => {
+                    const participant = participantName(thread, user);
+                    return (
+                      <button key={thread.id} className={`admin-inbox-thread-v2 ${selectedId === thread.id ? "is-active" : ""} ${thread.unreadCount > 0 ? "has-unread" : ""}`} type="button" onClick={() => selectThread(thread.id)}>
+                        <span className="admin-inbox-thread-avatar-v2">{initials(participant)}</span>
+                        <span className="admin-inbox-thread-copy-v2">
+                          <span><strong>{thread.subject}</strong><small>{formatDate(thread.updatedAt || thread.createdAt)}</small></span>
+                          <b>{participant}</b>
+                          <p>{thread.lastMessage?.body || "No messages yet"}</p>
+                          <mark>{contextLabel(thread)}</mark>
+                        </span>
+                        {thread.unreadCount > 0 && <i>{thread.unreadCount}</i>}
+                        <AdminIcon name="chevron" size={16} />
+                      </button>
+                    );
+                  })}
+                </div>
+                <AdminPagination pagination={adminPagination} />
+              </>
+            )}
+          </aside>
+
+          <main className="admin-inbox-conversation-v2">
+            {threadLoading ? (
+              <div className="admin-inbox-loading-v2">Opening conversation...</div>
+            ) : selectedThread ? (
+              <>
+                <header className="admin-inbox-conversation-head-v2">
+                  <div className="admin-inbox-conversation-person-v2"><span>{initials(currentParticipant)}</span><div><small>{contextLabel(selectedThread)}</small><h2>{selectedThread.subject}</h2><p>{currentParticipant}</p></div></div>
+                  <div className="admin-inbox-conversation-actions-v2">{contextLink(selectedThread) && <Link to={contextLink(selectedThread)}>Open related page <AdminIcon name="arrow" size={15} /></Link>}<AdminStatusBadge status={connected ? "active" : "pending"} label={connected ? "Live" : "Offline"} /></div>
+                </header>
+
+                <div className="admin-inbox-message-list-v2">
+                  {(selectedThread.messages || []).length ? (selectedThread.messages || []).map((message) => {
+                    const mine = message.sender?.id === user?.id;
+                    const sender = mine ? "You" : message.sender?.businessName || message.sender?.name || "SmartSell user";
+                    return <article key={message.id} className={`admin-inbox-message-v2 ${mine ? "is-mine" : "is-theirs"}`}><span>{initials(sender)}</span><div><strong>{sender}</strong><p>{message.body}</p><small>{formatDate(message.createdAt)}</small></div></article>;
+                  }) : <AdminEmptyState icon="inbox" title="No messages in this thread" description="Send the first reply to continue this conversation." />}
+                </div>
+
+                <form className="admin-inbox-reply-v2" onSubmit={sendReply}>
+                  <label><span>Reply to this conversation</span><textarea value={reply} onChange={(event) => setReply(event.target.value)} rows="3" placeholder="Write a clear administrative reply..." required /></label>
+                  <button className="admin-primary-button-v2" type="submit" disabled={sending}>{sending ? "Sending..." : "Send reply"}<AdminIcon name="arrow" size={16} /></button>
+                </form>
+              </>
+            ) : (
+              <AdminEmptyState icon="inbox" title="Select a conversation" description="Choose a conversation from the directory or start a new message." action={<button className="admin-primary-button-v2" type="button" onClick={() => setComposeOpen(true)}>New conversation</button>} />
+            )}
+          </main>
+        </div>
+
+        <AdminModal open={composeOpen} onClose={() => setComposeOpen(false)} title="Start a new conversation" eyebrow="Admin message" size="medium">
+          <form className="admin-form-v2 admin-inbox-compose-v2" onSubmit={sendNewThread}>
+            <label>Recipient<select value={compose.recipientId} onChange={(event) => setCompose((current) => ({ ...current, recipientId: event.target.value }))} required><option value="">Select a customer or team member</option>{recipients.map((recipient) => <option key={recipient.id} value={recipient.id}>{recipient.label}</option>)}</select></label>
+            <label>Subject<input value={compose.subject} onChange={(event) => setCompose((current) => ({ ...current, subject: event.target.value }))} placeholder="Example: Update about order #SM-1028" required /></label>
+            <label>Message<textarea value={compose.message} onChange={(event) => setCompose((current) => ({ ...current, message: event.target.value }))} placeholder="Write the complete message..." rows="6" required /></label>
+            <div className="admin-modal-actions-v2"><button className="admin-primary-button-v2" type="submit" disabled={sending}>{sending ? "Sending..." : "Send message"}</button><button className="admin-secondary-button-v2" type="button" onClick={() => setComposeOpen(false)}>Cancel</button></div>
+          </form>
+        </AdminModal>
+      </section>
+    );
+  }
 
   return (
     <section className="ca-account-page ca-inbox-page">

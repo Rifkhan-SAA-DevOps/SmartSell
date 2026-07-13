@@ -74,6 +74,7 @@ export default function AdminDashboard() {
   const [selected, setSelected] = useState(null);
   const [requestForm, setRequestForm] = useState({ status: "new", quotation: "", assignedTo: "", adminNote: "" });
   const [saving, setSaving] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   async function loadOverview() {
     try {
@@ -81,6 +82,7 @@ export default function AdminDashboard() {
       setError("");
       const { data } = await api.get("/admin/overview");
       setOverview(data.data);
+      setLastUpdated(new Date());
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load admin overview.");
     } finally {
@@ -178,6 +180,13 @@ export default function AdminDashboard() {
     actionTile("shield", "Security", "Review sessions, incidents and risky access.", "/security"),
   ];
 
+  const priorityBreakdown = [
+    { label: "Listings", value: safe(stats.pendingProducts) + safe(stats.pendingServices), tone: "blue" },
+    { label: "Orders", value: safe(stats.pendingOrders), tone: "violet" },
+    { label: "Businesses", value: safe(stats.pendingSellers), tone: "emerald" },
+    { label: "Requests", value: safe(stats.pendingRequests), tone: "amber" },
+  ];
+
   const activity = [
     { icon: "order", title: `${safe(stats.pendingOrders)} active orders`, text: "Pending, confirmed or processing orders need operational attention." },
     { icon: "alert", title: `${safe(stats.pendingProducts) + safe(stats.pendingServices)} listing decisions`, text: "Products and services are waiting for marketplace review." },
@@ -202,17 +211,19 @@ export default function AdminDashboard() {
         <div className="admin-command-intro-v2">
           <AdminPageHeader
             eyebrow="SmartSell administration"
-            title="Marketplace command center"
-            description="Run approvals, account governance, order operations, custom requests, review moderation, and platform controls from one focused workspace."
-            actions={<><Link className="admin-primary-button-v2" to="/listings"><AdminIcon name="list" size={17} />Review listings</Link><Link className="admin-ghost-button-v2" to="/reports"><AdminIcon name="report" size={17} />Open reports</Link></>}
-            meta={<><span><AdminIcon name="activity" size={15} />Live operational overview</span><AdminStatusBadge status="pending" label={`${queueTotal} need attention`} /></>}
+            title="Admin operations overview"
+            description="Review marketplace activity, make approval decisions, coordinate orders and requests, and keep customer-facing operations moving from one clear workspace."
+            actions={<><button className="admin-ghost-button-v2" type="button" onClick={loadOverview} disabled={loading}><AdminIcon name="refresh" size={17} />{loading ? "Refreshing" : "Refresh data"}</button><Link className="admin-primary-button-v2" to="/listings"><AdminIcon name="list" size={17} />Review listings</Link></>}
+            meta={<><span><AdminIcon name="activity" size={15} />{lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString("en-LK", { hour: "2-digit", minute: "2-digit" })}` : "Loading live marketplace data"}</span><AdminStatusBadge status={queueTotal ? "pending" : "approved"} label={queueTotal ? `${queueTotal} records need attention` : "All priority queues are clear"} /></>}
           />
         </div>
         <aside className="admin-priority-card-v2">
-          <span><AdminIcon name="alert" size={16} />Priority queue</span>
-          <strong>{queueTotal}</strong>
-          <p>Approvals, active orders, customer requests and reviews currently need an admin decision.</p>
-          <Link to="/support">Open support center <AdminIcon name="arrow" size={16} /></Link>
+          <div className="admin-priority-card-head-v2"><span><AdminIcon name="alert" size={16} />Priority workload</span><strong>{queueTotal}</strong></div>
+          <p>Records currently waiting for an administrative decision or operational follow-up.</p>
+          <div className="admin-priority-breakdown-v2">
+            {priorityBreakdown.map((item) => <div key={item.label} className={`tone-${item.tone}`}><span>{item.label}</span><strong>{item.value}</strong></div>)}
+          </div>
+          <Link to="/support">Open support operations <AdminIcon name="arrow" size={16} /></Link>
         </aside>
       </div>
 
@@ -220,10 +231,10 @@ export default function AdminDashboard() {
       {message && <div className="admin-alert-v2 success">{message}</div>}
 
       <div className="admin-metrics-grid-v2">
-        <AdminMetricCard icon="box" label="Products" value={safe(stats.totalProducts)} note={`${safe(stats.pendingProducts)} pending`} tone="blue" />
-        <AdminMetricCard icon="store" label="Services" value={safe(stats.totalServices)} note={`${safe(stats.pendingServices)} pending`} tone="cyan" />
-        <AdminMetricCard icon="users" label="Users" value={safe(stats.totalUsers)} note={`${safe(stats.pendingSellers)} business approvals`} tone="emerald" />
-        <AdminMetricCard icon="order" label="Orders" value={safe(stats.totalOrders)} note={`${safe(stats.pendingOrders)} active`} tone="violet" />
+        <AdminMetricCard icon="box" label="Total products" value={safe(stats.totalProducts)} note={`${safe(stats.pendingProducts)} pending`} tone="blue" />
+        <AdminMetricCard icon="store" label="Total services" value={safe(stats.totalServices)} note={`${safe(stats.pendingServices)} pending`} tone="cyan" />
+        <AdminMetricCard icon="users" label="Registered users" value={safe(stats.totalUsers)} note={`${safe(stats.pendingSellers)} business approvals`} tone="emerald" />
+        <AdminMetricCard icon="order" label="Total orders" value={safe(stats.totalOrders)} note={`${safe(stats.pendingOrders)} active`} tone="violet" />
         <AdminMetricCard icon="request" label="Requests" value={safe(stats.pendingRequests)} note="New or pending" tone="amber" />
         <AdminMetricCard icon="star" label="Reviews" value={safe(stats.pendingReviews)} note="Waiting moderation" tone="rose" />
       </div>

@@ -347,3 +347,129 @@
   clip-path: inset(50%);
   overflow: hidden;
 }
+
+/* --------------------------------------------------------------------------
+   Phase 122 — admin operations precision pass
+---------------------------------------------------------------------------- */
+.admin-operations-page-v2 {
+  width: min(100%, 1480px);
+  padding: clamp(18px, 2.2vw, 30px);
+}
+
+.admin-operations-page-v2 .admin-page-header-v2 {
+  margin-bottom: 20px;
+}
+
+.admin-operations-page-v2 .admin-ops-metrics-v2 {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-operations-page-v2 .admin-panel-v2,
+.admin-operations-page-v2 .admin-ops-chart-v2,
+.admin-operations-page-v2 .admin-editor-layout-v2,
+.admin-operations-page-v2 .admin-ops-record-v2 {
+  border-radius: 12px;
+}
+
+.admin-operations-page-v2 .admin-toolbar-v2 {
+  margin: 12px;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+
+.admin-operations-page-v2 .admin-ops-record-v2 {
+  min-height: 60px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.admin-operations-page-v2 .admin-ops-record-v2:hover {
+  background: #f6f9fd;
+  box-shadow: inset 3px 0 #6d94ed;
+}
+
+.admin-editor-layout-v2 {
+  grid-template-columns: minmax(230px, 270px) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.admin-editor-nav-v2 {
+  top: 84px;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 7px 24px rgba(22,40,67,.04);
+}
+
+.admin-editor-nav-v2 > button {
+  padding: 9px;
+  border-radius: 8px;
+}
+
+.admin-editor-nav-v2 > button > span {
+  width: 31px;
+  height: 31px;
+  border-radius: 8px;
+}
+
+.admin-editor-nav-v2 > button strong { font-size: .74rem; }
+.admin-editor-nav-v2 > button small { font-size: .62rem; }
+
+.admin-editor-form-head-v2 {
+  padding: 17px 18px;
+}
+
+.admin-editor-form-head-v2 h2 { font-size: 1rem; }
+.admin-editor-form-head-v2 p { font-size: .72rem; }
+
+.admin-editor-fields-v2,
+.admin-settings-grid-v2 {
+  gap: 0 18px;
+  padding: 6px 20px 18px;
+}
+
+.admin-editor-fields-v2 > label,
+.admin-settings-grid-v2 > label {
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid #e6ebf1;
+  border-radius: 0;
+  background: transparent;
+}
+
+.admin-editor-fields-v2 > label:nth-last-child(-n+2),
+.admin-settings-grid-v2 > label:nth-last-child(-n+2) {
+  border-bottom-color: transparent;
+}
+
+.admin-editor-fields-v2 :is(input,textarea,select),
+.admin-settings-grid-v2 :is(input,textarea,select) {
+  min-height: 40px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.admin-content-preview-v2,
+.admin-seo-preview-v2,
+.admin-settings-guidance-v2 {
+  margin-inline: 20px;
+  border-radius: 11px;
+}
+
+.admin-editor-actions-v2 {
+  padding: 12px 20px;
+}
+
+@media (max-width: 900px) {
+  .admin-editor-layout-v2 { grid-template-columns: minmax(0,1fr); }
+  .admin-editor-nav-v2 { position: static; grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width: 640px) {
+  .admin-operations-page-v2 { padding: 14px 12px 24px; }
+  .admin-editor-nav-v2 { grid-template-columns: minmax(0,1fr); }
+  .admin-editor-fields-v2,
+  .admin-settings-grid-v2 { grid-template-columns: minmax(0,1fr); padding-inline: 16px; }
+  .admin-editor-fields-v2 > label,
+  .admin-settings-grid-v2 > label { border-bottom-color: #e6ebf1; }
+}

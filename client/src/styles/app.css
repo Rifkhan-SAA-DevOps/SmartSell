@@ -53,5 +53,8 @@
 /* Final customer shared shell, authentication, home, footer, and state pages. */
 @import "./pages/customer/CustomerSharedExperience.css";
 
+/* Realistic marketplace Home presentation. */
+@import "./pages/customer/HomeMarketplace.css";
+
 /* Final application-wide accessibility, route-state, and dialog quality layer. */
 @import "./quality/ApplicationQuality.css";
