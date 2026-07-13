@@ -82,7 +82,7 @@ export default function Sidebar({ isOpen = false, isCollapsed = false, onClose =
   const canCreateListings = isBusinessUser || isAdmin;
 
   const workspaceItems = [
-    { to: "/dashboard", label: "Account Overview", icon: "overview" },
+    !isDeliveryPartner ? { to: "/dashboard", label: "Account Overview", icon: "overview" } : null,
     { to: "/notifications", label: "Notifications", icon: "bell" },
     { to: "/inbox", label: "Inbox", icon: "inbox" },
     { to: "/profile", label: "Profile & Security", icon: "profile" },
@@ -105,28 +105,34 @@ export default function Sidebar({ isOpen = false, isCollapsed = false, onClose =
   ];
 
   const deliveryItems = [
-    isDeliveryPartner ? { to: "/delivery", label: "My Deliveries", icon: "delivery" } : null,
+    isDeliveryPartner ? { to: "/delivery", label: "Route Board", icon: "delivery" } : null,
   ];
 
-  const adminItems = [
+  const adminCommandItems = [
     { to: "/admin", label: "Admin Center", icon: "overview" },
-    { to: "/users", label: "User Management", icon: "users" },
-    { to: "/listings", label: "Listings", icon: "listings" },
-    { to: "/reports", label: "Reports", icon: "reports" },
+    { to: "/users", label: "Users & Roles", icon: "users" },
+    { to: "/listings", label: "Listing Approvals", icon: "listings" },
     { to: "/fulfillment", label: "Fulfillment", icon: "fulfillment" },
+  ];
+
+  const adminOperationsItems = [
+    { to: "/reports", label: "Reports", icon: "reports" },
     { to: "/inventory", label: "Inventory", icon: "inventory" },
-    { to: "/catalog-advanced", label: "Advanced Catalog", icon: "catalog" },
-    { to: "/gallery-management", label: "Gallery Manager", icon: "gallery" },
     { to: "/delivery", label: "Delivery Partners", icon: "delivery" },
     { to: "/offers", label: "Product Offers", icon: "offers" },
-    { to: "/earnings", label: "Finance", icon: "earnings" },
-    { to: "/seller-hub", label: "Create Listing", icon: "create" },
-    { to: "/business", label: "Business View", icon: "business" },
+    { to: "/earnings", label: "Finance & Payouts", icon: "earnings" },
+    { to: "/catalog-advanced", label: "Advanced Catalog", icon: "catalog" },
+    { to: "/gallery-management", label: "Gallery Manager", icon: "gallery" },
+  ];
+
+  const adminPlatformItems = [
     { to: "/promotions", label: "Growth Center", icon: "growth" },
     { to: "/content", label: "Content", icon: "content" },
     { to: "/seo", label: "SEO", icon: "seo" },
-    { to: "/settings", label: "Settings", icon: "settings" },
+    { to: "/settings", label: "Platform Settings", icon: "settings" },
     { to: "/security", label: "Security", icon: "security" },
+    { to: "/seller-hub", label: "Create Listing", icon: "create" },
+    { to: "/business", label: "Business View", icon: "business" },
   ];
 
   function handleLogout() {
@@ -136,12 +142,12 @@ export default function Sidebar({ isOpen = false, isCollapsed = false, onClose =
   }
 
   return (
-    <aside className={`app-sidebar management-sidebar ${isBusinessUser ? "business-sidebar-v2" : ""} ${isOpen ? "open" : ""} ${isCollapsed ? "collapsed" : ""}`} aria-label="Management sidebar" data-role={user?.role || "user"}>
+    <aside className={`app-sidebar management-sidebar ${isBusinessUser ? "business-sidebar-v2" : ""} ${isDeliveryPartner ? "delivery-sidebar-v2" : ""} ${isAdmin ? "admin-sidebar-v2" : ""} ${isOpen ? "open" : ""} ${isCollapsed ? "collapsed" : ""}`} aria-label="Management sidebar" data-role={user?.role || "user"}>
       <div className="sidebar-topbar">
         <div className="sidebar-workspace-title">
           <span className="sidebar-workspace-icon" aria-hidden="true">S</span>
           <div>
-            <strong>{isAdmin ? "Admin Panel" : isDeliveryPartner ? "Delivery Panel" : "Business Panel"}</strong>
+            <strong>{isAdmin ? "Admin Panel" : isDeliveryPartner ? "Delivery Workspace" : "Business Panel"}</strong>
             <small>{roleLabel(user?.role)}</small>
           </div>
         </div>
@@ -151,7 +157,7 @@ export default function Sidebar({ isOpen = false, isCollapsed = false, onClose =
         <button className="sidebar-mobile-close" type="button" onClick={onClose} aria-label="Close sidebar">×</button>
       </div>
 
-      <Link to="/dashboard" className="sidebar-profile-card" onClick={onClose} title={user?.name || "SmartSell user"}>
+      <Link to={isAdmin ? "/admin" : isDeliveryPartner ? "/delivery" : "/dashboard"} className="sidebar-profile-card" onClick={onClose} title={user?.name || "SmartSell user"}>
         <span className="sidebar-avatar">{user?.name?.charAt(0)?.toUpperCase() || "S"}</span>
         <span className="sidebar-profile-copy">
           <strong>{user?.name || "SmartSell User"}</strong>
@@ -162,9 +168,11 @@ export default function Sidebar({ isOpen = false, isCollapsed = false, onClose =
       <div className="sidebar-scroll-area">
         {!isAdmin && isBusinessUser && <SidebarGroup title="Business Command" items={businessCommandItems} onClose={onClose} />}
         {!isAdmin && isBusinessUser && <SidebarGroup title="Manage" items={businessManageItems} onClose={onClose} />}
+        {!isAdmin && isDeliveryPartner && <SidebarGroup title="Delivery Command" items={deliveryItems} onClose={onClose} />}
+        {isAdmin && <SidebarGroup title="Admin Command" items={adminCommandItems} onClose={onClose} />}
+        {isAdmin && <SidebarGroup title="Operations" items={adminOperationsItems} onClose={onClose} />}
+        {isAdmin && <SidebarGroup title="Platform" items={adminPlatformItems} onClose={onClose} />}
         <SidebarGroup title="Account" items={workspaceItems} onClose={onClose} />
-        {!isAdmin && isDeliveryPartner && <SidebarGroup title="Delivery" items={deliveryItems} onClose={onClose} />}
-        {isAdmin && <SidebarGroup title="Administration" items={adminItems} onClose={onClose} />}
 
         <div className="sidebar-divider" />
         <div className="sidebar-mini-links">

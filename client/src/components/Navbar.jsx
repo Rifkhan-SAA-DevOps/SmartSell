@@ -27,9 +27,20 @@ function workspaceTitle(role) {
 
 function workspacePageTitle(pathname, role) {
   const routes = [
+    ["/admin", "Admin Center"],
+    ["/users", "Users & Roles"],
+    ["/listings", "Listing Approvals"],
+    ["/reports", "Reports & Insights"],
+    ["/fulfillment", "Order Fulfillment"],
+    ["/delivery", role === "delivery_partner" ? "My Deliveries" : "Delivery Partners"],
+    ["/promotions", "Growth Center"],
+    ["/content", "Content Manager"],
+    ["/seo", "SEO & Sharing"],
+    ["/settings", "Platform Settings"],
+    ["/security", "Security Center"],
     ["/seller-hub", "Create Listing"],
     ["/business", "Business Overview"],
-    ["/earnings", "Earnings"],
+    ["/earnings", ["admin", "super_admin"].includes(role) ? "Finance & Payouts" : "Earnings"],
     ["/offers", "Product Offers"],
     ["/inventory", "Inventory"],
     ["/catalog-advanced", "Advanced Catalog"],
@@ -82,6 +93,7 @@ export default function Navbar({ showManagementSidebar = false, onOpenSidebar = 
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const isBusinessWorkspaceRole = ["seller", "shop", "shop_seller", "service_provider"].includes(user?.role);
+  const isAdminWorkspaceRole = ["admin", "super_admin"].includes(user?.role);
   const accountRef = useRef(null);
 
   useEffect(() => {
@@ -143,6 +155,9 @@ export default function Navbar({ showManagementSidebar = false, onOpenSidebar = 
         <div className="nav-actions workspace-actions">
           {isBusinessWorkspaceRole && pathname !== "/seller-hub" && (
             <Link className="workspace-quick-create-v2" to="/seller-hub"><span>+</span>Create listing</Link>
+          )}
+          {isAdminWorkspaceRole && pathname !== "/listings" && (
+            <Link className="admin-workspace-quick-v2" to="/listings">Review listings</Link>
           )}
           <Link className="customer-icon-button" to="/inbox" title="Inbox" aria-label="Inbox">
             <Icon name="inbox" />

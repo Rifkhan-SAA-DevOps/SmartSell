@@ -1,122 +1,72 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  AdminEmptyState,
+  AdminIcon,
+  AdminInfoGrid,
+  AdminMetricCard,
+  AdminModal,
+  AdminPageHeader,
+  AdminPagination,
+  AdminSearchToolbar,
+  AdminStatusBadge,
+  useAdminPagination,
+} from "../components/AdminWorkspaceUi.jsx";
 import api from "../utils/api.js";
+import "../styles/pages/admin/AdminWorkspaceV2.css";
 
 const STATUS_OPTIONS = ["all", "pending", "approved", "rejected", "archived"];
-const PRODUCT_STATUS_ACTIONS = ["approved", "rejected", "pending", "archived"];
-const SERVICE_STATUS_ACTIONS = ["approved", "rejected", "pending", "archived"];
+const STATUS_ACTIONS = ["approved", "rejected", "pending", "archived"];
 
 function formatMoney(value) {
   const number = Number(value || 0);
-  return `Rs. ${number.toLocaleString()}`;
+  return `Rs. ${number.toLocaleString("en-LK")}`;
 }
 
 function formatDate(value) {
   if (!value) return "—";
-  return new Date(value).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return new Date(value).toLocaleDateString("en-LK", { year: "numeric", month: "short", day: "2-digit" });
 }
 
-function statusClass(status) {
-  return `status-pill status-${String(status || "pending").toLowerCase()}`;
+function titleCase(value) {
+  return String(value || "").replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function getImage(item) {
   return item?.image || item?.images?.[0]?.url || null;
 }
 
-function ListingCard({ type, item, busyKey, onStatus, onFeatured }) {
+function getListingRecord(type, item) {
   const isProduct = type === "product";
-  const title = isProduct ? item.name : item.title;
-  const price = isProduct ? item.price : item.priceFrom;
-  const owner = isProduct ? item.sellerName : item.providerName;
-  const statusActions = isProduct ? PRODUCT_STATUS_ACTIONS : SERVICE_STATUS_ACTIONS;
-  const image = getImage(item);
-  const isBusy = busyKey?.startsWith(`${type}:${item.id}`);
-
-  return (
-    <article className="listing-admin-card">
-      <div className="listing-admin-media">
-        {image ? <img src={image} alt={title} /> : <div className="listing-admin-placeholder">{isProduct ? "PR" : "SV"}</div>}
-        {item.isFeatured && <span className="listing-featured-ribbon">Featured</span>}
-      </div>
-
-      <div className="listing-admin-main">
-        <div className="listing-admin-title-row">
-          <div>
-            <div className="listing-admin-eyebrow">{isProduct ? item.type?.replaceAll("_", " ") : item.providerType || "Service"}</div>
-            <h3>{title}</h3>
-          </div>
-          <span className={statusClass(item.status)}>{item.status}</span>
-        </div>
-
-        <p>{item.description || "No description added yet."}</p>
-
-        <div className="listing-admin-meta-grid">
-          <span><strong>Price</strong>{price ? formatMoney(price) : "Quote based"}</span>
-          <span><strong>Category</strong>{item.category || "Uncategorized"}</span>
-          <span><strong>{isProduct ? "Seller" : "Provider"}</strong>{owner || "SmartSell"}</span>
-          <span><strong>{isProduct ? "Stock" : "Rating"}</strong>{isProduct ? item.stock ?? 0 : `${item.ratingAverage || 0} / 5`}</span>
-          {isProduct && <span><strong>Condition</strong>{item.condition?.replaceAll("_", " ") || "—"}</span>}
-          <span><strong>Created</strong>{formatDate(item.createdAt)}</span>
-        </div>
-
-        <div className="listing-admin-actions">
-          {statusActions.map((status) => (
-            <button
-              key={`${item.id}-${status}`}
-              type="button"
-              className={`btn ${status === "approved" ? "btn-primary" : status === "rejected" ? "btn-danger-soft" : "btn-soft"}`}
-              disabled={isBusy || item.status === status}
-              onClick={() => onStatus(type, item.id, status)}
-            >
-              {status === "approved" ? "Approve" : status === "rejected" ? "Reject" : status === "archived" ? "Archive" : "Move Pending"}
-            </button>
-          ))}
-
-          <button
-            type="button"
-            className="btn btn-outline"
-            disabled={isBusy}
-            onClick={() => onFeatured(type, item.id, !item.isFeatured)}
-          >
-            {item.isFeatured ? "Remove Featured" : "Mark Featured"}
-          </button>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function EmptyState({ label }) {
-  return (
-    <div className="empty-state premium-empty-state">
-      <div className="empty-icon">LM</div>
-      <h3>No {label} found</h3>
-      <p>Try changing the search, status, or featured filter.</p>
-    </div>
-  );
+  return {
+    type,
+    item,
+    title: isProduct ? item.name : item.title,
+    price: isProduct ? item.price : item.priceFrom,
+    owner: isProduct ? item.sellerName : item.providerName,
+    kind: isProduct ? item.type || "product" : item.providerType || "service",
+    stockOrRating: isProduct ? `${item.stock ?? 0} in stock` : `${Number(item.ratingAverage || 0).toFixed(1)} / 5 rating`,
+  };
 }
 
 export default function ListingManagement() {
-  const [data, setData] = useState({ products: [], services: [], counts: { products: {}, services: {} } });
+  const [data, setData] = useState({ products: [], services: [] });
   const [loading, setLoading] = useState(true);
   const [busyKey, setBusyKey] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [tab, setTab] = useState("all");
   const [filters, setFilters] = useState({ q: "", status: "all", featured: "all" });
+  const [selected, setSelected] = useState(null);
 
   async function loadListings() {
     setLoading(true);
     setError("");
     try {
       const response = await api.get("/admin/listings", { params: filters });
-      setData(response.data.data || { products: [], services: [], counts: { products: {}, services: {} } });
+      setData(response.data.data || { products: [], services: [] });
     } catch (err) {
-      setError(err.smartSellMessage || "Failed to load listings.");
+      setError(err.smartSellMessage || err.response?.data?.message || "Failed to load listings.");
     } finally {
       setLoading(false);
     }
@@ -136,9 +86,10 @@ export default function ListingManagement() {
       const endpoint = type === "product" ? `/admin/products/${id}/status` : `/admin/services/${id}/status`;
       const response = await api.patch(endpoint, { status, note: `Changed from Listing Management to ${status}` });
       setSuccess(response.data.message || "Listing updated.");
+      setSelected((current) => current ? { ...current, item: { ...current.item, status } } : current);
       await loadListings();
     } catch (err) {
-      setError(err.smartSellMessage || "Failed to update listing status.");
+      setError(err.smartSellMessage || err.response?.data?.message || "Failed to update listing status.");
     } finally {
       setBusyKey("");
     }
@@ -152,117 +103,169 @@ export default function ListingManagement() {
       const endpoint = type === "product" ? `/admin/products/${id}/featured` : `/admin/services/${id}/featured`;
       const response = await api.patch(endpoint, { isFeatured, note: isFeatured ? "Marked as featured" : "Removed from featured" });
       setSuccess(response.data.message || "Featured status updated.");
+      setSelected((current) => current ? { ...current, item: { ...current.item, isFeatured } } : current);
       await loadListings();
     } catch (err) {
-      setError(err.smartSellMessage || "Failed to update featured status.");
+      setError(err.smartSellMessage || err.response?.data?.message || "Failed to update featured status.");
     } finally {
       setBusyKey("");
     }
   }
 
+  const records = useMemo(() => {
+    const products = (tab === "all" || tab === "products") ? (data.products || []).map((item) => getListingRecord("product", item)) : [];
+    const services = (tab === "all" || tab === "services") ? (data.services || []).map((item) => getListingRecord("service", item)) : [];
+    return [...products, ...services].sort((a, b) => new Date(b.item.createdAt || 0) - new Date(a.item.createdAt || 0));
+  }, [data, tab]);
+
   const stats = useMemo(() => {
-    const products = data.products || [];
-    const services = data.services || [];
-    const all = [...products, ...services];
+    const all = [
+      ...(data.products || []).map((item) => getListingRecord("product", item)),
+      ...(data.services || []).map((item) => getListingRecord("service", item)),
+    ];
     return {
       total: all.length,
-      products: products.length,
-      services: services.length,
-      pending: all.filter((item) => item.status === "pending").length,
-      approved: all.filter((item) => item.status === "approved").length,
-      featured: all.filter((item) => item.isFeatured).length,
+      products: data.products?.length || 0,
+      services: data.services?.length || 0,
+      pending: all.filter(({ item }) => item.status === "pending").length,
+      approved: all.filter(({ item }) => item.status === "approved").length,
+      featured: all.filter(({ item }) => item.isFeatured).length,
     };
   }, [data]);
 
-  const visibleProducts = tab === "all" || tab === "products" ? data.products || [] : [];
-  const visibleServices = tab === "all" || tab === "services" ? data.services || [] : [];
-  const visibleListings = [
-    ...visibleProducts.map((item) => ({ type: "product", item })),
-    ...visibleServices.map((item) => ({ type: "service", item })),
-  ];
+  const pagination = useAdminPagination(records, 10, [tab, filters.q, filters.status, filters.featured]);
+  const selectedBusy = selected ? busyKey.startsWith(`${selected.type}:${selected.item.id}`) : false;
 
   return (
-    <div className="page-shell listing-management-page">
-      <section className="admin-hero listing-hero">
-        <div>
-          <span className="eyebrow">Admin Control</span>
-          <h1>Listing Management Center</h1>
-          <p>Review, approve, reject, archive, and feature SmartSell products and services from one professional workspace.</p>
-        </div>
-        <div className="hero-icon-card">LM</div>
-      </section>
+    <section className="admin-workspace-v2 admin-listings-page-v2">
+      <AdminPageHeader
+        eyebrow="Marketplace governance"
+        title="Listing approvals"
+        description="Review product and service submissions, verify ownership and quality, control visibility, and feature the strongest listings without cluttering the main list with action buttons."
+        actions={(
+          <>
+            <button className="admin-ghost-button-v2" type="button" onClick={loadListings} disabled={loading}><AdminIcon name="refresh" size={17} />Refresh</button>
+            <Link className="admin-primary-button-v2" to="/seller-hub"><AdminIcon name="edit" size={17} />Create listing</Link>
+          </>
+        )}
+        meta={<><span><AdminIcon name="list" size={15} />{stats.total} loaded</span><AdminStatusBadge status="pending" label={`${stats.pending} waiting`} /></>}
+      />
 
-      <section className="stats-grid compact-stats">
-        <div className="stat-card"><span>Total Listings</span><strong>{stats.total}</strong></div>
-        <div className="stat-card"><span>Products</span><strong>{stats.products}</strong></div>
-        <div className="stat-card"><span>Services</span><strong>{stats.services}</strong></div>
-        <div className="stat-card"><span>Pending Review</span><strong>{stats.pending}</strong></div>
-        <div className="stat-card"><span>Approved</span><strong>{stats.approved}</strong></div>
-        <div className="stat-card"><span>Featured</span><strong>{stats.featured}</strong></div>
-      </section>
+      <div className="admin-metrics-grid-v2">
+        <AdminMetricCard icon="list" label="All listings" value={stats.total} note="Products and services" tone="blue" />
+        <AdminMetricCard icon="box" label="Products" value={stats.products} note="Physical and used items" tone="cyan" />
+        <AdminMetricCard icon="store" label="Services" value={stats.services} note="Provider submissions" tone="violet" />
+        <AdminMetricCard icon="alert" label="Pending review" value={stats.pending} note="Need an admin decision" tone="amber" />
+        <AdminMetricCard icon="check" label="Approved" value={stats.approved} note="Visible to customers" tone="emerald" />
+        <AdminMetricCard icon="star" label="Featured" value={stats.featured} note="Promoted discovery items" tone="rose" />
+      </div>
 
-      <section className="management-panel listing-filter-panel">
-        <div className="panel-header-row">
-          <div>
-            <h2>Search & Filter</h2>
-            <p>Quickly find submitted products and services.</p>
-          </div>
-          <button className="btn btn-outline" type="button" onClick={loadListings} disabled={loading}>Refresh</button>
-        </div>
+      {error && <div className="admin-alert-v2 error">{error}</div>}
+      {success && <div className="admin-alert-v2 success">{success}</div>}
 
-        <div className="filter-grid listing-filter-grid">
-          <label>
-            <span>Search listings</span>
-            <input
-              value={filters.q}
-              onChange={(event) => setFilters((prev) => ({ ...prev, q: event.target.value }))}
-              placeholder="Search title, category, seller, location..."
-            />
-          </label>
-          <label>
-            <span>Status</span>
-            <select value={filters.status} onChange={(event) => setFilters((prev) => ({ ...prev, status: event.target.value }))}>
-              {STATUS_OPTIONS.map((status) => <option key={status} value={status}>{status === "all" ? "All statuses" : status}</option>)}
+      <AdminSearchToolbar
+        value={filters.q}
+        onChange={(q) => setFilters((current) => ({ ...current, q }))}
+        placeholder="Search title, category, seller, provider or location"
+        filters={(
+          <>
+            <select value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} aria-label="Listing status">
+              {STATUS_OPTIONS.map((status) => <option key={status} value={status}>{status === "all" ? "All statuses" : titleCase(status)}</option>)}
             </select>
-          </label>
-          <label>
-            <span>Featured</span>
-            <select value={filters.featured} onChange={(event) => setFilters((prev) => ({ ...prev, featured: event.target.value }))}>
-              <option value="all">All listings</option>
+            <select value={filters.featured} onChange={(event) => setFilters((current) => ({ ...current, featured: event.target.value }))} aria-label="Featured filter">
+              <option value="all">All visibility</option>
               <option value="true">Featured only</option>
             </select>
-          </label>
+          </>
+        )}
+        actions={(
+          <div className="admin-queue-tabs-v2" role="tablist" aria-label="Listing type">
+            {["all", "products", "services"].map((value) => <button type="button" key={value} className={tab === value ? "active" : ""} onClick={() => setTab(value)}>{titleCase(value)}</button>)}
+          </div>
+        )}
+      />
+
+      <section className="admin-panel-v2">
+        <div className="admin-panel-head-v2">
+          <div><h2>Listing directory</h2><p>Click any record to inspect the submission and access approval, rejection, archive, or featured controls.</p></div>
+          <AdminStatusBadge status="approved" label={`${pagination.total} results`} />
         </div>
 
-        <div className="segmented-tabs listing-tabs" role="tablist" aria-label="Listing type filter">
-          <button type="button" className={tab === "all" ? "active" : ""} onClick={() => setTab("all")}>All</button>
-          <button type="button" className={tab === "products" ? "active" : ""} onClick={() => setTab("products")}>Products</button>
-          <button type="button" className={tab === "services" ? "active" : ""} onClick={() => setTab("services")}>Services</button>
-        </div>
+        {loading ? <div className="admin-empty-v2"><span><AdminIcon name="refresh" /></span><h3>Loading listings</h3><p>Retrieving the latest marketplace submissions.</p></div> : null}
+
+        {!loading && !pagination.items.length ? (
+          <AdminEmptyState icon="list" title="No listings found" description="Try a different search term, status, type, or featured filter." />
+        ) : null}
+
+        {!loading && pagination.items.length ? (
+          <div className="admin-queue-list-v2">
+            {pagination.items.map((record) => (
+              <button className="admin-listing-row-v2" type="button" key={`${record.type}-${record.item.id}`} onClick={() => setSelected(record)}>
+                <span className="admin-listing-identity-v2">
+                  <span className="admin-listing-thumb-v2">{getImage(record.item) ? <img src={getImage(record.item)} alt="" /> : record.type === "product" ? "PR" : "SV"}</span>
+                  <span>
+                    <strong>{record.title}</strong>
+                    <small>{record.owner || "SmartSell"} · {titleCase(record.kind)}</small>
+                  </span>
+                </span>
+                <div><strong>{record.price ? formatMoney(record.price) : "Quote based"}</strong><small>{record.item.category || "Uncategorized"}</small></div>
+                <div><strong>{record.stockOrRating}</strong><small>Created {formatDate(record.item.createdAt)}</small></div>
+                <div><strong>{record.item.isFeatured ? "Featured" : "Standard"}</strong><small>{record.type === "product" ? titleCase(record.item.condition || "not set") : titleCase(record.item.providerType || "provider")}</small></div>
+                <span className="admin-status-v2-wrapper"><AdminStatusBadge status={record.item.status} /></span>
+                <span className="admin-row-open-v2"><AdminIcon name="chevron" size={16} /></span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+        <AdminPagination pagination={pagination} />
       </section>
 
-      {error && <div className="alert alert-error">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
-      {loading && <div className="loading-card">Loading listings...</div>}
+      <AdminModal
+        open={Boolean(selected)}
+        onClose={() => setSelected(null)}
+        title={selected?.title || "Listing details"}
+        eyebrow={selected ? `${titleCase(selected.type)} submission` : "Listing"}
+        size="wide"
+        footer={selected ? (
+          <>
+            <button className="admin-ghost-button-v2" type="button" onClick={() => setSelected(null)}>Close</button>
+            <button className="admin-secondary-button-v2" type="button" disabled={selectedBusy || selected.item.status === "pending"} onClick={() => updateStatus(selected.type, selected.item.id, "pending")}>Move to pending</button>
+            <button className="admin-danger-button-v2" type="button" disabled={selectedBusy || selected.item.status === "rejected"} onClick={() => updateStatus(selected.type, selected.item.id, "rejected")}>Reject</button>
+            <button className="admin-success-button-v2" type="button" disabled={selectedBusy || selected.item.status === "approved"} onClick={() => updateStatus(selected.type, selected.item.id, "approved")}>Approve</button>
+          </>
+        ) : null}
+      >
+        {selected && (
+          <div>
+            <div className="admin-listing-modal-hero-v2">
+              <div className="admin-listing-modal-image-v2">{getImage(selected.item) ? <img src={getImage(selected.item)} alt={selected.title} /> : selected.type === "product" ? "PRODUCT" : "SERVICE"}</div>
+              <div className="admin-listing-modal-copy-v2">
+                <AdminStatusBadge status={selected.item.status} />
+                <h3>{selected.title}</h3>
+                <p>{selected.item.description || "No description has been added to this listing."}</p>
+                <div className="admin-listing-actions-v2">
+                  <button className="admin-secondary-button-v2" type="button" disabled={selectedBusy} onClick={() => updateFeatured(selected.type, selected.item.id, !selected.item.isFeatured)}>
+                    <AdminIcon name="star" size={16} />{selected.item.isFeatured ? "Remove featured" : "Mark featured"}
+                  </button>
+                  <button className="admin-danger-button-v2" type="button" disabled={selectedBusy || selected.item.status === "archived"} onClick={() => updateStatus(selected.type, selected.item.id, "archived")}>Archive listing</button>
+                </div>
+              </div>
+            </div>
 
-      {!loading && (
-        <>
-          <div className="listing-admin-grid">
-            {visibleListings.map(({ type, item }) => (
-              <ListingCard
-                key={`${type}-${item.id}`}
-                type={type}
-                item={item}
-                busyKey={busyKey}
-                onStatus={updateStatus}
-                onFeatured={updateFeatured}
-              />
-            ))}
-
-            {!visibleListings.length && <EmptyState label={tab === "all" ? "listings" : tab} />}
+            <AdminInfoGrid items={[
+              { label: "Listing type", value: titleCase(selected.type) },
+              { label: "Category", value: selected.item.category || "Uncategorized" },
+              { label: "Owner", value: selected.owner || "SmartSell" },
+              { label: "Price", value: selected.price ? formatMoney(selected.price) : "Quote based" },
+              { label: selected.type === "product" ? "Stock" : "Rating", value: selected.stockOrRating },
+              { label: "Created", value: formatDate(selected.item.createdAt) },
+              { label: "Condition / provider", value: selected.type === "product" ? titleCase(selected.item.condition || "Not set") : titleCase(selected.item.providerType || "Provider") },
+              { label: "Visibility", value: selected.item.isFeatured ? "Featured" : "Standard" },
+              { label: "Current status", value: titleCase(selected.item.status) },
+            ]} />
           </div>
-        </>
-      )}
-    </div>
+        )}
+      </AdminModal>
+    </section>
   );
 }

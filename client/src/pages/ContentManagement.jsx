@@ -1,95 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
+import { AdminIcon, AdminPageHeader } from "../components/AdminWorkspaceUi.jsx";
 import api from "../utils/api.js";
-import "../styles/pages/admin/AdminWorkspace.css";
-import "../styles/pages/admin/ContentManagement.css";
+import "../styles/pages/admin/AdminWorkspaceV2.css";
+import "../styles/pages/admin/AdminOperations.css";
 
 const contentSections = [
-  {
-    title: "Hero Area",
-    icon: "✦",
-    description: "Control the first impression customers see on the homepage.",
-    keys: [
-      "content.heroBadge",
-      "content.heroTitle",
-      "content.heroSubtitle",
-      "content.heroPrimaryButtonText",
-      "content.heroPrimaryButtonLink",
-      "content.heroSecondaryButtonText",
-      "content.heroSecondaryButtonLink",
-      "content.heroFloatingOne",
-      "content.heroFloatingTwo",
-      "content.heroFloatingThree",
-    ],
-  },
-  {
-    title: "Homepage Stats",
-    icon: "▣",
-    description: "Small trust numbers shown under the hero message.",
-    keys: [
-      "content.statOneValue",
-      "content.statOneLabel",
-      "content.statTwoValue",
-      "content.statTwoLabel",
-      "content.statThreeValue",
-      "content.statThreeLabel",
-    ],
-  },
-  {
-    title: "Public Sections",
-    icon: "◇",
-    description: "Headings and descriptions for the product, service, and business-model sections.",
-    keys: [
-      "content.businessModelEyebrow",
-      "content.businessModelTitle",
-      "content.businessModelDescription",
-      "content.productsEyebrow",
-      "content.productsTitle",
-      "content.productsDescription",
-      "content.servicesEyebrow",
-      "content.servicesTitle",
-      "content.servicesDescription",
-    ],
-  },
-  {
-    title: "Request Anything Block",
-    icon: "☑",
-    description: "Control the strongest SmartSell public feature: custom request examples and copy.",
-    keys: [
-      "content.requestEyebrow",
-      "content.requestTitle",
-      "content.requestDescription",
-      "content.requestButtonText",
-      "content.requestExamples",
-    ],
-  },
-  {
-    title: "Announcement",
-    icon: "!",
-    description: "Optional public announcement banner shown on the homepage.",
-    keys: ["content.publicAnnouncement"],
-  },
+  { title: "Hero Area", icon: "spark", description: "Control the first impression customers see on the homepage.", keys: ["content.heroBadge", "content.heroTitle", "content.heroSubtitle", "content.heroPrimaryButtonText", "content.heroPrimaryButtonLink", "content.heroSecondaryButtonText", "content.heroSecondaryButtonLink", "content.heroFloatingOne", "content.heroFloatingTwo", "content.heroFloatingThree"] },
+  { title: "Homepage Stats", icon: "report", description: "Small trust numbers shown under the hero message.", keys: ["content.statOneValue", "content.statOneLabel", "content.statTwoValue", "content.statTwoLabel", "content.statThreeValue", "content.statThreeLabel"] },
+  { title: "Public Sections", icon: "list", description: "Headings and descriptions for products, services, and business models.", keys: ["content.businessModelEyebrow", "content.businessModelTitle", "content.businessModelDescription", "content.productsEyebrow", "content.productsTitle", "content.productsDescription", "content.servicesEyebrow", "content.servicesTitle", "content.servicesDescription"] },
+  { title: "Request Anything", icon: "request", description: "Control the custom-request promotion and example ideas.", keys: ["content.requestEyebrow", "content.requestTitle", "content.requestDescription", "content.requestButtonText", "content.requestExamples"] },
+  { title: "Announcement", icon: "alert", description: "Optional public announcement shown on the homepage.", keys: ["content.publicAnnouncement"] },
 ];
 
-function inputFor(setting, value, onChange) {
-  if (setting.type === "textarea") {
-    return (
-      <textarea
-        value={value ?? ""}
-        onChange={(event) => onChange(setting.key, event.target.value)}
-        rows={setting.key === "content.requestExamples" ? 7 : 4}
-        placeholder={setting.key === "content.requestExamples" ? "One example per line" : "Write content..."}
-      />
-    );
-  }
-
-  return (
-    <input
-      type="text"
-      value={value ?? ""}
-      onChange={(event) => onChange(setting.key, event.target.value)}
-      placeholder="Enter content"
-    />
-  );
+function ContentInput({ setting, value, onChange }) {
+  if (setting.type === "textarea") return <textarea value={value ?? ""} onChange={(event) => onChange(setting.key, event.target.value)} rows={setting.key === "content.requestExamples" ? 7 : 4} placeholder={setting.key === "content.requestExamples" ? "One example per line" : "Write content..."} />;
+  return <input type="text" value={value ?? ""} onChange={(event) => onChange(setting.key, event.target.value)} placeholder="Enter content" />;
 }
 
 export default function ContentManagement() {
@@ -102,138 +27,52 @@ export default function ContentManagement() {
   const [error, setError] = useState("");
 
   async function loadContent() {
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
       const { data } = await api.get("/settings/admin");
       const rows = (data.data?.settings || []).filter((setting) => setting.group === "content");
-      setSettings(rows);
-      setValues(rows.reduce((acc, setting) => ({ ...acc, [setting.key]: setting.value }), {}));
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load homepage content.");
-    } finally {
-      setLoading(false);
-    }
+      setSettings(rows); setValues(rows.reduce((acc, setting) => ({ ...acc, [setting.key]: setting.value }), {}));
+    } catch (err) { setError(err.response?.data?.message || "Failed to load homepage content."); }
+    finally { setLoading(false); }
   }
+  useEffect(() => { loadContent(); }, []);
 
-  useEffect(() => {
-    loadContent();
-  }, []);
-
-  const settingsByKey = useMemo(() => {
-    return settings.reduce((acc, setting) => ({ ...acc, [setting.key]: setting }), {});
-  }, [settings]);
-
+  const settingsByKey = useMemo(() => settings.reduce((acc, setting) => ({ ...acc, [setting.key]: setting }), {}), [settings]);
   const active = contentSections.find((section) => section.title === activeSection) || contentSections[0];
-
-  function updateValue(key, value) {
-    setValues((current) => ({ ...current, [key]: value }));
-  }
+  const previewExamples = String(values["content.requestExamples"] || "").split("\n").map((item) => item.trim()).filter(Boolean).slice(0, 4);
 
   async function handleSubmit(event) {
-    event.preventDefault();
-    setSaving(true);
-    setMessage("");
-    setError("");
-
-    const payload = Object.fromEntries(Object.entries(values).filter(([key]) => key.startsWith("content.")));
-
+    event.preventDefault(); setSaving(true); setMessage(""); setError("");
     try {
+      const payload = Object.fromEntries(Object.entries(values).filter(([key]) => key.startsWith("content.")));
       const { data } = await api.patch("/settings/admin", { settings: payload });
       const rows = (data.data?.settings || []).filter((setting) => setting.group === "content");
-      setSettings(rows);
-      setValues(rows.reduce((acc, setting) => ({ ...acc, [setting.key]: setting.value }), {}));
-      setMessage("Homepage content saved successfully.");
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to save homepage content.");
-    } finally {
-      setSaving(false);
-    }
+      setSettings(rows); setValues(rows.reduce((acc, setting) => ({ ...acc, [setting.key]: setting.value }), {})); setMessage("Homepage content saved successfully.");
+    } catch (err) { setError(err.response?.data?.message || "Failed to save homepage content."); }
+    finally { setSaving(false); }
   }
 
-  const previewExamples = String(values["content.requestExamples"] || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .slice(0, 4);
-
   return (
-    <section className="content-manager-page page-section">
-      <div className="management-page-header content-manager-hero">
-        <div>
-          <span className="eyebrow">Admin content</span>
-          <h1>Homepage Content Manager</h1>
-          <p>Update SmartSell public homepage copy, hero buttons, stat cards, announcement text, and Request Anything examples without touching code.</p>
-        </div>
-        <a className="secondary-btn" href="/" target="_blank" rel="noreferrer">Preview Homepage</a>
-      </div>
-
-      {loading ? (
-        <div className="empty-state-card">Loading homepage content...</div>
-      ) : (
-        <div className="content-manager-layout">
-          <aside className="content-section-tabs" aria-label="Homepage content sections">
-            {contentSections.map((section) => (
-              <button
-                key={section.title}
-                type="button"
-                className={section.title === activeSection ? "active" : ""}
-                onClick={() => setActiveSection(section.title)}
-              >
-                <span>{section.icon}</span>
-                <strong>{section.title}</strong>
-                <small>{section.description}</small>
-              </button>
-            ))}
+    <section className="admin-workspace-v2 admin-operations-page-v2 admin-editor-page-v2">
+      <AdminPageHeader eyebrow="Public experience" title="Homepage content manager" description="Update hero copy, calls to action, public section headings, request examples, and announcements without editing application code." actions={<a className="admin-secondary-button-v2" href="/" target="_blank" rel="noreferrer"><AdminIcon name="arrow" size={17} />Preview homepage</a>} meta={<span>{settings.length} managed content fields</span>} />
+      {message && <div className="admin-alert-v2 success">{message}</div>}
+      {error && <div className="admin-alert-v2 error">{error}</div>}
+      {loading ? <div className="admin-ops-loading-v2">Loading homepage content...</div> : (
+        <div className="admin-editor-layout-v2">
+          <aside className="admin-editor-nav-v2" aria-label="Homepage content sections">
+            <div className="admin-editor-nav-head-v2"><span>Content sections</span><strong>{contentSections.length}</strong></div>
+            {contentSections.map((section) => <button key={section.title} type="button" className={section.title === activeSection ? "active" : ""} onClick={() => setActiveSection(section.title)}><span><AdminIcon name={section.icon} size={18} /></span><div><strong>{section.title}</strong><small>{section.description}</small></div><AdminIcon name="chevron" size={16} /></button>)}
           </aside>
-
-          <form className="content-edit-card" onSubmit={handleSubmit}>
-            {message && <div className="success-banner">{message}</div>}
-            {error && <div className="error-banner">{error}</div>}
-
-            <div className="content-edit-heading">
-              <span>{active.icon}</span>
-              <div>
-                <h2>{active.title}</h2>
-                <p>{active.description}</p>
-              </div>
+          <form className="admin-panel-v2 admin-editor-form-v2 admin-form-v2" onSubmit={handleSubmit}>
+            <div className="admin-editor-form-head-v2"><span className="admin-ops-record-icon-v2 tone-blue"><AdminIcon name={active.icon} /></span><div><span className="admin-ops-eyebrow-v2">Active section</span><h2>{active.title}</h2><p>{active.description}</p></div></div>
+            <div className="admin-editor-fields-v2">
+              {active.keys.map((key) => { const setting = settingsByKey[key]; if (!setting) return null; return <label key={key}><span><strong>{setting.label}</strong>{setting.isPublic && <em>Public</em>}</span><small>{setting.description}</small><ContentInput setting={setting} value={values[key]} onChange={(settingKey, value) => setValues((current) => ({ ...current, [settingKey]: value }))} /></label>; })}
             </div>
-
-            <div className="content-field-grid">
-              {active.keys.map((key) => {
-                const setting = settingsByKey[key];
-                if (!setting) return null;
-                return (
-                  <label className="content-field" key={key}>
-                    <strong>{setting.label}</strong>
-                    <small>{setting.description}</small>
-                    {inputFor(setting, values[key], updateValue)}
-                  </label>
-                );
-              })}
+            <div className="admin-content-preview-v2">
+              <div><span>{values["content.heroBadge"] || "SmartSell marketplace"}</span><h3>{values["content.heroTitle"] || "Homepage title"}</h3><p>{values["content.heroSubtitle"] || "Homepage subtitle"}</p><div><b>{values["content.heroPrimaryButtonText"] || "Primary action"}</b><b>{values["content.heroSecondaryButtonText"] || "Secondary action"}</b></div></div>
+              {!!previewExamples.length && <aside>{previewExamples.map((example) => <span key={example}>{example}</span>)}</aside>}
             </div>
-
-            <div className="content-preview-card">
-              <div>
-                <span className="eyebrow">Live content preview</span>
-                <h3>{values["content.heroTitle"] || "Homepage title"}</h3>
-                <p>{values["content.heroSubtitle"] || "Homepage subtitle"}</p>
-              </div>
-              <div className="content-preview-actions">
-                <span>{values["content.heroPrimaryButtonText"] || "Primary"}</span>
-                <span>{values["content.heroSecondaryButtonText"] || "Secondary"}</span>
-              </div>
-              {!!previewExamples.length && (
-                <div className="content-preview-examples">
-                  {previewExamples.map((example) => <em key={example}>“{example}”</em>)}
-                </div>
-              )}
-            </div>
-
-            <div className="settings-sticky-actions">
-              <button type="button" className="secondary-btn" onClick={loadContent} disabled={saving}>Reset</button>
-              <button type="submit" className="primary-btn" disabled={saving}>{saving ? "Saving..." : "Save Homepage Content"}</button>
-            </div>
+            <div className="admin-editor-actions-v2"><button type="button" className="admin-ghost-button-v2" onClick={loadContent} disabled={saving}>Reset changes</button><button type="submit" className="admin-primary-button-v2" disabled={saving}>{saving ? "Saving..." : "Save homepage content"}</button></div>
           </form>
         </div>
       )}
