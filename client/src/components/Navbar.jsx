@@ -34,6 +34,7 @@ function workspacePageTitle(pathname, role) {
     ["/fulfillment", "Order Fulfillment"],
     ["/delivery", role === "delivery_partner" ? "My Deliveries" : "Delivery Partners"],
     ["/promotions", "Growth Center"],
+    ["/home-merchandising", "Home Offers & Highlights"],
     ["/content", "Content Manager"],
     ["/seo", "SEO & Sharing"],
     ["/settings", "Platform Settings"],

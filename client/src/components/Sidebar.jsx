@@ -126,6 +126,7 @@ export default function Sidebar({ isOpen = false, isCollapsed = false, onClose =
   ];
 
   const adminPlatformItems = [
+    { to: "/home-merchandising", label: "Home Offers", icon: "growth" },
     { to: "/promotions", label: "Growth Center", icon: "growth" },
     { to: "/content", label: "Content", icon: "content" },
     { to: "/seo", label: "SEO", icon: "seo" },

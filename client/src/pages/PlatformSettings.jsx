@@ -33,7 +33,7 @@ export default function PlatformSettings() {
     setLoading(true); setError("");
     try {
       const { data } = await api.get("/settings/admin");
-      const rows = data.data?.settings || [];
+      const rows = (data.data?.settings || []).filter((setting) => setting.type !== "json");
       setSettings(rows); setValues(rows.reduce((acc, setting) => ({ ...acc, [setting.key]: setting.value }), {}));
       if (rows.length && !rows.some((setting) => setting.group === activeGroup)) setActiveGroup(rows[0].group);
     } catch (err) { setError(err.response?.data?.message || "Failed to load platform settings."); }
@@ -51,7 +51,7 @@ export default function PlatformSettings() {
     event.preventDefault(); setSaving(true); setMessage(""); setError("");
     try {
       const { data } = await api.patch("/settings/admin", { settings: values });
-      const rows = data.data?.settings || [];
+      const rows = (data.data?.settings || []).filter((setting) => setting.type !== "json");
       setSettings(rows); setValues(rows.reduce((acc, setting) => ({ ...acc, [setting.key]: setting.value }), {})); setMessage("Platform settings saved successfully.");
     } catch (err) { setError(err.response?.data?.message || "Failed to save settings."); }
     finally { setSaving(false); }

@@ -26,6 +26,7 @@ const Earnings = lazy(() => import("./pages/Earnings.jsx"));
 const Notifications = lazy(() => import("./pages/Notifications.jsx"));
 const Inbox = lazy(() => import("./pages/Inbox.jsx"));
 const PromotionCenter = lazy(() => import("./pages/PromotionCenter.jsx"));
+const HomeMerchandising = lazy(() => import("./pages/HomeMerchandising.jsx"));
 const Reports = lazy(() => import("./pages/Reports.jsx"));
 const SupportCenter = lazy(() => import("./pages/SupportCenter.jsx"));
 const UserManagement = lazy(() => import("./pages/UserManagement.jsx"));
@@ -84,6 +85,7 @@ export default function App() {
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
             <Route path="/promotions" element={<ProtectedRoute roles={["admin", "super_admin"]}><PromotionCenter /></ProtectedRoute>} />
+            <Route path="/home-merchandising" element={<ProtectedRoute roles={["admin", "super_admin"]}><HomeMerchandising /></ProtectedRoute>} />
             <Route path="/reports" element={<ProtectedRoute roles={["admin", "super_admin"]}><Reports /></ProtectedRoute>} />
             <Route path="/support" element={<ProtectedRoute><SupportCenter /></ProtectedRoute>} />
             <Route path="/users" element={<ProtectedRoute roles={["admin", "super_admin"]}><UserManagement /></ProtectedRoute>} />

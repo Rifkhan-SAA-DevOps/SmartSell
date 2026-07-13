@@ -4,6 +4,7 @@
   --admin-inbox-muted: #6b7a90;
   --admin-inbox-soft: #f7f9fc;
   --admin-inbox-blue: #2458d8;
+  min-height: 0;
 }
 
 .admin-inbox-workspace-v2 .admin-page-header-v2 {
@@ -119,8 +120,8 @@
 .admin-inbox-layout-v2 {
   display: grid;
   grid-template-columns: minmax(330px, .74fr) minmax(0, 1.45fr);
-  height: clamp(660px, 72vh, 790px);
-  min-height: 660px;
+  height: clamp(610px, calc(100dvh - 300px), 790px);
+  min-height: 610px;
   overflow: hidden;
   border: 1px solid var(--admin-inbox-line);
   border-radius: 16px;
@@ -416,13 +417,18 @@
 }
 
 @media (max-width: 860px) {
-  .admin-inbox-metrics-v2 { grid-template-columns: minmax(0, 1fr); }
-  .admin-inbox-layout-v2 { height: auto; min-height: 0; grid-template-columns: minmax(0, 1fr); overflow: visible; }
-  .admin-inbox-directory-v2 { min-height: 480px; border-right: 0; border-bottom: 1px solid #e2e8f0; }
-  .admin-inbox-thread-list-v2 { max-height: 410px; }
-  .admin-inbox-conversation-v2 { min-height: 620px; }
+  .admin-inbox-metrics-v2 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-inbox-layout-v2 { grid-template-columns: minmax(270px, .78fr) minmax(0, 1.22fr); }
   .admin-inbox-context-filter-v2 { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .admin-inbox-context-filter-v2 select { width: 100%; }
+}
+
+@media (max-width: 700px) {
+  .admin-inbox-metrics-v2 { grid-template-columns: minmax(0, 1fr); }
+  .admin-inbox-layout-v2 { height: auto; min-height: 0; grid-template-columns: minmax(0, 1fr); overflow: visible; }
+  .admin-inbox-directory-v2 { min-height: 440px; border-right: 0; border-bottom: 1px solid #e2e8f0; }
+  .admin-inbox-thread-list-v2 { max-height: 380px; }
+  .admin-inbox-conversation-v2 { min-height: 560px; }
 }
 
 @media (max-width: 620px) {

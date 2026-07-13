@@ -246,6 +246,13 @@ function sortListings(items, sort) {
 export async function listProducts(filters = {}) {
   const where = {};
 
+  const selectedIds = String(filters.ids || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .slice(0, 60);
+  if (selectedIds.length) where.id = { in: selectedIds };
+
   if (filters.status === "all") {
     // Admin/internal callers can request all statuses.
   } else if (filters.status) {

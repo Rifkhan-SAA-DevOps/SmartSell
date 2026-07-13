@@ -1,5 +1,47 @@
 import { prisma } from "../config/prisma.js";
 
+const DEFAULT_HOME_MERCHANDISING = {
+  carousel: {
+    enabled: true,
+    direction: "ltr",
+    speedSeconds: 34,
+    pauseOnHover: true,
+  },
+  todayOffers: {
+    enabled: true,
+    eyebrow: "Today's marketplace offers",
+    title: "Popular products worth checking now",
+    description: "Approved products selected for today's SmartSell shoppers.",
+    link: "/marketplace?sort=featured",
+    productIds: [],
+  },
+  flashSale: {
+    enabled: true,
+    badge: "Limited-time marketplace event",
+    title: "Flash Friday",
+    description: "Fast-moving products and special marketplace picks for a limited time.",
+    link: "/marketplace?sort=featured",
+    startAt: "",
+    endAt: "",
+    productIds: [],
+  },
+  budgetCollection: {
+    enabled: true,
+    eyebrow: "Small prices, useful finds",
+    title: "Products under Rs. 1,000",
+    description: "Affordable everyday products, gifts, accessories, and locally made items.",
+    maxPrice: 1000,
+    link: "/marketplace?maxPrice=1000&sort=price_asc",
+    productIds: [],
+  },
+  marketplaceHighlights: {
+    enabled: true,
+    autoplay: true,
+    intervalSeconds: 5,
+    slides: [],
+  },
+};
+
 const DEFAULT_SETTINGS = [
   {
     key: "general.platformName",
@@ -143,6 +185,15 @@ const DEFAULT_SETTINGS = [
     value: true,
     isPublic: true,
     type: "boolean",
+  },
+  {
+    key: "homeMerchandising.config",
+    group: "homeMerchandising",
+    label: "Homepage merchandising",
+    description: "Admin-managed homepage offer rails, flash-sale campaign, budget collection, and marketplace highlight slides.",
+    value: DEFAULT_HOME_MERCHANDISING,
+    isPublic: true,
+    type: "json",
   },
   {
     key: "content.heroBadge",
@@ -603,6 +654,21 @@ function normalizeValue(setting, nextValue) {
     if (setting.min !== undefined) number = Math.max(Number(setting.min), number);
     if (setting.max !== undefined) number = Math.min(Number(setting.max), number);
     return number;
+  }
+
+  if (setting.type === "json") {
+    if (nextValue === null || nextValue === undefined) return setting.value;
+    if (typeof nextValue === "string") {
+      try {
+        return JSON.parse(nextValue);
+      } catch {
+        throw new Error(`${setting.label || setting.key} must be valid JSON.`);
+      }
+    }
+    if (typeof nextValue !== "object") {
+      throw new Error(`${setting.label || setting.key} must be an object or array.`);
+    }
+    return JSON.parse(JSON.stringify(nextValue));
   }
 
   return String(nextValue ?? "").trim();
