@@ -1,16 +1,26 @@
-import { useEffect, useState } from "react";
-import SectionHeader from "../components/SectionHeader.jsx";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard.jsx";
+import SmartPagination from "../components/SmartPagination.jsx";
+import {
+  AccountEmpty,
+  AccountIcon,
+  AccountPageHeader,
+  AccountSearch,
+  AccountStatGrid,
+  AccountToolbar,
+} from "../components/CustomerAccountUi.jsx";
+import useSmartPagination from "../hooks/useSmartPagination.js";
 import api from "../utils/api.js";
 
 export default function Wishlist() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadWishlist() {
       try {
         setError("");
@@ -22,35 +32,48 @@ export default function Wishlist() {
         if (!cancelled) setLoading(false);
       }
     }
-
     loadWishlist();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  const products = items.map((item) => ({ ...item.product, saved: true })).filter(Boolean);
+  const products = useMemo(() => items.map((item) => ({ ...item.product, saved: true })).filter(Boolean), [items]);
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return products;
+    return products.filter((product) => [product.name, product.category, product.location, product.description]
+      .some((value) => String(value || "").toLowerCase().includes(query)));
+  }, [products, search]);
+  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: search });
 
   return (
-    <section className="page section">
-      <SectionHeader
-        eyebrow="Wishlist"
-        title="Saved SmartSell products"
-        description="Save products you like and come back later before ordering. Wishlist data is stored in PostgreSQL."
+    <section className="ca-account-page ca-wishlist-page">
+      <AccountPageHeader
+        eyebrow="Saved collection"
+        title="Wishlist"
+        description="A clean shortlist of products you may want to compare or order later."
+        icon="wishlist"
+        actions={<Link className="ca-button ca-button--primary" to="/marketplace">Discover products <AccountIcon name="arrow" size={16} /></Link>}
       />
 
-      {loading && <p className="form-status">Loading wishlist...</p>}
-      {error && <div className="form-alert spaced-alert">{error}</div>}
+      <AccountStatGrid items={[
+        { label: "Saved products", value: products.length, note: "In your shortlist", icon: "heart", tone: "rose" },
+        { label: "Ready to compare", value: filtered.length, note: search ? "Matching your search" : "All saved items", icon: "search", tone: "cyan" },
+      ]} />
 
-      {products.length ? (
-        <div className="product-grid">
-          {products.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
-      ) : !loading && (
-        <div className="empty-business-card">
-          <strong>No saved products yet</strong>
-          <p>Open Marketplace and click Save on products you want to remember.</p>
-        </div>
+      <AccountToolbar resultText={`${filtered.length} saved product${filtered.length === 1 ? "" : "s"}`}>
+        <AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search saved products..." />
+      </AccountToolbar>
+
+      {error && <div className="ca-alert ca-alert--error">{error}</div>}
+      {loading ? <div className="ca-loading">Loading your wishlist...</div> : filtered.length === 0 ? (
+        <AccountEmpty icon="wishlist" title={products.length ? "No matching products" : "Your wishlist is empty"} text={products.length ? "Try a different search term." : "Save products from Marketplace and they will appear here."} actionLabel="Browse marketplace" actionTo="/marketplace" />
+      ) : (
+        <>
+          <div className="product-grid ca-wishlist-grid">
+            {pagination.items.map((product) => <ProductCard key={product.id} product={product} />)}
+          </div>
+          <SmartPagination pagination={pagination} label="saved products" compact />
+        </>
       )}
     </section>
   );

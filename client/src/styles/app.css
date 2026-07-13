@@ -46,3 +46,6 @@
 
 /* Customer detail and transaction journey. */
 @import "./pages/customer/CustomerJourney.css";
+
+/* Customer account workspace: dashboard, orders, wishlist, reviews, requests, offers, profile, notifications, inbox, and support. */
+@import "./pages/customer/CustomerAccount.css";
