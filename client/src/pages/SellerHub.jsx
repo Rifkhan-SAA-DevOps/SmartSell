@@ -1,17 +1,13 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
-import SectionHeader from "../components/SectionHeader.jsx";
+import {
+  BusinessIcon,
+  BusinessPageHeader,
+  BusinessStatusBadge,
+} from "../components/BusinessWorkspaceUi.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../utils/api.js";
-import "../styles/pages/business/SellerBusinessWorkspace.css";
-
-const steps = [
-  "Create seller or service-provider account",
-  "Submit product/service with photos and details",
-  "Admin reviews and approves listing",
-  "Customer orders or requests quotation",
-  "Seller/provider completes order and receives payout",
-];
+import "../styles/pages/business/BusinessWorkspace.css";
 
 const emptyProduct = {
   name: "",
@@ -35,57 +31,71 @@ const emptyService = {
 };
 
 function SellerIntro() {
+  const steps = [
+    ["Create your business account", "Register as a seller, shop or service provider."],
+    ["Publish a complete listing", "Add clear photos, pricing, location and an accurate description."],
+    ["Pass marketplace review", "SmartSell checks the listing before it becomes visible to customers."],
+    ["Receive customer activity", "Manage orders, quotations and requests from your business workspace."],
+  ];
+
   return (
-    <>
-      <div className="hero-actions seller-actions">
-        <Link className="primary-btn" to="/register">Create seller/provider account</Link>
-        <Link className="secondary-btn" to="/login">Already registered? Login</Link>
-      </div>
-      <div className="seller-layout">
-        <div className="seller-panel">
-          <h3>Seller Types</h3>
-          <ul>
-            <li>Own business products</li>
-            <li>Client product sellers</li>
-            <li>Local shop sellers</li>
-            <li>Used product sellers</li>
-            <li>Service providers</li>
-            <li>Delivery partners</li>
-          </ul>
+    <div className="seller-intro-v2">
+      <section className="seller-intro-main-v2">
+        <span className="business-page-eyebrow"><BusinessIcon name="spark" size={15} />Start selling professionally</span>
+        <h2>Build a trusted local storefront on SmartSell</h2>
+        <p>Publish products, used items or professional services and manage customer activity from one workspace.</p>
+        <div className="seller-intro-actions-v2">
+          <Link className="business-primary-button-v2" to="/register">Create business account</Link>
+          <Link className="business-ghost-button-v2" to="/login">Log in</Link>
         </div>
-        <div className="seller-panel accent-panel">
-          <h3>How it works</h3>
-          {steps.map((step, index) => (
-            <p key={step}><strong>{index + 1}</strong> {step}</p>
-          ))}
+        <div className="seller-intro-types-v2">
+          <span><BusinessIcon name="store" size={17} />Local shops</span>
+          <span><BusinessIcon name="box" size={17} />Product sellers</span>
+          <span><BusinessIcon name="service" size={17} />Service providers</span>
+          <span><BusinessIcon name="inventory" size={17} />Used items</span>
         </div>
-      </div>
-    </>
+      </section>
+      <section className="seller-intro-steps-v2">
+        <div><span>How it works</span><strong>From listing to customer</strong></div>
+        {steps.map(([title, description], index) => (
+          <article key={title}>
+            <b>{String(index + 1).padStart(2, "0")}</b>
+            <div><h3>{title}</h3><p>{description}</p></div>
+          </article>
+        ))}
+      </section>
+    </div>
   );
 }
 
-function Field({ label, children }) {
-  return <label>{label}{children}</label>;
+function Field({ label, hint, children, full = false }) {
+  return (
+    <label className={`business-field-v2 ${full ? "field-full" : ""}`}>
+      <span>{label}</span>
+      {children}
+      {hint && <small>{hint}</small>}
+    </label>
+  );
 }
 
 function FilePreview({ files }) {
   const previewItems = useMemo(
-    () =>
-      Array.from(files || []).map((file) => ({
-        name: file.name,
-        url: URL.createObjectURL(file),
-      })),
+    () => Array.from(files || []).map((file) => ({ name: file.name, url: URL.createObjectURL(file) })),
     [files]
   );
 
-  if (!previewItems.length) return null;
+  useEffect(() => () => previewItems.forEach((item) => URL.revokeObjectURL(item.url)), [previewItems]);
+
+  if (!previewItems.length) {
+    return <div className="listing-upload-empty-v2"><BusinessIcon name="image" size={22} /><span>Selected images will appear here</span></div>;
+  }
 
   return (
-    <div className="upload-preview-grid">
-      {previewItems.map((item) => (
-        <figure key={`${item.name}-${item.url}`} className="upload-preview-card">
+    <div className="listing-upload-preview-v2">
+      {previewItems.map((item, index) => (
+        <figure key={`${item.name}-${item.url}`}>
           <img src={item.url} alt={item.name} />
-          <figcaption>{item.name}</figcaption>
+          <figcaption><strong>{index === 0 ? "Cover" : `Image ${index + 1}`}</strong><span>{item.name}</span></figcaption>
         </figure>
       ))}
     </div>
@@ -106,6 +116,33 @@ async function uploadListingImages(files) {
   return (data.data || []).map((item) => item.url).filter(Boolean);
 }
 
+function ListingGuide({ activeType }) {
+  const product = activeType === "product";
+  return (
+    <aside className="listing-guide-v2">
+      <div className="listing-guide-head-v2">
+        <span><BusinessIcon name={product ? "box" : "service"} /></span>
+        <div><small>Publishing guide</small><h3>{product ? "A stronger product listing" : "A stronger service listing"}</h3></div>
+      </div>
+      <ul>
+        <li><BusinessIcon name="check" size={17} /><span>Use a clear title customers can search.</span></li>
+        <li><BusinessIcon name="check" size={17} /><span>Add several real, well-lit photos.</span></li>
+        <li><BusinessIcon name="check" size={17} /><span>Set honest pricing and availability.</span></li>
+        <li><BusinessIcon name="check" size={17} /><span>Describe exactly what customers receive.</span></li>
+      </ul>
+      <div className="listing-review-note-v2">
+        <strong>Marketplace review</strong>
+        <p>New and edited listings remain pending until an administrator approves them.</p>
+      </div>
+      <nav className="listing-guide-links-v2">
+        <Link to="/business"><BusinessIcon name="briefcase" size={17} /><span>Business dashboard</span><BusinessIcon name="arrow" size={16} /></Link>
+        <Link to="/gallery-management"><BusinessIcon name="image" size={17} /><span>Gallery manager</span><BusinessIcon name="arrow" size={16} /></Link>
+        <Link to="/inventory"><BusinessIcon name="inventory" size={17} /><span>Inventory centre</span><BusinessIcon name="arrow" size={16} /></Link>
+      </nav>
+    </aside>
+  );
+}
+
 export default function SellerHub() {
   const { user, isAuthenticated } = useAuth();
   const [productForm, setProductForm] = useState(emptyProduct);
@@ -114,6 +151,14 @@ export default function SellerHub() {
   const [serviceFiles, setServiceFiles] = useState([]);
   const [productStatus, setProductStatus] = useState("");
   const [serviceStatus, setServiceStatus] = useState("");
+  const canSubmitProducts = ["seller", "shop", "shop_seller", "admin", "super_admin"].includes(user?.role);
+  const canSubmitServices = ["service_provider", "admin", "super_admin"].includes(user?.role);
+  const [activeType, setActiveType] = useState(() => user?.role === "service_provider" ? "service" : "product");
+
+  useEffect(() => {
+    if (canSubmitServices && !canSubmitProducts) setActiveType("service");
+    if (canSubmitProducts && !canSubmitServices) setActiveType("product");
+  }, [canSubmitProducts, canSubmitServices]);
 
   function updateProduct(event) {
     const { name, value } = event.target;
@@ -131,15 +176,11 @@ export default function SellerHub() {
     try {
       const uploadedUrls = await uploadListingImages(productFiles);
       const manualImageUrl = productForm.imageUrl?.trim();
-      const payload = {
-        ...productForm,
-        images: [...uploadedUrls, manualImageUrl].filter(Boolean),
-      };
-
+      const payload = { ...productForm, images: [...uploadedUrls, manualImageUrl].filter(Boolean) };
       const { data } = await api.post("/products", payload);
       setProductForm(emptyProduct);
       setProductFiles([]);
-      event.target.reset();
+      event.currentTarget.reset();
       setProductStatus(data.message || "Product submitted for admin approval.");
     } catch (error) {
       setProductStatus(error.response?.data?.message || "Failed to submit product.");
@@ -152,125 +193,124 @@ export default function SellerHub() {
     try {
       const uploadedUrls = await uploadListingImages(serviceFiles);
       const manualImageUrl = serviceForm.imageUrl?.trim();
-      const payload = {
-        ...serviceForm,
-        images: [...uploadedUrls, manualImageUrl].filter(Boolean),
-      };
-
+      const payload = { ...serviceForm, images: [...uploadedUrls, manualImageUrl].filter(Boolean) };
       const { data } = await api.post("/services", payload);
       setServiceForm(emptyService);
       setServiceFiles([]);
-      event.target.reset();
+      event.currentTarget.reset();
       setServiceStatus(data.message || "Service submitted for admin approval.");
     } catch (error) {
       setServiceStatus(error.response?.data?.message || "Failed to submit service.");
     }
   }
 
-  const canSubmitProducts = ["seller", "shop", "admin", "super_admin"].includes(user?.role);
-  const canSubmitServices = ["service_provider", "admin", "super_admin"].includes(user?.role);
-
   return (
-    <section className="page section seller-hub-page seller-business-polish">
-      <SectionHeader
-        eyebrow="Seller Hub"
-        title="Upload products and services with real photos"
-        description="Seller submissions are saved to PostgreSQL as pending listings. Uploaded photos are stored locally for development and can later be moved to AWS S3."
+    <section className="business-workspace-v2 seller-hub-v2">
+      <BusinessPageHeader
+        eyebrow="Create listing"
+        title="Publish something customers can trust"
+        description="Create a complete product or service listing with accurate details and real photos."
+        meta={isAuthenticated ? <><span><BusinessIcon name="user" size={15} />{user?.businessName || user?.name}</span><BusinessStatusBadge status={user?.status || "active"} /></> : null}
+        actions={isAuthenticated ? <Link className="business-ghost-button-v2" to="/business"><BusinessIcon name="briefcase" size={17} />Back to business</Link> : null}
       />
 
       {!isAuthenticated ? <SellerIntro /> : (
         <>
-          <div className="seller-command-hero">
-            <div className="seller-command-copy">
-              <span className="seller-command-eyebrow">Business workspace</span>
-              <h2>Welcome, {user.name}</h2>
-              <p>Your role is <strong>{user.role}</strong>. Use this page to submit new products/services, then manage them from the business tools below.</p>
-              {user.status !== "active" && <p className="soft-note">Your seller/provider account is still waiting for admin approval, but you can test submissions in development.</p>}
+          <section className="listing-type-selector-v2">
+            <div>
+              <span>Choose listing type</span>
+              <p>Only the listing types allowed for your account are enabled.</p>
             </div>
-            <div className="seller-command-grid">
-              <Link className="seller-command-card" to="/business"><strong>Business Dashboard</strong><span>Edit listings and view orders</span></Link>
-              <Link className="seller-command-card" to="/gallery-management"><strong>Gallery Manager</strong><span>Manage product/service images</span></Link>
-              <Link className="seller-command-card" to="/inventory"><strong>Inventory Center</strong><span>Stock, low-stock and movements</span></Link>
-              <Link className="seller-command-card" to="/earnings"><strong>Earnings</strong><span>Payouts and commission ledger</span></Link>
+            <div className="listing-type-tabs-v2" role="tablist" aria-label="Listing type">
+              <button type="button" role="tab" aria-selected={activeType === "product"} className={activeType === "product" ? "active" : ""} onClick={() => setActiveType("product")} disabled={!canSubmitProducts}>
+                <span><BusinessIcon name="box" /></span><div><strong>Product or used item</strong><small>Physical products, shop stock and pre-owned items</small></div>
+              </button>
+              <button type="button" role="tab" aria-selected={activeType === "service"} className={activeType === "service" ? "active" : ""} onClick={() => setActiveType("service")} disabled={!canSubmitServices}>
+                <span><BusinessIcon name="service" /></span><div><strong>Professional service</strong><small>Food, events, delivery, editing and digital work</small></div>
+              </button>
             </div>
-          </div>
+          </section>
 
-          <div className="seller-submit-grid">
-            <form className="smart-form management-form seller-submit-card" onSubmit={submitProduct}>
-              <h3>Add Product / Used Item</h3>
-              {!canSubmitProducts && <p className="soft-note">Register as a seller/shop or login as admin to submit products.</p>}
-              <Field label="Product Name"><input name="name" value={productForm.name} onChange={updateProduct} required disabled={!canSubmitProducts} /></Field>
-              <div className="form-row">
-                <Field label="Type">
-                  <select name="type" value={productForm.type} onChange={updateProduct} disabled={!canSubmitProducts}>
-                    <option value="seller_product">Client / Seller Product</option>
-                    <option value="shop_product">Shop Product</option>
-                    <option value="used_product">Used Product</option>
-                    <option value="own_product">SmartSell Own Product</option>
-                  </select>
-                </Field>
-                <Field label="Condition">
-                  <select name="condition" value={productForm.condition} onChange={updateProduct} disabled={!canSubmitProducts}>
-                    <option value="new">New</option>
-                    <option value="like_new">Like New</option>
-                    <option value="good">Good</option>
-                    <option value="used">Used</option>
-                    <option value="needs_repair">Needs Repair</option>
-                  </select>
-                </Field>
-              </div>
-              <div className="form-row">
-                <Field label="Category"><input name="category" value={productForm.category} onChange={updateProduct} placeholder="Electronics, gifts, bikes..." disabled={!canSubmitProducts} /></Field>
-                <Field label="Price"><input name="price" type="number" min="0" value={productForm.price} onChange={updateProduct} required disabled={!canSubmitProducts} /></Field>
-              </div>
-              <div className="form-row">
-                <Field label="Stock"><input name="stock" type="number" min="1" value={productForm.stock} onChange={updateProduct} disabled={!canSubmitProducts} /></Field>
-                <Field label="Location"><input name="location" value={productForm.location} onChange={updateProduct} placeholder="Kalmunai, Colombo..." disabled={!canSubmitProducts} /></Field>
-              </div>
+          <div className="listing-creator-layout-v2">
+            <main className="listing-form-panel-v2">
+              {activeType === "product" ? (
+                <form className="listing-form-v2" onSubmit={submitProduct}>
+                  <div className="listing-form-title-v2"><span><BusinessIcon name="box" /></span><div><small>Product listing</small><h2>Product information</h2><p>Give customers enough detail to confidently open and order this listing.</p></div></div>
+                  {!canSubmitProducts && <div className="business-error-v2"><strong>Product publishing is unavailable</strong><p>Use a seller or shop account to publish products.</p></div>}
 
-              <Field label="Upload Product Photos">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  disabled={!canSubmitProducts}
-                  onChange={(event) => setProductFiles(event.target.files)}
-                />
-              </Field>
-              <FilePreview files={productFiles} />
-              <Field label="Optional Image URL"><input name="imageUrl" value={productForm.imageUrl} onChange={updateProduct} placeholder="Paste external image URL only if needed" disabled={!canSubmitProducts} /></Field>
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>01</b><div><h3>Basic details</h3><p>Name, category and product type.</p></div></div>
+                    <div className="business-form-grid-v2 two-columns">
+                      <Field label="Product name" full><input name="name" value={productForm.name} onChange={updateProduct} placeholder="Example: Samsung Galaxy A55" required disabled={!canSubmitProducts} /></Field>
+                      <Field label="Product type"><select name="type" value={productForm.type} onChange={updateProduct} disabled={!canSubmitProducts}><option value="seller_product">Seller product</option><option value="shop_product">Shop product</option><option value="used_product">Used product</option><option value="own_product">SmartSell own product</option></select></Field>
+                      <Field label="Category"><input name="category" value={productForm.category} onChange={updateProduct} placeholder="Electronics, gifts, bikes..." disabled={!canSubmitProducts} /></Field>
+                    </div>
+                  </section>
 
-              <Field label="Description"><textarea name="description" rows="5" value={productForm.description} onChange={updateProduct} disabled={!canSubmitProducts} /></Field>
-              <button className="primary-btn" type="submit" disabled={!canSubmitProducts}>Submit Product</button>
-              {productStatus && <p className="form-status">{productStatus}</p>}
-            </form>
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>02</b><div><h3>Price and availability</h3><p>Set the selling price, condition and available stock.</p></div></div>
+                    <div className="business-form-grid-v2 three-columns">
+                      <Field label="Price (LKR)"><input name="price" type="number" min="0" value={productForm.price} onChange={updateProduct} placeholder="0" required disabled={!canSubmitProducts} /></Field>
+                      <Field label="Condition"><select name="condition" value={productForm.condition} onChange={updateProduct} disabled={!canSubmitProducts}><option value="new">New</option><option value="like_new">Like New</option><option value="good">Good</option><option value="used">Used</option><option value="needs_repair">Needs Repair</option></select></Field>
+                      <Field label="Stock"><input name="stock" type="number" min="1" value={productForm.stock} onChange={updateProduct} disabled={!canSubmitProducts} /></Field>
+                      <Field label="Location" full><input name="location" value={productForm.location} onChange={updateProduct} placeholder="Kalmunai, Colombo, Kandy..." disabled={!canSubmitProducts} /></Field>
+                    </div>
+                  </section>
 
-            <form className="smart-form management-form seller-submit-card" onSubmit={submitService}>
-              <h3>Add Service</h3>
-              {!canSubmitServices && <p className="soft-note">Register as a service provider or login as admin to submit services.</p>}
-              <Field label="Service Title"><input name="title" value={serviceForm.title} onChange={updateService} required disabled={!canSubmitServices} /></Field>
-              <div className="form-row">
-                <Field label="Category"><input name="category" value={serviceForm.category} onChange={updateService} placeholder="Cake, editing, delivery..." disabled={!canSubmitServices} /></Field>
-                <Field label="Price From"><input name="priceFrom" type="number" min="0" value={serviceForm.priceFrom} onChange={updateService} disabled={!canSubmitServices} /></Field>
-              </div>
-              <Field label="Provider Type"><input name="providerType" value={serviceForm.providerType} onChange={updateService} placeholder="Cake maker, editor, web developer..." disabled={!canSubmitServices} /></Field>
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>03</b><div><h3>Photos</h3><p>The first image becomes the main listing cover.</p></div></div>
+                    <Field label="Upload product photos" hint="JPG, PNG or WebP. Use several clear angles."><input className="listing-file-input-v2" type="file" accept="image/*" multiple disabled={!canSubmitProducts} onChange={(event) => setProductFiles(event.target.files)} /></Field>
+                    <FilePreview files={productFiles} />
+                    <Field label="Optional external image URL" hint="Use only when you cannot upload the image directly."><input name="imageUrl" value={productForm.imageUrl} onChange={updateProduct} placeholder="https://..." disabled={!canSubmitProducts} /></Field>
+                  </section>
 
-              <Field label="Upload Service Photos">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  disabled={!canSubmitServices}
-                  onChange={(event) => setServiceFiles(event.target.files)}
-                />
-              </Field>
-              <FilePreview files={serviceFiles} />
-              <Field label="Optional Image URL"><input name="imageUrl" value={serviceForm.imageUrl} onChange={updateService} placeholder="Paste external image URL only if needed" disabled={!canSubmitServices} /></Field>
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>04</b><div><h3>Description</h3><p>Explain important specifications, condition and what is included.</p></div></div>
+                    <Field label="Product description"><textarea name="description" rows="7" value={productForm.description} onChange={updateProduct} placeholder="Describe the product clearly..." disabled={!canSubmitProducts} /></Field>
+                  </section>
 
-              <Field label="Description"><textarea name="description" rows="7" value={serviceForm.description} onChange={updateService} disabled={!canSubmitServices} /></Field>
-              <button className="primary-btn" type="submit" disabled={!canSubmitServices}>Submit Service</button>
-              {serviceStatus && <p className="form-status">{serviceStatus}</p>}
-            </form>
+                  {productStatus && <p className="business-form-message-v2">{productStatus}</p>}
+                  <div className="listing-submit-row-v2"><span><BusinessIcon name="check" size={17} />Your listing will be sent for approval.</span><button className="business-primary-button-v2" type="submit" disabled={!canSubmitProducts}><BusinessIcon name="add" size={17} />Submit product</button></div>
+                </form>
+              ) : (
+                <form className="listing-form-v2" onSubmit={submitService}>
+                  <div className="listing-form-title-v2"><span><BusinessIcon name="service" /></span><div><small>Service listing</small><h2>Service information</h2><p>Explain your service, starting price and professional speciality.</p></div></div>
+                  {!canSubmitServices && <div className="business-error-v2"><strong>Service publishing is unavailable</strong><p>Use a service-provider account to publish services.</p></div>}
+
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>01</b><div><h3>Basic details</h3><p>Use a clear service title and suitable category.</p></div></div>
+                    <div className="business-form-grid-v2 two-columns">
+                      <Field label="Service title" full><input name="title" value={serviceForm.title} onChange={updateService} placeholder="Example: Custom birthday cake design" required disabled={!canSubmitServices} /></Field>
+                      <Field label="Category"><input name="category" value={serviceForm.category} onChange={updateService} placeholder="Food, events, editing..." disabled={!canSubmitServices} /></Field>
+                      <Field label="Provider type"><input name="providerType" value={serviceForm.providerType} onChange={updateService} placeholder="Cake maker, editor, developer..." disabled={!canSubmitServices} /></Field>
+                    </div>
+                  </section>
+
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>02</b><div><h3>Starting price</h3><p>Customers understand that the final quotation may depend on requirements.</p></div></div>
+                    <div className="business-form-grid-v2 two-columns">
+                      <Field label="Price from (LKR)"><input name="priceFrom" type="number" min="0" value={serviceForm.priceFrom} onChange={updateService} placeholder="0" disabled={!canSubmitServices} /></Field>
+                    </div>
+                  </section>
+
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>03</b><div><h3>Portfolio photos</h3><p>Show previous work, examples or your service setup.</p></div></div>
+                    <Field label="Upload service photos" hint="JPG, PNG or WebP. The first image becomes the cover."><input className="listing-file-input-v2" type="file" accept="image/*" multiple disabled={!canSubmitServices} onChange={(event) => setServiceFiles(event.target.files)} /></Field>
+                    <FilePreview files={serviceFiles} />
+                    <Field label="Optional external image URL"><input name="imageUrl" value={serviceForm.imageUrl} onChange={updateService} placeholder="https://..." disabled={!canSubmitServices} /></Field>
+                  </section>
+
+                  <section className="listing-form-section-v2">
+                    <div className="listing-section-heading-v2"><b>04</b><div><h3>Service description</h3><p>Explain the scope, process, delivery time and what customers should provide.</p></div></div>
+                    <Field label="Description"><textarea name="description" rows="8" value={serviceForm.description} onChange={updateService} placeholder="Describe your service clearly..." disabled={!canSubmitServices} /></Field>
+                  </section>
+
+                  {serviceStatus && <p className="business-form-message-v2">{serviceStatus}</p>}
+                  <div className="listing-submit-row-v2"><span><BusinessIcon name="check" size={17} />Your listing will be sent for approval.</span><button className="business-primary-button-v2" type="submit" disabled={!canSubmitServices}><BusinessIcon name="add" size={17} />Submit service</button></div>
+                </form>
+              )}
+            </main>
+            <ListingGuide activeType={activeType} />
           </div>
         </>
       )}

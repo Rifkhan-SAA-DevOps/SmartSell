@@ -24,6 +24,28 @@ function workspaceTitle(role) {
   return "Business Workspace";
 }
 
+
+function workspacePageTitle(pathname, role) {
+  const routes = [
+    ["/seller-hub", "Create Listing"],
+    ["/business", "Business Overview"],
+    ["/earnings", "Earnings"],
+    ["/offers", "Product Offers"],
+    ["/inventory", "Inventory"],
+    ["/catalog-advanced", "Advanced Catalog"],
+    ["/gallery-management", "Gallery Manager"],
+    ["/my-requests", "Assigned Requests"],
+    ["/my-reviews", "Customer Reviews"],
+    ["/notifications", "Notifications"],
+    ["/inbox", "Inbox"],
+    ["/profile", "Profile & Security"],
+    ["/support", "Support"],
+    ["/dashboard", "Account Overview"],
+  ];
+  const match = routes.find(([path]) => pathname === path || pathname.startsWith(`${path}/`));
+  return match?.[1] || workspaceTitle(role);
+}
+
 function workspaceLink(role) {
   if (["admin", "super_admin"].includes(role)) return "/admin";
   if (role === "delivery_partner") return "/delivery";
@@ -59,6 +81,7 @@ export default function Navbar({ showManagementSidebar = false, onOpenSidebar = 
   const { pathname } = useLocation();
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const isBusinessWorkspaceRole = ["seller", "shop", "shop_seller", "service_provider"].includes(user?.role);
   const accountRef = useRef(null);
 
   useEffect(() => {
@@ -112,12 +135,15 @@ export default function Navbar({ showManagementSidebar = false, onOpenSidebar = 
           <div className="workspace-title-block">
             <span className="workspace-title-icon" aria-hidden="true" />
             <div>
-              <strong>{workspaceTitle(user?.role)}</strong>
-              <small><span className={`realtime-dot ${connected ? "online" : "offline"}`} />{connected ? "Live" : "Offline"} · {roleLabel(user?.role)}</small>
+              <strong>{workspacePageTitle(pathname, user?.role)}</strong>
+              <small><span className={`realtime-dot ${connected ? "online" : "offline"}`} />{connected ? "Live workspace" : "Offline"} · {roleLabel(user?.role)}</small>
             </div>
           </div>
         </div>
         <div className="nav-actions workspace-actions">
+          {isBusinessWorkspaceRole && pathname !== "/seller-hub" && (
+            <Link className="workspace-quick-create-v2" to="/seller-hub"><span>+</span>Create listing</Link>
+          )}
           <Link className="customer-icon-button" to="/inbox" title="Inbox" aria-label="Inbox">
             <Icon name="inbox" />
             {summary.unreadMessages > 0 && <b>{summary.unreadMessages}</b>}

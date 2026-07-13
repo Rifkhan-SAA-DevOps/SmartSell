@@ -71,6 +71,7 @@ export default function AppLayout({ children }) {
   });
 
   const routeClass = routeClassName(pathname);
+  const managementRoleClass = `management-role-${String(user?.role || "member").replace(/[^a-zA-Z0-9_-]/g, "-").toLowerCase()}`;
 
   const isManagement = useMemo(
     () => isAuthenticated && shouldUseManagementShell(user, pathname),
@@ -112,7 +113,7 @@ export default function AppLayout({ children }) {
   }
 
   return (
-    <div className={`app-shell management-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+    <div className={`app-shell management-shell ${managementRoleClass} ${sidebarCollapsed ? "sidebar-collapsed" : ""}`} data-management-role={user?.role || "member"}>
       <button
         className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
         type="button"
