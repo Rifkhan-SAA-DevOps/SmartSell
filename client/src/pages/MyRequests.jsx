@@ -13,125 +13,63 @@ import {
   AccountStatus,
   AccountToolbar,
 } from "../components/CustomerAccountUi.jsx";
+import {
+  BusinessEmptyState,
+  BusinessIcon,
+  BusinessInfoGrid,
+  BusinessMetricCard,
+  BusinessModal,
+  BusinessPageHeader,
+  BusinessSearchToolbar,
+  BusinessStatusBadge,
+} from "../components/BusinessWorkspaceUi.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import useSmartPagination from "../hooks/useSmartPagination.js";
 import api from "../utils/api.js";
+import "../styles/pages/business/BusinessWorkspace.css";
+import "../styles/pages/business/BusinessManagement.css";
 
 const money = new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", maximumFractionDigits: 0 });
+function formatMoney(value) { return value === null || value === undefined || value === "" ? "Not set" : money.format(Number(value || 0)); }
+function readable(value) { return String(value || "").replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+function shortDate(value) { if (!value) return "Not set"; const date = new Date(value); return Number.isNaN(date.getTime()) ? "Not set" : date.toLocaleDateString("en-LK", { year: "numeric", month: "short", day: "numeric" }); }
 
-function formatMoney(value) {
-  if (value === null || value === undefined || value === "") return "Not set";
-  return money.format(Number(value || 0));
-}
-function readable(value) {
-  return String(value || "").replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-function shortDate(value) {
-  if (!value) return "Not set";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "Not set" : date.toLocaleDateString("en-LK", { year: "numeric", month: "short", day: "numeric" });
-}
-
-export default function MyRequests() {
+function CustomerRequestsView() {
   const [requests, setRequests] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
-
-  async function loadRequests() {
-    setLoading(true);
-    try {
-      const { data } = await api.get("/requests/mine");
-      setRequests(data.data || []);
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Could not load your requests.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  async function loadRequests() { setLoading(true); try { const { data } = await api.get("/requests/mine"); setRequests(data.data || []); } catch (error) { setMessage(error.response?.data?.message || "Could not load your requests."); } finally { setLoading(false); } }
   useEffect(() => { loadRequests(); }, []);
-
-  async function updateRequest(id, nextStatus) {
-    setMessage("Updating request...");
-    try {
-      await api.patch(`/requests/${id}/customer`, { status: nextStatus });
-      setMessage(nextStatus === "accepted" ? "Quotation accepted." : "Request cancelled.");
-      setSelected(null);
-      await loadRequests();
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Could not update this request.");
-    }
-  }
-
-  const stats = useMemo(() => ({
-    active: requests.filter((request) => !["completed", "cancelled", "rejected"].includes(request.status)).length,
-    quoted: requests.filter((request) => request.status === "quoted").length,
-    completed: requests.filter((request) => request.status === "completed").length,
-  }), [requests]);
-
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return requests.filter((request) => {
-      const haystack = `${request.requestType} ${request.message} ${request.location} ${request.assignedTo}`.toLowerCase();
-      return (status === "all" || request.status === status) && (!query || haystack.includes(query));
-    });
-  }, [requests, search, status]);
+  async function updateRequest(id, nextStatus) { setMessage("Updating request..."); try { await api.patch(`/requests/${id}/customer`, { status: nextStatus }); setMessage(nextStatus === "accepted" ? "Quotation accepted." : "Request cancelled."); setSelected(null); await loadRequests(); } catch (error) { setMessage(error.response?.data?.message || "Could not update this request."); } }
+  const stats = useMemo(() => ({ active: requests.filter((request) => !["completed", "cancelled", "rejected"].includes(request.status)).length, quoted: requests.filter((request) => request.status === "quoted").length, completed: requests.filter((request) => request.status === "completed").length }), [requests]);
+  const filtered = useMemo(() => { const query = search.trim().toLowerCase(); return requests.filter((request) => (status === "all" || request.status === status) && (!query || `${request.requestType} ${request.message} ${request.location} ${request.assignedTo}`.toLowerCase().includes(query))); }, [requests, search, status]);
   const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${search}-${status}` });
+  return <section className="ca-account-page ca-requests-page"><AccountPageHeader eyebrow="Custom needs" title="My requests" description="Track requests, quotations, assignments, and decisions without crowded action buttons." icon="request" actions={<Link className="ca-button ca-button--primary" to="/request-anything"><AccountIcon name="plus" size={16} /> Create request</Link>} /><AccountStatGrid items={[{ label: "All requests", value: requests.length, note: "Submitted to SmartSell", icon: "request", tone: "cyan" }, { label: "Active", value: stats.active, note: "Currently in progress", icon: "activity", tone: "violet" }, { label: "Quoted", value: stats.quoted, note: "Waiting for your decision", icon: "money", tone: "amber" }, { label: "Completed", value: stats.completed, note: "Successfully finished", icon: "check", tone: "emerald" }]} /><AccountToolbar resultText={`${filtered.length} request${filtered.length === 1 ? "" : "s"}`}><AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search request, location, or provider..." /><label className="ca-select-filter"><AccountIcon name="filter" size={17} /><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="new">New</option><option value="pending">Pending</option><option value="quoted">Quoted</option><option value="accepted">Accepted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></label></AccountToolbar>{message && <div className="ca-alert">{message}</div>}{loading ? <div className="ca-loading">Loading your requests...</div> : filtered.length === 0 ? <AccountEmpty icon="request" title="No requests found" text={requests.length ? "Try another search or status filter." : "Ask SmartSell for products, services, delivery, gifts, digital work, or any custom need."} actionLabel="Create a request" actionTo="/request-anything" /> : <><div className="ca-record-grid">{pagination.items.map((request) => <article className="ca-summary-card tone-cyan" key={request.id} role="button" tabIndex="0" onClick={() => setSelected(request)} onKeyDown={(event) => (event.key === "Enter" || event.key === " ") && setSelected(request)}><div className="ca-summary-card__top"><span className="ca-summary-card__icon"><AccountIcon name="request" size={20} /></span><AccountStatus value={request.status} label={readable(request.status)} /></div><small>{shortDate(request.createdAt)} · {request.location || "No location"}</small><h3>{readable(request.requestType || "Custom request")}</h3><p className="ca-clamp-3">{request.message}</p><div className="ca-summary-card__values"><span>Budget <b>{formatMoney(request.budget)}</b></span><span>Quotation <b>{formatMoney(request.quotation)}</b></span></div><div className="ca-summary-card__footer"><span>{request.assignedTo || "Not assigned"}</span><b>View details <AccountIcon name="chevron" size={15} /></b></div></article>)}</div><SmartPagination pagination={pagination} label="requests" compact /></>}<AccountModal open={Boolean(selected)} onClose={() => setSelected(null)} title={readable(selected?.requestType || "Request details")} eyebrow="Request details" icon="request" size="large">{selected && <><div className="ca-modal-summary-row"><div><span>Status</span><AccountStatus value={selected.status} label={readable(selected.status)} /></div><div><span>Budget</span><strong>{formatMoney(selected.budget)}</strong></div><div><span>Quotation</span><strong>{formatMoney(selected.quotation)}</strong></div></div><section className="ca-modal-section"><h3>Your requirement</h3><div className="ca-note ca-note--large"><p>{selected.message}</p></div></section><section className="ca-modal-section"><h3>Request information</h3><AccountDetailGrid items={[{ label: "Created", value: shortDate(selected.createdAt) }, { label: "Location", value: selected.location || "Not provided" }, { label: "Phone", value: selected.phone || "Not provided" }, { label: "Assigned to", value: selected.assignedTo || "Not assigned" }, { label: "Current status", value: readable(selected.status) }]} /></section>{selected.adminNote && <div className="ca-note ca-note--accent"><strong>SmartSell note</strong><p>{selected.adminNote}</p></div>}<div className="ca-modal-actions">{selected.status === "quoted" && <button className="ca-button ca-button--primary" type="button" onClick={() => updateRequest(selected.id, "accepted")}>Accept quotation</button>}<ContextMessageButton contextType="request" contextId={selected.id} subject={`Request discussion: ${readable(selected.requestType || "Custom request")}`} message={`Hi SmartSell team, I want to discuss this request: ${readable(selected.requestType || "Custom request")}.`} label="Message SmartSell" className="ca-button ca-button--soft" />{["new", "pending", "quoted", "accepted"].includes(selected.status) && <button className="ca-button ca-button--danger" type="button" onClick={() => updateRequest(selected.id, "cancelled")}>Cancel request</button>}</div></>}</AccountModal></section>;
+}
 
-  return (
-    <section className="ca-account-page ca-requests-page">
-      <AccountPageHeader eyebrow="Custom needs" title="My requests" description="Track requests, quotations, assignments, and decisions without crowded action buttons." icon="request" actions={<Link className="ca-button ca-button--primary" to="/request-anything"><AccountIcon name="plus" size={16} /> Create request</Link>} />
+function BusinessRequestsView({ user }) {
+  const [requests, setRequests] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [saving, setSaving] = useState(false);
+  async function loadRequests() { setLoading(true); setError(""); try { const { data } = await api.get("/business/me"); setRequests(data.data?.assignedRequests || []); } catch (requestError) { setError(requestError.response?.data?.message || "Could not load assigned requests."); } finally { setLoading(false); } }
+  useEffect(() => { loadRequests(); }, []);
+  async function updateStatus(nextStatus) { if (!selected) return; setSaving(true); setMessage("Updating request..."); try { const { data } = await api.patch(`/business/requests/${selected.id}/status`, { status: nextStatus }); setRequests((current) => current.map((item) => item.id === data.data.id ? data.data : item)); setSelected(data.data); setMessage(`Request moved to ${readable(nextStatus)}.`); } catch (requestError) { setError(requestError.response?.data?.message || "Could not update assigned request."); } finally { setSaving(false); } }
+  const filtered = useMemo(() => { const query = search.trim().toLowerCase(); return requests.filter((request) => (status === "all" || request.status === status) && (!query || `${request.requestType} ${request.name} ${request.phone} ${request.location} ${request.message}`.toLowerCase().includes(query))); }, [requests, search, status]);
+  const stats = useMemo(() => ({ pending: requests.filter((item) => ["new", "pending"].includes(item.status)).length, active: requests.filter((item) => ["accepted", "in_progress"].includes(item.status)).length, completed: requests.filter((item) => item.status === "completed").length }), [requests]);
+  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${search}-${status}` });
+  return <section className="business-workspace-v2 business-management-v2 business-requests-v2"><BusinessPageHeader eyebrow="Customer work queue" title="Assigned requests" description="Review complete customer requirements, contact details, budgets, and work status from a focused service queue." meta={<><span><BusinessIcon name="briefcase" size={15} />{user?.businessName || user?.name || "Your business"}</span><span><BusinessIcon name="clock" size={15} />{stats.pending} need review</span></>} actions={<button className="business-primary-button-v2" type="button" onClick={loadRequests}><BusinessIcon name="refresh" size={17} />Refresh requests</button>} />{error && <div className="business-error-v2"><strong>Requests could not load</strong><p>{error}</p></div>}{message && <div className="bm-notice-v2 success"><BusinessIcon name="check" size={18} /><span>{message}</span></div>}<div className="business-metrics-grid-v2"><BusinessMetricCard icon="request" label="Assigned" value={requests.length} note="All customer requests" tone="blue" /><BusinessMetricCard icon="clock" label="Need review" value={stats.pending} note="New or pending work" tone="amber" /><BusinessMetricCard icon="service" label="Active work" value={stats.active} note="Accepted or in progress" tone="violet" /><BusinessMetricCard icon="check" label="Completed" value={stats.completed} note="Successfully delivered" tone="emerald" /></div><section className="business-content-panel-v2 bm-management-panel-v2"><div className="business-tab-content-v2"><BusinessSearchToolbar value={search} onChange={setSearch} placeholder="Search requirement, customer, phone, or location" filter={<select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="new">New</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>} />{loading ? <div className="business-loading-v2"><span /><p>Loading assigned requests...</p></div> : !filtered.length ? <BusinessEmptyState icon="request" title="No assigned requests found" description={requests.length ? "Change the search term or status filter." : "Requests assigned by SmartSell will appear here."} /> : <div className="business-request-grid-v2">{pagination.items.map((request) => <article className="business-record-v2 request-record" key={request.id} role="button" tabIndex="0" onClick={() => setSelected(request)} onKeyDown={(event) => (event.key === "Enter" || event.key === " ") && setSelected(request)}><div className="business-request-icon-v2"><BusinessIcon name="request" /></div><div className="business-record-content-v2"><div className="business-record-heading-v2"><div><h3>{readable(request.requestType || "Custom request")}</h3><p>{request.name || "Customer"} · {request.location || "Location not set"}</p></div><BusinessStatusBadge status={request.status} /></div><p className="business-record-summary-v2">{request.message || "No requirement description."}</p><div className="business-record-facts-v2 three-columns"><span><small>Budget</small><strong>{formatMoney(request.budget)}</strong></span><span><small>Quotation</small><strong>{formatMoney(request.quotation)}</strong></span><span><small>Phone</small><strong>{request.phone || "Not provided"}</strong></span></div></div><span className="business-record-arrow-v2"><BusinessIcon name="chevron" /></span></article>)}<SmartPagination pagination={pagination} label="requests" /></div>}</div></section><BusinessModal open={Boolean(selected)} title={readable(selected?.requestType || "Customer request")} eyebrow="Assigned customer request" onClose={() => setSelected(null)}>{selected && <><div className="business-modal-status-line-v2"><BusinessStatusBadge status={selected.status} /></div><BusinessInfoGrid items={[{ label: "Customer", value: selected.name || "Customer" }, { label: "Phone", value: selected.phone || "Not provided" }, { label: "Location", value: selected.location || "Not set" }, { label: "Budget", value: formatMoney(selected.budget) }, { label: "Quotation", value: formatMoney(selected.quotation) }, { label: "Created", value: shortDate(selected.createdAt) }]} /><div className="business-description-v2"><span>Customer requirement</span><p>{selected.message || "No requirement description."}</p></div>{selected.adminNote && <div className="business-note-v2"><strong>SmartSell note</strong><p>{selected.adminNote}</p></div>}<div className="business-modal-action-row-v2 status-actions"><button className="business-danger-button-v2" type="button" disabled={saving} onClick={() => updateStatus("cancelled")}>Cancel assignment</button><ContextMessageButton contextType="request" contextId={selected.id} subject={`Request discussion: ${readable(selected.requestType || "Custom request")}`} message={`Hello ${selected.name || "customer"}, I am contacting you about your ${readable(selected.requestType || "request")}.`} label="Message customer" className="business-ghost-button-v2" /><button className="business-secondary-button-v2" type="button" disabled={saving} onClick={() => updateStatus("accepted")}>Accept</button><button className="business-secondary-button-v2" type="button" disabled={saving} onClick={() => updateStatus("in_progress")}>Start work</button><button className="business-primary-button-v2" type="button" disabled={saving} onClick={() => updateStatus("completed")}>Mark complete</button></div></>}</BusinessModal></section>;
+}
 
-      <AccountStatGrid items={[
-        { label: "All requests", value: requests.length, note: "Submitted to SmartSell", icon: "request", tone: "cyan" },
-        { label: "Active", value: stats.active, note: "Currently in progress", icon: "activity", tone: "violet" },
-        { label: "Quoted", value: stats.quoted, note: "Waiting for your decision", icon: "money", tone: "amber" },
-        { label: "Completed", value: stats.completed, note: "Successfully finished", icon: "check", tone: "emerald" },
-      ]} />
-
-      <AccountToolbar resultText={`${filtered.length} request${filtered.length === 1 ? "" : "s"}`}>
-        <AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search request, location, or provider..." />
-        <label className="ca-select-filter"><AccountIcon name="filter" size={17} /><select value={status} onChange={(event) => setStatus(event.target.value)}>
-          <option value="all">All statuses</option><option value="new">New</option><option value="pending">Pending</option><option value="quoted">Quoted</option><option value="accepted">Accepted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
-        </select></label>
-      </AccountToolbar>
-
-      {message && <div className="ca-alert">{message}</div>}
-      {loading ? <div className="ca-loading">Loading your requests...</div> : filtered.length === 0 ? (
-        <AccountEmpty icon="request" title="No requests found" text={requests.length ? "Try another search or status filter." : "Ask SmartSell for products, services, delivery, gifts, digital work, or any custom need."} actionLabel="Create a request" actionTo="/request-anything" />
-      ) : <>
-        <div className="ca-record-grid">
-          {pagination.items.map((request) => (
-            <article className="ca-summary-card tone-cyan" key={request.id} role="button" tabIndex="0" onClick={() => setSelected(request)} onKeyDown={(event) => (event.key === "Enter" || event.key === " ") && setSelected(request)}>
-              <div className="ca-summary-card__top"><span className="ca-summary-card__icon"><AccountIcon name="request" size={20} /></span><AccountStatus value={request.status} label={readable(request.status)} /></div>
-              <small>{shortDate(request.createdAt)} · {request.location || "No location"}</small>
-              <h3>{readable(request.requestType || "Custom request")}</h3>
-              <p className="ca-clamp-3">{request.message}</p>
-              <div className="ca-summary-card__values"><span>Budget <b>{formatMoney(request.budget)}</b></span><span>Quotation <b>{formatMoney(request.quotation)}</b></span></div>
-              <div className="ca-summary-card__footer"><span>{request.assignedTo || "Not assigned"}</span><b>View details <AccountIcon name="chevron" size={15} /></b></div>
-            </article>
-          ))}
-        </div>
-        <SmartPagination pagination={pagination} label="requests" compact />
-      </>}
-
-      <AccountModal open={Boolean(selected)} onClose={() => setSelected(null)} title={readable(selected?.requestType || "Request details")} eyebrow="Request details" icon="request" size="large">
-        {selected && <>
-          <div className="ca-modal-summary-row"><div><span>Status</span><AccountStatus value={selected.status} label={readable(selected.status)} /></div><div><span>Budget</span><strong>{formatMoney(selected.budget)}</strong></div><div><span>Quotation</span><strong>{formatMoney(selected.quotation)}</strong></div></div>
-          <section className="ca-modal-section"><h3>Your requirement</h3><div className="ca-note ca-note--large"><p>{selected.message}</p></div></section>
-          <section className="ca-modal-section"><h3>Request information</h3><AccountDetailGrid items={[
-            { label: "Created", value: shortDate(selected.createdAt) }, { label: "Location", value: selected.location || "Not provided" }, { label: "Phone", value: selected.phone || "Not provided" }, { label: "Assigned to", value: selected.assignedTo || "Not assigned" }, { label: "Current status", value: readable(selected.status) },
-          ]} /></section>
-          {selected.adminNote && <div className="ca-note ca-note--accent"><strong>SmartSell note</strong><p>{selected.adminNote}</p></div>}
-          <div className="ca-modal-actions">
-            {selected.status === "quoted" && <button className="ca-button ca-button--primary" type="button" onClick={() => updateRequest(selected.id, "accepted")}>Accept quotation</button>}
-            <ContextMessageButton contextType="request" contextId={selected.id} subject={`Request discussion: ${readable(selected.requestType || "Custom request")}`} message={`Hi SmartSell team, I want to discuss this request: ${readable(selected.requestType || "Custom request")}.`} label="Message SmartSell" className="ca-button ca-button--soft" />
-            {["new", "pending", "quoted", "accepted"].includes(selected.status) && <button className="ca-button ca-button--danger" type="button" onClick={() => updateRequest(selected.id, "cancelled")}>Cancel request</button>}
-          </div>
-        </>}
-      </AccountModal>
-    </section>
-  );
+export default function MyRequests() {
+  const { user } = useAuth();
+  const businessMode = ["seller", "shop", "shop_seller", "service_provider"].includes(user?.role);
+  return businessMode ? <BusinessRequestsView user={user} /> : <CustomerRequestsView />;
 }
