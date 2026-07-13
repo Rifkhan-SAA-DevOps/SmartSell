@@ -1,0 +1,43 @@
+:where(.smart-form, .ss-form) {
+  display: grid;
+  gap: 16px;
+}
+:where(.smart-form label, .ss-form label, .form-field) {
+  display: grid;
+  gap: 8px;
+  color: var(--ss-text-soft);
+  font-weight: 650;
+}
+:where(.smart-form input, .smart-form select, .smart-form textarea, .ss-form input, .ss-form select, .ss-form textarea, .form-field input, .form-field select, .form-field textarea) {
+  width: 100%;
+  min-height: 46px;
+  border-radius: var(--ss-radius-sm);
+  border: 1px solid #dbe3ef;
+  background: #f8fbff;
+  padding: 0 14px;
+  color: var(--ss-text);
+  font: inherit;
+}
+:where(.smart-form textarea, .ss-form textarea, .form-field textarea) {
+  min-height: 130px;
+  padding: 14px;
+  resize: vertical;
+}
+:where(.smart-form input, .smart-form select, .smart-form textarea, .ss-form input, .ss-form select, .ss-form textarea):focus {
+  outline: none;
+  border-color: var(--ss-primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+:where(.form-row, .ss-form-row) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.form-status {
+  margin: 0;
+  color: var(--ss-primary);
+  font-weight: 650;
+}
+@media (max-width: 720px) {
+  :where(.form-row, .ss-form-row) { grid-template-columns: 1fr; }
+}

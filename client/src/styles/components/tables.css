@@ -1,0 +1,29 @@
+:where(.table-wrap, .ss-table-wrap, .admin-table-wrap) {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--ss-radius-lg);
+  border: 1px solid var(--ss-border);
+  background: #fff;
+}
+:where(table, .ss-table) {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+:where(table, .ss-table) th {
+  color: #475569;
+  background: #f8fafc;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+:where(table, .ss-table) th,
+:where(table, .ss-table) td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  white-space: nowrap;
+}
+:where(table, .ss-table) tr:last-child td { border-bottom: 0; }
+:where(.clickable-row, tr[role="button"]) { cursor: pointer; }
+:where(.clickable-row, tr[role="button"]):hover td { background: #f8fbff; }

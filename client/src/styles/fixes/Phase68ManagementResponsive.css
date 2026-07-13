@@ -1,0 +1,363 @@
+/* Phase 68: Management workspace responsive polish
+   Keep this scoped to the management shell. Do not move page-specific rules into global.css. */
+
+.management-shell {
+  --mgmt-sidebar-width: 286px;
+  --mgmt-sidebar-collapsed: 86px;
+  --mgmt-page-max: 1380px;
+  --mgmt-card-bg: #ffffff;
+  --mgmt-border: rgba(15, 23, 42, 0.1);
+  --mgmt-soft-border: rgba(148, 163, 184, 0.24);
+  --mgmt-muted: #64748b;
+  --mgmt-text: #0f172a;
+  --mgmt-primary: #0f766e;
+  --mgmt-primary-dark: #0f172a;
+  background:
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.10), transparent 34rem),
+    linear-gradient(180deg, #f8fafc 0%, #eef6f8 100%);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.management-shell .management-sidebar {
+  width: var(--mgmt-sidebar-width);
+  min-width: var(--mgmt-sidebar-width);
+  margin: 0;
+  border-radius: 0;
+  height: 100vh;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  overflow: hidden;
+  box-shadow: 18px 0 45px rgba(15, 23, 42, 0.12);
+}
+
+.management-shell.sidebar-collapsed .management-sidebar {
+  width: var(--mgmt-sidebar-collapsed);
+  min-width: var(--mgmt-sidebar-collapsed);
+}
+
+.management-shell .sidebar-scroll-area {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  padding-bottom: 1rem;
+}
+
+.management-shell .management-workspace {
+  min-width: 0;
+  flex: 1 1 auto;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.management-shell .workspace-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 72px;
+  padding: 0.85rem clamp(1rem, 2vw, 1.75rem);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.management-shell .management-main-content {
+  width: 100%;
+  max-width: var(--mgmt-page-max);
+  margin: 0 auto;
+  padding: clamp(1rem, 2.1vw, 2rem);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Management pages: default to clean vertical stacking. */
+.management-main-content .admin-ops-page,
+.management-main-content .account-management-page,
+.management-main-content .listing-admin-page,
+.management-main-content .delivery-management-page,
+.management-main-content .report-page,
+.management-main-content .growth-page,
+.management-main-content .settings-page,
+.management-main-content .content-manager-page,
+.management-main-content .seo-settings-page,
+.management-main-content .security-center-page,
+.management-main-content .business-dashboard-page,
+.management-main-content .seller-hub-page,
+.management-main-content .finance-page,
+.management-main-content .delivery-dashboard-page,
+.management-main-content .profile-settings-page {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* Replace squeezed multi-column layouts with strong vertical sections where pages are dense. */
+.management-main-content .um-command-grid,
+.management-main-content .um-workspace-grid,
+.management-main-content .management-grid,
+.management-main-content .finance-layout-grid,
+.management-main-content .delivery-dashboard-grid,
+.management-main-content .report-grid-two,
+.management-main-content .growth-grid,
+.management-main-content .content-grid,
+.management-main-content .security-grid,
+.management-main-content .settings-grid,
+.management-main-content .profile-settings-grid,
+.management-main-content .business-request-grid,
+.management-main-content .admin-request-grid,
+.management-main-content .ops-request-grid,
+.management-main-content .listing-filter-grid,
+.management-main-content .fulfillment-form-grid {
+  display: grid;
+  grid-template-columns: 1fr !important;
+  gap: 1rem !important;
+  align-items: stretch;
+}
+
+/* Stats can stay side-by-side, but with sane minimum widths and wrapping. */
+.management-main-content .stats-grid,
+.management-main-content .stat-grid,
+.management-main-content .compact-stat-grid,
+.management-main-content .ops-metric-grid,
+.management-main-content .business-stats-grid,
+.management-main-content .finance-stat-grid,
+.management-main-content .fulfillment-kpi-grid,
+.management-main-content .delivery-kpi-grid,
+.management-main-content .report-metric-grid,
+.management-main-content .report-mini-grid,
+.management-main-content .security-stats-grid,
+.management-main-content .um-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)) !important;
+  gap: 1rem !important;
+}
+
+/* Cards/panels should not be compressed by parent grid rules. */
+.management-main-content .admin-table,
+.management-main-content .business-panel,
+.management-main-content .seller-panel,
+.management-main-content .management-panel,
+.management-main-content .panel-card,
+.management-main-content .content-edit-card,
+.management-main-content .content-preview-card,
+.management-main-content .settings-group-card,
+.management-main-content .seo-edit-card,
+.management-main-content .seo-preview-card,
+.management-main-content .report-panel,
+.management-main-content .finance-table-panel,
+.management-main-content .coupon-table-panel,
+.management-main-content .um-create-card,
+.management-main-content .um-filter-card,
+.management-main-content .um-directory-panel,
+.management-main-content .um-detail-panel,
+.management-main-content .listing-filter-panel,
+.management-main-content .fulfillment-card,
+.management-main-content .delivery-assign-card,
+.management-main-content .auth-card,
+.management-main-content .profile-panel {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--mgmt-soft-border);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.08);
+  box-sizing: border-box;
+}
+
+/* Dense listing/admin cards should have predictable width and not stretch awkwardly. */
+.management-main-content .listing-admin-grid,
+.management-main-content .business-list,
+.management-main-content .offer-grid,
+.management-main-content .category-admin-list {
+  display: grid;
+  grid-template-columns: 1fr !important;
+  gap: 1rem !important;
+}
+
+.management-main-content .listing-admin-card,
+.management-main-content .business-list-card,
+.management-main-content .offer-card,
+.management-main-content .category-admin-item,
+.management-main-content .fulfillment-card,
+.management-main-content .delivery-task-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Forms: below/below on smaller areas; at wide size allow two columns only for simple field groups. */
+.management-main-content .form-row,
+.management-main-content .form-grid,
+.management-main-content .form-two,
+.management-main-content .content-field-grid,
+.management-main-content .seo-field-grid,
+.management-main-content .um-form-grid,
+.management-main-content .filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.management-main-content input,
+.management-main-content select,
+.management-main-content textarea {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Tables: never shrink text columns into unreadable columns. */
+.management-main-content .responsive-table-wrap,
+.management-main-content .table-scroll,
+.management-main-content .table-shell,
+.management-main-content .admin-table,
+.management-main-content .finance-table-panel,
+.management-main-content .coupon-table-panel,
+.management-main-content .table-panel {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.management-main-content table,
+.management-main-content .smart-table,
+.management-main-content .professional-table,
+.management-main-content .audit-table,
+.management-main-content .report-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.management-main-content th,
+.management-main-content td {
+  white-space: nowrap;
+}
+
+.management-main-content td.wrap-cell,
+.management-main-content .muted-table-text {
+  white-space: normal;
+  min-width: 220px;
+}
+
+/* Make page headers neat and not too wide. */
+.management-main-content .dashboard-hero,
+.management-main-content .admin-hero,
+.management-main-content .management-page-header,
+.management-main-content .settings-header-card,
+.management-main-content .um-hero-panel,
+.management-main-content .fulfillment-toolbar,
+.management-main-content .business-top-actions {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: 26px;
+}
+
+/* Responsive behavior */
+@media (max-width: 1180px) {
+  .management-shell .management-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 120;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+    width: min(320px, 88vw);
+    min-width: min(320px, 88vw);
+  }
+
+  .management-shell .management-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .management-shell.sidebar-collapsed .management-sidebar {
+    width: min(320px, 88vw);
+    min-width: min(320px, 88vw);
+  }
+
+  .management-shell .management-workspace {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .management-shell .mobile-sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .management-shell .management-main-content {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 1181px) {
+  .management-shell .mobile-sidebar-toggle {
+    display: none !important;
+  }
+
+  .management-shell .sidebar-mobile-close,
+  .management-shell .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .management-shell .workspace-topbar {
+    min-height: 64px;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .management-shell .workspace-title-block strong {
+    font-size: 0.95rem;
+  }
+
+  .management-shell .workspace-title-block small {
+    font-size: 0.75rem;
+  }
+
+  .management-shell .management-main-content {
+    padding: 0.85rem;
+  }
+
+  .management-main-content .stats-grid,
+  .management-main-content .stat-grid,
+  .management-main-content .compact-stat-grid,
+  .management-main-content .ops-metric-grid,
+  .management-main-content .business-stats-grid,
+  .management-main-content .finance-stat-grid,
+  .management-main-content .fulfillment-kpi-grid,
+  .management-main-content .delivery-kpi-grid,
+  .management-main-content .report-metric-grid,
+  .management-main-content .report-mini-grid,
+  .management-main-content .security-stats-grid,
+  .management-main-content .um-stat-grid,
+  .management-main-content .form-row,
+  .management-main-content .form-grid,
+  .management-main-content .form-two,
+  .management-main-content .content-field-grid,
+  .management-main-content .seo-field-grid,
+  .management-main-content .um-form-grid,
+  .management-main-content .filter-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .management-main-content table,
+  .management-main-content .smart-table,
+  .management-main-content .professional-table,
+  .management-main-content .audit-table,
+  .management-main-content .report-table {
+    min-width: 760px;
+  }
+}

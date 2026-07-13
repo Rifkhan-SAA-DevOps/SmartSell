@@ -1,0 +1,590 @@
+/* Phase 57 admin workspace UI system. Scoped to admin/management page roots only. */
+.admin-ops-page,
+.um-page,
+.listing-management-page,
+.fulfillment-page,
+.report-page,
+.promotion-center-page,
+.settings-page,
+.content-manager-page,
+.seo-settings-page,
+.security-center-page {
+  --admin-ink: #0f172a;
+  --admin-muted: #64748b;
+  --admin-border: #e2e8f0;
+  --admin-soft: #f8fafc;
+  --admin-card: #ffffff;
+  --admin-primary: #2563eb;
+  --admin-primary-dark: #1d4ed8;
+  --admin-teal: #0f766e;
+  --admin-danger: #dc2626;
+  --admin-success: #16a34a;
+  --admin-warning: #d97706;
+  width: min(100%, 1440px);
+  margin-inline: auto;
+  padding: clamp(18px, 2.2vw, 32px);
+  color: var(--admin-ink);
+}
+
+.admin-ops-page *,
+.um-page *,
+.listing-management-page *,
+.fulfillment-page *,
+.report-page *,
+.promotion-center-page *,
+.settings-page *,
+.content-manager-page *,
+.seo-settings-page *,
+.security-center-page * {
+  box-sizing: border-box;
+}
+
+.admin-ops-page .eyebrow,
+.um-page .eyebrow,
+.listing-management-page .eyebrow,
+.report-page .eyebrow,
+.settings-page .eyebrow,
+.content-manager-page .eyebrow,
+.seo-settings-page .eyebrow,
+.security-center-page .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-ops-page h1,
+.um-page h1,
+.listing-management-page h1,
+.fulfillment-page h1,
+.report-page h1,
+.promotion-center-page h1,
+.settings-page h1,
+.content-manager-page h1,
+.seo-settings-page h1,
+.security-center-page h1 {
+  margin: 12px 0 8px;
+  color: #07142b;
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.admin-ops-page p,
+.um-page p,
+.listing-management-page p,
+.fulfillment-page p,
+.report-page p,
+.promotion-center-page p,
+.settings-page p,
+.content-manager-page p,
+.seo-settings-page p,
+.security-center-page p {
+  color: var(--admin-muted);
+  line-height: 1.65;
+}
+
+.admin-ops-page .primary-btn,
+.um-page .primary-btn,
+.listing-management-page .primary-btn,
+.fulfillment-page .primary-btn,
+.report-page .primary-btn,
+.promotion-center-page .primary-btn,
+.settings-page .primary-btn,
+.content-manager-page .primary-btn,
+.seo-settings-page .primary-btn,
+.security-center-page .primary-btn,
+.admin-ops-page .btn,
+.listing-management-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+  color: #fff;
+  padding: 11px 16px;
+  font-weight: 850;
+  text-decoration: none;
+  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.18);
+  cursor: pointer;
+}
+
+.admin-ops-page .secondary-btn,
+.um-page .secondary-btn,
+.listing-management-page .secondary-btn,
+.fulfillment-page .secondary-btn,
+.report-page .secondary-btn,
+.promotion-center-page .secondary-btn,
+.settings-page .secondary-btn,
+.content-manager-page .secondary-btn,
+.seo-settings-page .secondary-btn,
+.security-center-page .secondary-btn,
+.um-page .ghost-btn,
+.listing-management-page .btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 13px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  padding: 10px 14px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-ops-page .small-btn,
+.um-page .small-btn,
+.listing-management-page .small-btn,
+.fulfillment-page .small-btn,
+.promotion-center-page .small-btn {
+  min-height: 34px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.admin-ops-page .approve-btn,
+.fulfillment-page .approve-btn,
+.um-page .approve-btn {
+  border: 0;
+  border-radius: 11px;
+  background: #dcfce7;
+  color: #166534;
+  padding: 9px 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.admin-ops-page .reject-btn,
+.fulfillment-page .reject-btn,
+.um-page .danger-btn,
+.um-page .reject-btn {
+  border: 0;
+  border-radius: 11px;
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 9px 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.admin-ops-page input,
+.admin-ops-page select,
+.admin-ops-page textarea,
+.um-page input,
+.um-page select,
+.um-page textarea,
+.listing-management-page input,
+.listing-management-page select,
+.listing-management-page textarea,
+.fulfillment-page input,
+.fulfillment-page select,
+.fulfillment-page textarea,
+.report-page input,
+.report-page select,
+.report-page textarea,
+.promotion-center-page input,
+.promotion-center-page select,
+.promotion-center-page textarea,
+.settings-page input,
+.settings-page select,
+.settings-page textarea,
+.content-manager-page input,
+.content-manager-page select,
+.content-manager-page textarea,
+.seo-settings-page input,
+.seo-settings-page select,
+.seo-settings-page textarea,
+.security-center-page input,
+.security-center-page select,
+.security-center-page textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #dbe4ef;
+  border-radius: 14px;
+  background: #fff;
+  color: #0f172a;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.admin-ops-page textarea,
+.um-page textarea,
+.listing-management-page textarea,
+.fulfillment-page textarea,
+.promotion-center-page textarea,
+.settings-page textarea,
+.content-manager-page textarea,
+.seo-settings-page textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.admin-ops-page input:focus,
+.admin-ops-page select:focus,
+.admin-ops-page textarea:focus,
+.um-page input:focus,
+.um-page select:focus,
+.um-page textarea:focus,
+.listing-management-page input:focus,
+.listing-management-page select:focus,
+.listing-management-page textarea:focus,
+.fulfillment-page input:focus,
+.fulfillment-page select:focus,
+.fulfillment-page textarea:focus,
+.promotion-center-page input:focus,
+.promotion-center-page select:focus,
+.promotion-center-page textarea:focus,
+.settings-page input:focus,
+.settings-page select:focus,
+.settings-page textarea:focus,
+.content-manager-page input:focus,
+.content-manager-page select:focus,
+.content-manager-page textarea:focus,
+.seo-settings-page input:focus,
+.seo-settings-page select:focus,
+.seo-settings-page textarea:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+}
+
+.admin-ops-page .status-pill,
+.listing-management-page .status-pill,
+.fulfillment-page .status-pill,
+.report-page .status-pill,
+.security-center-page .pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.admin-ops-page .status-approved,
+.listing-management-page .status-approved,
+.fulfillment-page .status-delivered,
+.fulfillment-page .status-paid {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #047857;
+}
+
+.admin-ops-page .status-pending,
+.listing-management-page .status-pending,
+.fulfillment-page .status-pending,
+.fulfillment-page .status-unpaid,
+.fulfillment-page .status-not-assigned {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.admin-ops-page .status-rejected,
+.listing-management-page .status-rejected,
+.fulfillment-page .status-cancelled,
+.fulfillment-page .status-failed {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.admin-ops-page .smart-table,
+.report-page .smart-table,
+.security-center-page .professional-table,
+.promotion-center-page table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-ops-page .smart-table th,
+.admin-ops-page .smart-table td,
+.report-page .smart-table th,
+.report-page .smart-table td,
+.security-center-page .professional-table th,
+.security-center-page .professional-table td,
+.promotion-center-page th,
+.promotion-center-page td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5edf7;
+  vertical-align: top;
+  text-align: left;
+}
+
+.admin-ops-page .smart-table th,
+.report-page .smart-table th,
+.security-center-page .professional-table th,
+.promotion-center-page th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.admin-ops-page .table-scroll,
+.report-page .table-scroll,
+.security-center-page .table-shell,
+.promotion-center-page .responsive-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.admin-ops-page .form-alert,
+.admin-ops-page .success-alert,
+.um-page .um-toast,
+.listing-management-page .alert,
+.fulfillment-page .form-alert,
+.promotion-center-page .success-alert,
+.settings-page .success-banner,
+.settings-page .error-banner,
+.content-manager-page .success-banner,
+.content-manager-page .error-banner,
+.seo-settings-page .success-banner,
+.seo-settings-page .error-banner,
+.security-center-page .alert {
+  border-radius: 16px;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  padding: 13px 15px;
+  font-weight: 750;
+}
+
+.admin-ops-page .success-alert,
+.settings-page .success-banner,
+.content-manager-page .success-banner,
+.seo-settings-page .success-banner,
+.listing-management-page .alert-success {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #065f46;
+}
+
+.settings-page .error-banner,
+.content-manager-page .error-banner,
+.seo-settings-page .error-banner,
+.security-center-page .error-alert,
+.listing-management-page .alert-error,
+.report-page .form-status.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+@media (max-width: 1100px) {
+  .admin-ops-page,
+  .um-page,
+  .listing-management-page,
+  .fulfillment-page,
+  .report-page,
+  .promotion-center-page,
+  .settings-page,
+  .content-manager-page,
+  .seo-settings-page,
+  .security-center-page {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-ops-page,
+  .um-page,
+  .listing-management-page,
+  .fulfillment-page,
+  .report-page,
+  .promotion-center-page,
+  .settings-page,
+  .content-manager-page,
+  .seo-settings-page,
+  .security-center-page {
+    padding: 14px;
+  }
+
+  .admin-ops-page .primary-btn,
+  .admin-ops-page .secondary-btn,
+  .um-page .primary-btn,
+  .um-page .secondary-btn,
+  .listing-management-page .primary-btn,
+  .listing-management-page .secondary-btn,
+  .fulfillment-page .primary-btn,
+  .fulfillment-page .secondary-btn,
+  .promotion-center-page .primary-btn,
+  .promotion-center-page .secondary-btn {
+    width: 100%;
+  }
+}
+
+/* Phase 58: Stack-below responsive rule.
+   Management pages should not squeeze two panels side-by-side.
+   Main sections stack vertically; tables scroll horizontally instead of shrinking. */
+.admin-ops-page,
+.um-page,
+.listing-management-page,
+.fulfillment-page,
+.report-page,
+.promotion-center-page,
+.settings-page,
+.content-manager-page,
+.seo-settings-page,
+.security-center-page {
+  width: min(100% - 28px, 1180px) !important;
+  padding: clamp(14px, 2vw, 24px) !important;
+}
+
+.admin-ops-page .page-heading-row,
+.um-page .um-page-header,
+.listing-management-page .listing-hero,
+.fulfillment-page .fulfillment-hero,
+.report-page .report-hero,
+.security-center-page .security-hero,
+.settings-page .settings-grid,
+.content-manager-page .content-grid,
+.seo-settings-page .seo-field-grid,
+.security-center-page .two-col-grid,
+.report-page .report-grid-two,
+.promotion-center-page .growth-grid,
+.promotion-center-page .growth-list-grid,
+.um-page .um-workspace-grid,
+.admin-ops-page .admin-main-grid,
+.listing-management-page .listing-filter-grid,
+.fulfillment-page .fulfillment-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+}
+
+.admin-ops-page .admin-metric-grid,
+.admin-ops-page .admin-action-grid,
+.um-page .um-stat-grid,
+.listing-management-page .listing-stats-grid,
+.report-page .report-metric-grid,
+.report-page .report-mini-grid,
+.fulfillment-page .fulfillment-stat-grid,
+.security-center-page .security-stats-grid,
+.promotion-center-page .form-two,
+.um-page .um-form-grid.two,
+.um-page .um-form-grid.three {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+  gap: 14px !important;
+}
+
+.admin-ops-page .admin-card,
+.admin-ops-page .panel,
+.um-page .panel,
+.um-page .um-panel,
+.listing-management-page .listing-card,
+.fulfillment-page .fulfillment-card,
+.report-page .report-card,
+.promotion-center-page .growth-card,
+.settings-page .settings-card,
+.content-manager-page .content-card,
+.seo-settings-page .seo-card,
+.security-center-page .security-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-ops-page table,
+.um-page table,
+.listing-management-page table,
+.fulfillment-page table,
+.report-page table,
+.promotion-center-page table,
+.settings-page table,
+.content-manager-page table,
+.seo-settings-page table,
+.security-center-page table {
+  width: 100% !important;
+  min-width: 760px !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.admin-ops-page .table-wrap,
+.admin-ops-page .table-shell,
+.admin-ops-page .admin-table-wrap,
+.um-page .table-wrap,
+.um-page .table-shell,
+.um-page .admin-table-wrap,
+.listing-management-page .table-wrap,
+.listing-management-page .table-shell,
+.fulfillment-page .table-wrap,
+.fulfillment-page .table-shell,
+.report-page .table-wrap,
+.report-page .table-shell,
+.promotion-center-page .table-wrap,
+.promotion-center-page .table-shell,
+.security-center-page .table-wrap,
+.security-center-page .table-shell,
+.admin-ops-page .responsive-table,
+.um-page .responsive-table,
+.report-page .responsive-table,
+.security-center-page .responsive-table {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+@media (max-width: 760px) {
+  .admin-ops-page,
+  .um-page,
+  .listing-management-page,
+  .fulfillment-page,
+  .report-page,
+  .promotion-center-page,
+  .settings-page,
+  .content-manager-page,
+  .seo-settings-page,
+  .security-center-page {
+    width: min(100% - 18px, 1180px) !important;
+    padding: 12px 0 28px !important;
+  }
+
+  .admin-ops-page .admin-metric-grid,
+  .admin-ops-page .admin-action-grid,
+  .um-page .um-stat-grid,
+  .listing-management-page .listing-stats-grid,
+  .report-page .report-metric-grid,
+  .report-page .report-mini-grid,
+  .fulfillment-page .fulfillment-stat-grid,
+  .security-center-page .security-stats-grid,
+  .promotion-center-page .form-two,
+  .um-page .um-form-grid.two,
+  .um-page .um-form-grid.three {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -1,0 +1,13 @@
+.app-main,
+.management-main,
+.customer-main {
+  min-width: 0;
+}
+.page,
+.section {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .page,
+  .section { overflow-x: clip; }
+}

@@ -1,0 +1,132 @@
+.um-page .um-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 20px;
+  align-items: stretch;
+  border: 1px solid #dbeafe;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(14, 165, 233, .16), transparent 38%),
+    linear-gradient(135deg, #fff 0%, #f8fbff 100%);
+  box-shadow: 0 26px 70px rgba(15, 23, 42, .08);
+  padding: clamp(22px, 3vw, 36px);
+  margin-bottom: 22px;
+}
+
+.um-page .um-hero-panel,
+.um-page .um-create-card,
+.um-page .um-filter-card,
+.um-page .um-directory-panel,
+.um-page .um-detail-panel,
+.um-page .um-action-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, .07);
+}
+
+.um-page .um-hero-panel {
+  padding: 18px;
+  background: #0f172a;
+  color: #fff;
+}
+
+.um-page .um-hero-icon,
+.um-page .um-stat-icon,
+.um-page .um-card-icon,
+.um-page .um-action-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 950;
+}
+
+.um-page .um-stat-grid,
+.um-page .um-command-grid,
+.um-page .um-action-grid,
+.um-page .um-detail-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.um-page .um-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.15fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.um-page .um-create-card,
+.um-page .um-filter-card,
+.um-page .um-directory-panel,
+.um-page .um-detail-panel {
+  padding: 18px;
+}
+
+.um-page .um-form-grid.two,
+.um-page .um-form-grid.three {
+  display: grid;
+  gap: 12px;
+}
+.um-page .um-form-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.um-page .um-form-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.um-page .um-directory-list {
+  display: grid;
+  gap: 10px;
+  max-height: 620px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.um-page .um-user-row-main {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  padding: 12px;
+}
+
+.um-page .um-user-row-meta,
+.um-page .um-profile-status,
+.um-page .um-button-row,
+.um-page .um-filter-actions,
+.um-page .um-form-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.um-page .um-profile-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.um-page .um-detail-metric,
+.um-page .um-action-card {
+  padding: 15px;
+}
+
+@media (max-width: 1100px) {
+  .um-page .um-hero,
+  .um-page .um-workspace-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .um-page .um-form-grid.two,
+  .um-page .um-form-grid.three,
+  .um-page .um-user-row-main { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,345 @@
+/* Phase 67 — scoped customer/navbar polish
+   Standalone navbar styles only. Do not import page CSS here. */
+.customer-nav-shell {
+  position: sticky;
+  top: 12px;
+  z-index: 80;
+  width: min(1240px, calc(100% - 28px));
+  margin: 12px auto 0;
+}
+.customer-nav {
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 10px 18px;
+  border: 1px solid rgba(226, 232, 240, .95);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, .10);
+}
+.customer-brand { display: inline-flex; align-items: center; min-width: 156px; }
+.customer-brand img { width: 158px; height: 46px; object-fit: contain; object-position: left center; display: block; }
+.customer-nav-links {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+}
+.customer-nav-links a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #334155;
+  font-size: .9rem;
+  font-weight: 850;
+  white-space: nowrap;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.customer-nav-links a:hover,
+.customer-nav-links a.active {
+  color: #075985;
+  background: linear-gradient(135deg, #eff6ff, #ecfeff);
+}
+.customer-nav-actions,
+.customer-auth-actions,
+.customer-account-menu { display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+.customer-icon-button,
+.customer-cart-link,
+.customer-login-btn,
+.customer-register-btn,
+.customer-account-pill,
+.customer-logout {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+  font-size: .86rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.customer-icon-button { position: relative; width: 40px; padding: 0; }
+.customer-icon-button svg,
+.customer-cart-link svg,
+.customer-menu-toggle svg,
+.mobile-sidebar-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.customer-icon-button b,
+.customer-cart-link b {
+  min-width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: #0f766e;
+  color: #fff;
+  font-size: .68rem;
+  line-height: 1;
+}
+.customer-icon-button b { position: absolute; right: -4px; top: -5px; }
+.customer-cart-link { padding: 0 12px; background: #f8fafc; }
+.customer-login-btn { padding: 0 15px; }
+.customer-register-btn {
+  padding: 0 17px;
+  border-color: transparent;
+  color: #fff;
+  background: linear-gradient(135deg, #0f172a, #2563eb 58%, #0891b2);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
+}
+.customer-account-pill { max-width: 170px; padding: 0 10px 0 5px; background: #f8fafc; }
+.customer-account-pill span {
+  width: 31px;
+  height: 31px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 99px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  font-size: .8rem;
+}
+.customer-account-pill em { max-width: 110px; overflow: hidden; text-overflow: ellipsis; font-style: normal; }
+.customer-logout { padding: 0 14px; color: #b91c1c; background: #fff5f5; border-color: #fecaca; }
+.customer-menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  color: #0f172a;
+}
+.customer-nav-backdrop { display: none; }
+
+/* Management topbar remains separate and clean. */
+.management-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+  padding: 12px 22px;
+  border-bottom: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(18px);
+}
+.management-nav-left { display: inline-flex; align-items: center; gap: 12px; min-width: 0; }
+.workspace-title-block { min-width: 0; }
+.workspace-title-block b { display: block; color: #0f172a; font-size: .96rem; }
+.workspace-title-block span { display: block; color: #64748b; font-size: .78rem; font-weight: 700; }
+.workspace-title-icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #0f172a, #2563eb);
+  font-weight: 900;
+}
+.workspace-actions { display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.realtime-dot { width: 9px; height: 9px; border-radius: 99px; background: #16a34a; box-shadow: 0 0 0 4px rgba(22,163,74,.14); }
+.mobile-sidebar-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+@media (max-width: 1060px) {
+  .customer-nav { grid-template-columns: auto auto; }
+  .customer-nav-links,
+  .customer-nav-actions { display: none; }
+  .customer-menu-toggle { display: inline-flex; justify-self: end; }
+  .customer-nav.menu-open .customer-nav-links,
+  .customer-nav.menu-open .customer-nav-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    width: 100%;
+    justify-content: stretch;
+  }
+  .customer-nav.menu-open .customer-nav-links { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 10px; }
+  .customer-nav.menu-open .customer-nav-links a { justify-content: center; background: #f8fafc; }
+  .customer-nav.menu-open .customer-nav-actions { justify-items: stretch; gap: 10px; }
+  .customer-auth-actions,
+  .customer-account-menu { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+  .customer-account-pill,
+  .customer-logout,
+  .customer-login-btn,
+  .customer-register-btn { width: 100%; }
+}
+@media (max-width: 720px) {
+  .customer-nav-shell { width: min(100% - 18px, 1240px); top: 8px; margin-top: 8px; }
+  .customer-nav { border-radius: 18px; padding: 8px 10px 8px 12px; }
+  .customer-brand { min-width: 128px; }
+  .customer-brand img { width: 132px; height: 42px; }
+  .customer-nav.menu-open .customer-nav-links { grid-template-columns: 1fr; }
+  .customer-auth-actions,
+  .customer-account-menu { grid-template-columns: 1fr; }
+  .management-nav { min-height: 62px; padding: 10px 14px; }
+  .mobile-sidebar-toggle { display: inline-flex; }
+  .workspace-actions { gap: 6px; }
+}
+
+/* Phase 71 — customer mobile navigation + navbar reliability
+   Keep this scoped to the customer navbar. Do not move to global.css. */
+.customer-bottom-nav {
+  display: none;
+}
+
+.customer-nav.menu-open {
+  align-items: start;
+}
+
+.customer-nav.menu-open .customer-nav-links.open,
+.customer-nav.menu-open .customer-nav-actions {
+  animation: customerMenuReveal .16s ease both;
+}
+
+@keyframes customerMenuReveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.customer-bottom-nav svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 760px) {
+  .public-shell {
+    padding-bottom: 82px;
+  }
+
+  .customer-nav-shell {
+    top: 8px;
+  }
+
+  .customer-nav {
+    min-height: 60px;
+    box-shadow: 0 14px 36px rgba(15, 23, 42, .10);
+  }
+
+  .customer-bottom-nav {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    z-index: 95;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+    padding: 7px;
+    border: 1px solid rgba(226, 232, 240, .94);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .96);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .20);
+  }
+
+  .customer-bottom-nav a {
+    position: relative;
+    min-width: 0;
+    min-height: 54px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 16px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: -.01em;
+  }
+
+  .customer-bottom-nav a.active {
+    color: #0f766e;
+    background: linear-gradient(135deg, #ecfeff, #eff6ff);
+  }
+
+  .customer-bottom-nav a b {
+    position: absolute;
+    top: 5px;
+    right: 14px;
+    min-width: 17px;
+    height: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: #0f766e;
+    color: #fff;
+    font-size: .62rem;
+    line-height: 1;
+    box-shadow: 0 6px 14px rgba(15, 118, 110, .25);
+  }
+
+  .customer-menu-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .customer-nav.menu-open .customer-nav-links,
+  .customer-nav.menu-open .customer-nav-actions {
+    border-top: 1px solid rgba(226, 232, 240, .9);
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .customer-bottom-nav {
+    left: 7px;
+    right: 7px;
+    bottom: 7px;
+    border-radius: 18px;
+  }
+
+  .customer-bottom-nav a {
+    min-height: 50px;
+    font-size: .62rem;
+  }
+
+  .customer-bottom-nav svg {
+    width: 18px;
+    height: 18px;
+  }
+}

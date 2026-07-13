@@ -1,0 +1,587 @@
+
+/*
+  Phase 89 — Customer-side final UI repair
+  Scope: customer/public journey only.
+  This file intentionally avoids admin/business/sidebar selectors.
+*/
+
+/* ---------- Customer foundation safety ---------- */
+
+.customer-home-page,
+.customer-feed-page,
+.ms-discovery-page,
+.request-showcase-page,
+.cart-page,
+.checkout-page,
+.orders-page,
+.dashboard-page,
+.product-detail-page,
+.service-detail-page,
+.wishlist-page,
+.my-reviews-page,
+.notifications-page,
+.inbox-page,
+.support-page,
+.profile-page {
+  color: #0f172a;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.06), transparent 30%),
+    radial-gradient(circle at 92% 4%, rgba(124, 58, 237, 0.055), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 34%, #f8fbff 100%);
+}
+
+.customer-home-page *,
+.customer-feed-page *,
+.ms-discovery-page *,
+.request-showcase-page *,
+.cart-page *,
+.checkout-page *,
+.orders-page *,
+.dashboard-page *,
+.product-detail-page *,
+.service-detail-page * {
+  box-sizing: border-box;
+}
+
+/* ---------- Premium spacing rhythm ---------- */
+
+.customer-section-block,
+.customer-request-banner,
+.customer-stats-strip,
+.customer-feed-layout,
+.ms-content-shell,
+.request-showcase-shell,
+.cart-grid,
+.checkout-grid,
+.orders-list,
+.dashboard-grid,
+.product-detail-grid,
+.service-detail-grid {
+  width: min(100%, 1360px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.customer-section-block,
+.customer-request-banner,
+.ms-content-shell,
+.request-showcase-shell {
+  margin-top: clamp(22px, 3vw, 36px);
+}
+
+/* ---------- Remove childish emoji-like category feel ---------- */
+
+.customer-category-band a,
+.customer-work-grid article,
+.customer-stats-strip div,
+.customer-request-examples p {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+.customer-category-band span {
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.1));
+  border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+/* ---------- Professional customer hero ---------- */
+
+.customer-hero-section,
+.ms-discovery-hero {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  isolation: isolate;
+}
+
+.customer-hero-section::before,
+.ms-discovery-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: linear-gradient(180deg, black, transparent 78%);
+}
+
+.customer-hero-copy h1,
+.ms-hero-copy h1,
+.request-showcase-panel h1 {
+  font-weight: 850;
+  letter-spacing: -0.055em;
+}
+
+.customer-hero-copy p,
+.ms-hero-copy p,
+.request-showcase-panel p {
+  max-width: 820px;
+}
+
+/* ---------- Marketplace / Services repair ---------- */
+
+.ms-search-surface {
+  transform: translateY(0);
+}
+
+.ms-search-grid {
+  align-items: end;
+}
+
+.ms-search-grid .ms-actions {
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.ms-search-grid .ms-actions > button {
+  flex: 1 1 auto;
+  min-width: 110px;
+}
+
+.ms-field input,
+.ms-field select,
+.ms-price-grid input,
+.customer-feed-search-card input,
+.customer-feed-search-card select,
+.customer-field-label input,
+.customer-field-label select {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.ms-filter-panel,
+.ms-results-panel {
+  overflow: hidden;
+}
+
+.ms-filter-panel {
+  max-height: calc(100vh - 112px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.ms-filter-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ms-filter-panel::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 999px;
+}
+
+.ms-panel-header {
+  align-items: flex-start;
+}
+
+.ms-panel-header .ms-secondary-btn,
+.ms-filter-actions .ms-secondary-btn,
+.ms-filter-actions .ms-primary-btn {
+  white-space: nowrap;
+}
+
+.ms-category-row {
+  padding: 4px 0 2px;
+}
+
+.ms-category-pill,
+.ms-type-pill,
+.ms-chip {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.ms-grid.products,
+.ms-grid.services,
+.customer-product-grid,
+.customer-service-grid {
+  align-items: stretch;
+}
+
+/* ---------- Product/service cards: less toy, more commerce ---------- */
+
+.customer-product-card,
+.customer-service-card {
+  border-radius: 22px;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.09);
+}
+
+.customer-product-card:hover,
+.customer-service-card:hover {
+  transform: translateY(-4px);
+}
+
+.customer-card-media,
+.customer-service-media {
+  background:
+    linear-gradient(135deg, rgba(226, 232, 240, 0.8), rgba(241, 245, 249, 0.9));
+}
+
+.customer-card-body h3 {
+  min-height: 2.75em;
+}
+
+.customer-card-body p {
+  min-height: 5em;
+}
+
+.customer-listing-badge,
+.customer-featured-badge {
+  font-size: 0.72rem;
+  letter-spacing: 0.025em;
+}
+
+.customer-primary-action,
+.customer-outline-action {
+  min-height: 44px;
+  border-radius: 12px;
+}
+
+.customer-primary-action {
+  background: linear-gradient(135deg, #1d4ed8 0%, #4f46e5 100%);
+}
+
+.customer-card-info-grid span {
+  min-width: 0;
+}
+
+.customer-card-info-grid b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Detail pages ---------- */
+
+.product-detail-page,
+.service-detail-page {
+  padding: clamp(18px, 2.5vw, 32px);
+}
+
+.product-detail-grid,
+.service-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(20px, 3vw, 32px);
+  align-items: start;
+}
+
+.product-detail-card,
+.service-detail-card,
+.product-info-card,
+.service-info-card,
+.detail-summary-card,
+.detail-action-card,
+.quote-card,
+.review-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 46px rgba(15, 23, 42, 0.08);
+}
+
+.product-detail-card img,
+.service-detail-card img,
+.detail-media img {
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+  border-radius: 24px;
+}
+
+.detail-action-card,
+.detail-summary-card {
+  position: sticky;
+  top: 92px;
+}
+
+/* ---------- Cart / Checkout professional structure ---------- */
+
+.cart-page,
+.checkout-page,
+.orders-page,
+.dashboard-page {
+  padding: clamp(18px, 2.5vw, 32px);
+}
+
+.cart-grid,
+.checkout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+  gap: clamp(18px, 2.5vw, 28px);
+  align-items: start;
+}
+
+.cart-item,
+.checkout-card,
+.order-card,
+.dashboard-card,
+.summary-card,
+.payment-card,
+.address-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.075);
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+}
+
+.cart-item img {
+  width: 110px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+.cart-item h3,
+.order-card h3,
+.checkout-card h3,
+.dashboard-card h3 {
+  margin-top: 0;
+}
+
+.cart-actions,
+.checkout-actions,
+.order-actions,
+.dashboard-actions,
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.cart-actions button,
+.checkout-actions button,
+.order-actions button,
+.form-actions button,
+.primary-btn,
+.secondary-btn {
+  min-height: 44px;
+  border-radius: 12px;
+}
+
+/* ---------- Orders tracker ---------- */
+
+.order-card {
+  padding: 18px;
+}
+
+.order-status-row,
+.order-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.delivery-tracker,
+.status-tracker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.delivery-tracker span,
+.status-tracker span {
+  display: block;
+  min-height: 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.delivery-tracker .active,
+.status-tracker .active {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+/* ---------- Customer workflow pages ---------- */
+
+.request-form-shell,
+.request-showcase-panel,
+.support-panel,
+.inbox-panel,
+.notification-panel,
+.review-panel,
+.wishlist-panel {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.request-icon-card {
+  min-height: 156px;
+}
+
+.request-icon-card small {
+  min-height: 3.2em;
+}
+
+.request-submit-button {
+  min-width: 180px;
+}
+
+/* ---------- Forms ---------- */
+
+.smart-form,
+.pro-request-form,
+.request-form-shell form,
+.checkout-page form,
+.profile-page form {
+  display: grid;
+  gap: 16px;
+}
+
+.smart-form label,
+.pro-request-form label,
+.request-form-shell label,
+.checkout-page label,
+.profile-page label {
+  color: #334155;
+}
+
+.smart-form input,
+.smart-form textarea,
+.smart-form select,
+.checkout-page input,
+.checkout-page textarea,
+.checkout-page select,
+.profile-page input,
+.profile-page textarea,
+.profile-page select {
+  border-radius: 14px;
+  border: 1px solid #dbe3ef;
+  background: #f8fbff;
+}
+
+/* ---------- Empty/loading/error states ---------- */
+
+.customer-state-line,
+.form-status,
+.empty-state,
+.error-state,
+.loading-state,
+.restricted-state {
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.96), rgba(248, 250, 252, 0.96));
+  border-radius: 18px;
+}
+
+.empty-state,
+.error-state,
+.loading-state,
+.restricted-state {
+  padding: 24px;
+  color: #334155;
+}
+
+/* ---------- Responsive repair ---------- */
+
+@media (max-width: 1180px) {
+  .product-detail-grid,
+  .service-detail-grid,
+  .cart-grid,
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-action-card,
+  .detail-summary-card {
+    position: static;
+  }
+}
+
+@media (max-width: 860px) {
+  .ms-search-grid .ms-actions {
+    justify-content: stretch;
+  }
+
+  .ms-search-grid .ms-actions > button {
+    width: 100%;
+  }
+
+  .cart-item {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .cart-item img {
+    width: 92px;
+    height: 82px;
+  }
+
+  .cart-item .cart-actions,
+  .cart-item > div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .delivery-tracker,
+  .status-tracker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .customer-feed-page,
+  .ms-discovery-page,
+  .request-showcase-page,
+  .cart-page,
+  .checkout-page,
+  .orders-page,
+  .dashboard-page,
+  .product-detail-page,
+  .service-detail-page {
+    padding-inline: 14px;
+  }
+
+  .customer-hero-section,
+  .ms-discovery-hero,
+  .ms-search-surface,
+  .ms-filter-panel,
+  .ms-results-panel,
+  .request-showcase-panel,
+  .request-form-shell,
+  .customer-request-banner,
+  .cart-item,
+  .checkout-card,
+  .order-card,
+  .dashboard-card {
+    border-radius: 22px;
+  }
+
+  .customer-card-footer,
+  .service-card-footer,
+  .order-status-row,
+  .order-meta-row {
+    align-items: stretch;
+  }
+
+  .customer-card-actions,
+  .cart-actions,
+  .checkout-actions,
+  .order-actions,
+  .form-actions {
+    width: 100%;
+  }
+
+  .customer-card-actions > *,
+  .cart-actions > *,
+  .checkout-actions > *,
+  .order-actions > *,
+  .form-actions > * {
+    flex: 1 1 140px;
+  }
+
+  .request-submit-button {
+    width: 100%;
+  }
+}

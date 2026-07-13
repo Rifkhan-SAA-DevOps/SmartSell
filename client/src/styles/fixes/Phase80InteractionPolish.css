@@ -1,0 +1,454 @@
+
+/* Phase 80: Interaction, action, and responsive polish layer
+   Purpose: improve clickable rows, action alignment, modal spacing, filters, and form ergonomics
+   without touching global.css or backend code. */
+
+/* Safer app-wide sizing inside SmartSell views */
+.app-shell,
+.app-shell * {
+  box-sizing: border-box;
+}
+
+.app-main-content,
+.management-main-content,
+.public-main-content {
+  min-width: 0;
+}
+
+/* Common page rhythm */
+.management-main-content > *,
+.public-main-content > * {
+  min-width: 0;
+}
+
+.management-main-content section,
+.public-main-content section {
+  scroll-margin-top: 96px;
+}
+
+/* Professional clickable table behavior */
+.table-wrap,
+.table-scroll,
+.responsive-table,
+.admin-table-wrap,
+.orders-table-wrap,
+.reviews-table-wrap,
+.notifications-table-wrap,
+.listing-table-wrap,
+.user-table-wrap,
+.fulfillment-table-wrap,
+.business-table-wrap,
+.support-table-wrap,
+.offers-table-wrap,
+.requests-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 18px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrap table,
+.table-scroll table,
+.responsive-table table,
+.admin-table-wrap table,
+.orders-table-wrap table,
+.reviews-table-wrap table,
+.notifications-table-wrap table,
+.listing-table-wrap table,
+.user-table-wrap table,
+.fulfillment-table-wrap table,
+.business-table-wrap table,
+.support-table-wrap table,
+.offers-table-wrap table,
+.requests-table-wrap table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table th {
+  white-space: nowrap;
+  font-size: 0.74rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+table td {
+  vertical-align: middle;
+}
+
+table tbody tr[role="button"],
+table tbody tr.clickable-row,
+tr.row-clickable,
+tr[data-clickable="true"] {
+  cursor: pointer;
+  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+table tbody tr[role="button"]:hover,
+table tbody tr.clickable-row:hover,
+tr.row-clickable:hover,
+tr[data-clickable="true"]:hover {
+  background: #f8fbff;
+}
+
+/* Button/action alignment inside tables and cards */
+.action-row,
+.table-actions,
+.card-actions,
+.modal-actions,
+.form-actions,
+.filter-actions,
+.header-actions,
+.page-actions,
+.quick-actions,
+.workflow-actions,
+.review-actions,
+.order-actions,
+.ticket-actions,
+.offer-actions,
+.listing-actions,
+.user-actions,
+.delivery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.table-actions,
+td .action-row,
+td .table-actions {
+  justify-content: flex-start;
+  min-width: max-content;
+}
+
+.header-actions,
+.page-actions {
+  justify-content: flex-end;
+}
+
+button,
+.btn,
+.button,
+a.btn,
+.action-button,
+.primary-button,
+.secondary-button,
+.ghost-button,
+.danger-button,
+.success-button,
+.icon-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+button:disabled,
+.btn:disabled,
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+/* Strong but clean focus states */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.24);
+  outline-offset: 2px;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* Forms should stack safely and never squeeze */
+.form-grid,
+.settings-grid,
+.profile-grid,
+.checkout-grid,
+.support-grid,
+.quote-grid,
+.request-grid,
+.admin-form-grid,
+.business-form-grid,
+.filter-grid,
+.search-filter-grid {
+  min-width: 0;
+}
+
+.form-grid > *,
+.settings-grid > *,
+.profile-grid > *,
+.checkout-grid > *,
+.support-grid > *,
+.quote-grid > *,
+.request-grid > *,
+.admin-form-grid > *,
+.business-form-grid > *,
+.filter-grid > *,
+.search-filter-grid > * {
+  min-width: 0;
+}
+
+/* Modal/detail surfaces */
+.modal-backdrop,
+.dialog-backdrop,
+.detail-backdrop,
+.drawer-backdrop {
+  padding: 1.25rem;
+}
+
+.modal-panel,
+.dialog-panel,
+.detail-modal,
+.detail-panel,
+.modal-card,
+.drawer-panel {
+  width: min(980px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  border-radius: 24px;
+}
+
+.modal-panel table,
+.dialog-panel table,
+.detail-modal table,
+.detail-panel table {
+  min-width: 680px;
+}
+
+.modal-header,
+.dialog-header,
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Pagination */
+.pagination,
+.pager,
+.table-pagination,
+.pagination-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.pagination-controls,
+.pager-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.pagination button,
+.pager button,
+.pagination-controls button,
+.pager-controls button {
+  min-width: 38px;
+  min-height: 38px;
+}
+
+/* Cards and panels */
+.panel,
+.card,
+.stat-card,
+.metric-card,
+.form-card,
+.table-card,
+.summary-card,
+.info-card,
+.workflow-card,
+.action-card {
+  min-width: 0;
+}
+
+.panel-header,
+.card-header,
+.table-card-header,
+.section-heading,
+.page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Badges should not break layouts */
+.badge,
+.status-badge,
+.role-badge,
+.type-badge,
+.pill,
+.status-pill,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+/* Prevent over-wide content from breaking layout */
+.breakable,
+.message-body,
+.ticket-description,
+.request-message,
+.order-note,
+.description-text,
+.thread-preview,
+.notification-message,
+.review-comment {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Mobile/tablet adjustments */
+@media (max-width: 980px) {
+  .header-actions,
+  .page-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .table-wrap table,
+  .table-scroll table,
+  .responsive-table table,
+  .admin-table-wrap table,
+  .orders-table-wrap table,
+  .reviews-table-wrap table,
+  .notifications-table-wrap table,
+  .listing-table-wrap table,
+  .user-table-wrap table,
+  .fulfillment-table-wrap table,
+  .business-table-wrap table,
+  .support-table-wrap table,
+  .offers-table-wrap table,
+  .requests-table-wrap table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 720px) {
+  .management-main-content,
+  .public-main-content {
+    padding-inline: clamp(0.8rem, 4vw, 1rem) !important;
+  }
+
+  .modal-backdrop,
+  .dialog-backdrop,
+  .detail-backdrop,
+  .drawer-backdrop {
+    padding: 0.75rem;
+  }
+
+  .modal-panel,
+  .dialog-panel,
+  .detail-modal,
+  .detail-panel,
+  .modal-card,
+  .drawer-panel {
+    width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+    border-radius: 18px;
+  }
+
+  .action-row,
+  .table-actions,
+  .card-actions,
+  .modal-actions,
+  .form-actions,
+  .filter-actions,
+  .workflow-actions,
+  .review-actions,
+  .order-actions,
+  .ticket-actions,
+  .offer-actions,
+  .listing-actions,
+  .user-actions,
+  .delivery-actions {
+    gap: 0.5rem;
+  }
+
+  .form-actions button,
+  .modal-actions button,
+  .card-actions button,
+  .filter-actions button,
+  .form-actions .btn,
+  .modal-actions .btn,
+  .card-actions .btn,
+  .filter-actions .btn {
+    flex: 1 1 160px;
+  }
+
+  .pagination,
+  .pager,
+  .table-pagination,
+  .pagination-row {
+    align-items: stretch;
+  }
+
+  .pagination-controls,
+  .pager-controls {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  button,
+  .btn,
+  .button,
+  a.btn,
+  .action-button,
+  .primary-button,
+  .secondary-button,
+  .ghost-button,
+  .danger-button,
+  .success-button {
+    min-height: 42px;
+  }
+
+  .table-wrap table,
+  .table-scroll table,
+  .responsive-table table,
+  .admin-table-wrap table,
+  .orders-table-wrap table,
+  .reviews-table-wrap table,
+  .notifications-table-wrap table,
+  .listing-table-wrap table,
+  .user-table-wrap table,
+  .fulfillment-table-wrap table,
+  .business-table-wrap table,
+  .support-table-wrap table,
+  .offers-table-wrap table,
+  .requests-table-wrap table {
+    min-width: 680px;
+  }
+}

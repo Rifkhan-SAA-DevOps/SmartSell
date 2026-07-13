@@ -1,0 +1,225 @@
+/* Phase 67 — Marketplace + Services feed/search/filter UI */
+.customer-feed-page,
+.service-feed-page {
+  --feed-sidebar: clamp(252px, 22vw, 300px);
+  --feed-gap: clamp(16px, 2vw, 24px);
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 30px 0 70px;
+}
+.customer-feed-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 280px);
+  gap: 20px;
+  align-items: stretch;
+  margin-top: 22px;
+  padding: clamp(28px, 5vw, 46px);
+  border-radius: 32px;
+  border: 1px solid #e2e8f0;
+  background: radial-gradient(circle at 8% 0%, rgba(37,99,235,.12), transparent 28rem), linear-gradient(135deg, #fff, #f8fbff 55%, #eef9ff);
+  box-shadow: 0 22px 64px rgba(15,23,42,.09);
+}
+.customer-feed-hero h1 { margin: 14px 0 12px; max-width: 820px; color: #061121; font-size: clamp(2.15rem, 4.4vw, 4.1rem); line-height: 1; letter-spacing: -.055em; }
+.customer-feed-hero p { margin: 0; max-width: 690px; color: #475569; line-height: 1.72; }
+.customer-feed-hero-card {
+  min-height: 188px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 26px;
+  color: #fff;
+  background: linear-gradient(145deg, #0f172a, #2563eb 60%, #06b6d4);
+}
+.customer-feed-hero-card.teal { background: linear-gradient(145deg, #0f172a, #0f766e 60%, #14b8a6); }
+.customer-feed-hero-card strong { font-size: 2.35rem; line-height: 1; letter-spacing: -.05em; }
+.customer-feed-hero-card span { margin-top: 6px; font-weight: 900; }
+.customer-feed-hero-card small { margin-top: 8px; color: #dbeafe; }
+.customer-search-zone {
+  margin: 20px 0;
+  display: grid;
+  grid-template-columns: minmax(260px, .38fr) minmax(320px, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 18px;
+  border-radius: 26px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 16px 42px rgba(15,23,42,.07);
+}
+.customer-search-copy span { display: block; color: #0369a1; font-size: .75rem; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
+.customer-search-copy b { display: block; margin-top: 4px; color: #0f172a; font-size: 1.08rem; letter-spacing: -.02em; }
+.customer-search-copy small { display: block; margin-top: 4px; color: #64748b; line-height: 1.45; }
+.customer-command-search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px;
+  border-radius: 18px;
+  border: 1px solid #dbe4ef;
+  background: #f8fafc;
+}
+.search-mark { width: 34px; height: 34px; display: grid; place-items: center; color: #64748b; }
+.search-mark svg { width: 20px; height: 20px; fill: currentColor; }
+.customer-command-search input { min-width: 0; height: 40px; border: 0; outline: 0; background: transparent; color: #0f172a; font-weight: 800; }
+.search-clear,
+.search-submit,
+.customer-feed-search-card button,
+.customer-filter-rail button {
+  min-height: 40px;
+  border-radius: 13px;
+  border: 1px solid #dbe4ef;
+  background: #fff;
+  padding: 0 13px;
+  color: #0f172a;
+  font-weight: 900;
+}
+.search-submit { color: #fff; border-color: transparent; background: linear-gradient(135deg, #0f172a, #2563eb 60%, #0891b2); }
+.customer-search-suggestions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.customer-search-suggestions span { color: #64748b; font-size: .82rem; font-weight: 850; }
+.customer-search-suggestions button {
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #075985;
+  padding: 0 11px;
+  font-size: .78rem;
+  font-weight: 900;
+}
+.customer-feed-search-card.compact-filter-row {
+  display: grid;
+  grid-template-columns: minmax(260px, .7fr) minmax(220px, .35fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 20px;
+  padding: 16px;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(15,23,42,.055);
+}
+.customer-feed-search-card label,
+.customer-filter-group,
+.customer-field-label { display: grid; gap: 7px; min-width: 0; color: #475569; font-size: .82rem; font-weight: 900; }
+.customer-feed-search-card input,
+.customer-feed-search-card select,
+.customer-filter-rail select,
+.customer-filter-rail input {
+  min-width: 0;
+  min-height: 42px;
+  border-radius: 13px;
+  border: 1px solid #dbe4ef;
+  background: #fff;
+  padding: 0 12px;
+  color: #0f172a;
+  font-weight: 800;
+}
+.customer-two-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.customer-feed-layout {
+  display: grid;
+  grid-template-columns: var(--feed-sidebar) minmax(0, 1fr);
+  gap: var(--feed-gap);
+  align-items: start;
+}
+.customer-filter-rail {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 118px);
+  overflow: auto;
+  border-radius: 26px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 17px;
+  box-shadow: 0 18px 44px rgba(15,23,42,.075);
+}
+.customer-filter-title { padding-bottom: 13px; margin-bottom: 14px; border-bottom: 1px solid #e2e8f0; }
+.customer-filter-title b { display: block; color: #0f172a; font-size: 1rem; }
+.customer-filter-title small { display: block; margin-top: 3px; color: #64748b; line-height: 1.4; }
+.customer-segment-list { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; }
+.customer-segment-list button {
+  width: 100%;
+  justify-content: flex-start;
+  min-height: 40px;
+  border-radius: 13px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  text-align: left;
+}
+.customer-segment-list button.active { color: #fff; border-color: transparent; background: linear-gradient(135deg, #0f172a, #2563eb); box-shadow: 0 12px 24px rgba(37,99,235,.18); }
+.customer-checkbox-line { display: flex; align-items: center; gap: 9px; color: #334155; font-weight: 850; margin: 12px 0; }
+.customer-service-tip { margin-top: 14px; padding: 14px; border-radius: 16px; background: #f0fdfa; color: #115e59; border: 1px solid #ccfbf1; }
+.customer-service-tip p { margin: 4px 0 0; line-height: 1.5; }
+.customer-feed-main { min-width: 0; }
+.customer-chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+.customer-chip-scroll button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  background: #fff;
+  color: #075985;
+  padding: 0 12px;
+  font-weight: 900;
+}
+.customer-chip-scroll button.active { color: #fff; border-color: transparent; background: linear-gradient(135deg, #0f172a, #2563eb); }
+.customer-feed-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 15px 17px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+.customer-feed-toolbar b { display: block; color: #0f172a; }
+.customer-feed-toolbar span,
+.customer-feed-toolbar small { color: #64748b; line-height: 1.45; }
+.customer-product-grid,
+.customer-service-grid {
+  display: grid;
+  gap: 20px;
+  align-items: stretch;
+}
+.customer-product-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.customer-service-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.customer-state-line { padding: 16px; border-radius: 16px; background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; }
+@media (max-width: 1160px) {
+  .customer-feed-layout { grid-template-columns: 1fr; }
+  .customer-filter-rail { position: static; max-height: none; }
+}
+@media (max-width: 860px) {
+  .customer-feed-page,
+  .service-feed-page { width: min(100% - 22px, 1240px); padding-top: 22px; }
+  .customer-feed-hero,
+  .customer-search-zone,
+  .customer-feed-search-card.compact-filter-row { grid-template-columns: 1fr; }
+  .customer-search-suggestions { grid-column: auto; }
+  .customer-command-search { grid-template-columns: auto minmax(0,1fr) auto; }
+  .search-clear { display: none; }
+  .customer-feed-toolbar { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 620px) {
+  .customer-feed-page,
+  .service-feed-page { width: min(100% - 18px, 1240px); }
+  .customer-feed-hero,
+  .customer-search-zone,
+  .customer-feed-search-card.compact-filter-row { border-radius: 22px; padding: 18px; }
+  .customer-command-search { grid-template-columns: minmax(0,1fr); }
+  .search-mark { display: none; }
+  .search-submit { width: 100%; }
+  .customer-two-inputs,
+  .customer-product-grid,
+  .customer-service-grid { grid-template-columns: 1fr; }
+}

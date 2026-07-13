@@ -1,0 +1,49 @@
+/*
+  Phase 106 safe alignment layer.
+
+  Important: do not globally redesign action groups, card grids, dashboard
+  columns, or table layouts from this file. Every management page already has
+  its own accepted scoped stylesheet.
+*/
+
+.admin-ops-page .ops-table-card,
+.finance-page .finance-table-panel,
+.management-page .management-panel,
+.fulfillment-page .fulfillment-toolbar,
+.delivery-redesign-page .delivery-filter-panel,
+.gallery-manager-page .gm-list-panel,
+.business-dashboard-page .business-list,
+.business-dashboard-page .business-request-grid,
+.order-list,
+.requests-grid,
+.wishlist-grid,
+.storefront-grid,
+.listing-admin-grid {
+  min-width: 0;
+}
+
+/* Allow existing page CSS to decide desktop column counts. */
+.admin-ops-page .ops-two-column,
+.admin-ops-page .ops-approval-grid {
+  min-width: 0;
+}
+
+/* Keep pagination in normal document flow. */
+.um-directory-panel .smart-pagination,
+.gm-list-panel .smart-pagination {
+  position: static;
+  inset: auto;
+  backdrop-filter: none;
+  z-index: auto;
+}
+
+/* Avoid accidental doubled pagination spacing. */
+.page .smart-pagination + .smart-pagination {
+  margin-top: 10px;
+}
+
+/*
+  Do not set display, width, wrapping, or minimum heights on shared action
+  classes here. Those rules caused buttons and rows across unrelated pages to
+  become oversized in Phase 105.
+*/

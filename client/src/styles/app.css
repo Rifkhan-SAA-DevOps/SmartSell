@@ -1,0 +1,48 @@
+/*
+  SmartSell application CSS entrypoint.
+
+  The old application styles remain available for compatibility. The final
+  route-scoped stability layer is loaded last so individual pages no longer
+  need competing global "repair" files.
+*/
+
+@import "./global.css";
+@import "./design-system.css";
+@import "./components/SmartPagination.css";
+
+/* Existing customer presentation layers. */
+
+/* Route-specific page styles that existed in the project but were not loaded. */
+@import "./pages/admin/AdminDashboard.css";
+@import "./pages/admin/AdminTablePages.css";
+@import "./pages/admin/Fulfillment.css";
+@import "./pages/admin/ListingManagement.css";
+@import "./pages/admin/Reports.css";
+@import "./pages/admin/UserManagement.css";
+
+@import "./pages/customer/FeedFilters.css";
+@import "./pages/customer/Inbox.css";
+@import "./pages/customer/MyRequests.css";
+@import "./pages/customer/MyReviews.css";
+@import "./pages/customer/Notifications.css";
+@import "./pages/customer/Offers.css";
+@import "./pages/customer/Orders.css";
+@import "./pages/customer/Storefronts.css";
+@import "./pages/customer/StorefrontDetail.css";
+@import "./pages/customer/SupportCenter.css";
+@import "./pages/customer/Wishlist.css";
+
+/* Existing management component presentation. */
+@import "./pages/management/AdminBusinessFinalRepair.css";
+
+/* Protect modern scoped pages from legacy broad selectors. */
+@import "./legacy/global-boundary.css";
+
+/* Final deterministic route, component, table, form and responsive repair. */
+@import "./stability/SmartSellUiStability.css";
+
+/* Final scoped customer/public design system. */
+@import "./pages/customer/CustomerProfessional.css";
+
+/* Customer detail and transaction journey. */
+@import "./pages/customer/CustomerJourney.css";

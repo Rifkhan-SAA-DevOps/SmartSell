@@ -1,0 +1,333 @@
+.delivery-dashboard-page {
+  --delivery-text: #0f172a;
+  --delivery-muted: #64748b;
+  --delivery-border: rgba(15, 23, 42, 0.09);
+  --delivery-panel: rgba(255, 255, 255, 0.92);
+  --delivery-blue: #2563eb;
+  --delivery-green: #16a34a;
+  --delivery-red: #dc2626;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 22px clamp(14px, 2vw, 28px) 48px;
+}
+
+.delivery-dashboard-page .section-header,
+.delivery-dashboard-page > .section-header {
+  margin-bottom: 18px;
+}
+
+.delivery-dashboard-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.09), transparent 26%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 24%);
+  z-index: -1;
+}
+
+.delivery-quick-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 20px;
+}
+
+.delivery-quick-nav a,
+.delivery-quick-nav .delivery-nav-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 94px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92));
+  border: 1px solid var(--delivery-border);
+  color: var(--delivery-text);
+  text-decoration: none;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
+}
+
+.delivery-quick-nav strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.delivery-quick-nav small {
+  display: block;
+  color: var(--delivery-muted);
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+.delivery-quick-nav b {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  background: #eff6ff;
+  color: var(--delivery-blue);
+}
+
+.delivery-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 18px 0 20px;
+}
+
+.delivery-dashboard-grid article {
+  min-height: 128px;
+  padding: 22px;
+  border-radius: 26px;
+  background: var(--delivery-panel);
+  border: 1px solid var(--delivery-border);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
+}
+
+.delivery-dashboard-grid span,
+.delivery-task-meta span {
+  color: var(--delivery-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.delivery-dashboard-grid strong {
+  display: block;
+  margin: 8px 0;
+  color: var(--delivery-text);
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  letter-spacing: -0.04em;
+}
+
+.delivery-dashboard-grid p,
+.delivery-task-head p,
+.delivery-task-card p {
+  margin: 0;
+  color: var(--delivery-muted);
+  line-height: 1.65;
+}
+
+.delivery-dashboard-page .fulfillment-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: var(--delivery-panel);
+  border: 1px solid var(--delivery-border);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.07);
+}
+
+.delivery-dashboard-page .fulfillment-toolbar strong {
+  color: var(--delivery-text);
+  font-size: 1.05rem;
+}
+
+.delivery-dashboard-page select,
+.delivery-dashboard-page input,
+.delivery-dashboard-page textarea {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--delivery-text);
+  font: inherit;
+}
+
+.delivery-dashboard-page select,
+.delivery-dashboard-page input {
+  min-height: 46px;
+  padding: 0 14px;
+}
+
+.delivery-dashboard-page textarea {
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.delivery-dashboard-page select:focus,
+.delivery-dashboard-page input:focus,
+.delivery-dashboard-page textarea:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+}
+
+.delivery-task-list {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.delivery-task-card {
+  padding: 22px;
+  border-radius: 28px;
+  background: var(--delivery-panel);
+  border: 1px solid var(--delivery-border);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.delivery-task-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.delivery-task-head h3 {
+  margin: 6px 0 6px;
+  color: var(--delivery-text);
+  font-size: 1.25rem;
+}
+
+.delivery-task-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.delivery-task-meta div {
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.delivery-task-meta strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--delivery-text);
+}
+
+.fulfillment-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+
+.fulfillment-items span {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.delivery-update-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.delivery-update-grid label,
+.fulfillment-note-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #334155;
+  font-weight: 800;
+}
+
+.fulfillment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.fulfillment-actions button,
+.delivery-dashboard-page .primary-btn,
+.delivery-dashboard-page .secondary-btn,
+.delivery-dashboard-page .approve-btn,
+.delivery-dashboard-page .reject-btn {
+  min-height: 42px;
+  border-radius: 14px;
+  border: 0;
+  padding: 0 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.delivery-dashboard-page .primary-btn,
+.delivery-dashboard-page .approve-btn {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+}
+
+.delivery-dashboard-page .secondary-btn {
+  background: #eef4ff;
+  color: #1d4ed8;
+}
+
+.delivery-dashboard-page .reject-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  white-space: nowrap;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.status-delivered { background: #dcfce7; color: #166534; }
+.status-failed { background: #fee2e2; color: #b91c1c; }
+.status-picked-up,
+.status-on-the-way { background: #fef3c7; color: #92400e; }
+.status-assigned { background: #e0e7ff; color: #3730a3; }
+
+.delivery-route-helper {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f0f9ff;
+  color: #075985;
+  border: 1px solid #bae6fd;
+  line-height: 1.7;
+}
+
+@media (max-width: 1100px) {
+  .delivery-quick-nav,
+  .delivery-dashboard-grid,
+  .delivery-update-grid,
+  .delivery-task-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .delivery-dashboard-page { padding-inline: 12px; }
+  .delivery-quick-nav,
+  .delivery-dashboard-grid,
+  .delivery-update-grid,
+  .delivery-task-meta {
+    grid-template-columns: 1fr;
+  }
+  .delivery-task-head,
+  .delivery-dashboard-page .fulfillment-toolbar {
+    display: grid;
+  }
+  .fulfillment-actions button { width: 100%; }
+}

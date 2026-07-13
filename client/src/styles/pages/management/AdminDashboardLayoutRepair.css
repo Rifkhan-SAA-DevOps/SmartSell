@@ -1,0 +1,289 @@
+/* Phase 93 — Admin dashboard layout repair
+   Fixes /admin spacing, card overlap, and uneven right/left card flow. */
+
+.management-main-content .admin-ops-page,
+.admin-ops-page {
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  display: grid;
+  gap: clamp(18px, 2vw, 26px);
+  overflow: visible;
+}
+
+/* Professional hero: text and priority card side by side on desktop. */
+.admin-ops-page .ops-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  align-items: stretch;
+  gap: clamp(18px, 2.2vw, 28px);
+  margin: 0 !important;
+}
+
+.admin-ops-page .ops-hero > div,
+.admin-ops-page .ops-priority-card {
+  min-width: 0;
+}
+
+.admin-ops-page .ops-hero h1 {
+  max-width: 860px;
+  font-size: clamp(2rem, 3.4vw, 3.45rem) !important;
+}
+
+.admin-ops-page .ops-priority-card {
+  width: 100%;
+  min-width: 0 !important;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 42%),
+    #ffffff;
+}
+
+.admin-ops-page .ops-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* KPI cards: always side-by-side on desktop, clean 2/1 column fallback. */
+.admin-ops-page .ops-metric-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin-top: 0 !important;
+}
+
+.admin-ops-page .ops-metric-card {
+  min-width: 0 !important;
+  height: 100%;
+  padding: 16px !important;
+  border-radius: 22px !important;
+}
+
+.admin-ops-page .ops-metric-card > span {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  flex: 0 0 auto;
+}
+
+.admin-ops-page .ops-metric-card strong {
+  font-size: clamp(1.25rem, 1.6vw, 1.75rem) !important;
+}
+
+/* Quick actions: force proper rows instead of one long vertical column. */
+.admin-ops-page .ops-action-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 0 !important;
+}
+
+.admin-ops-page .ops-action-tile {
+  min-width: 0 !important;
+  height: 100%;
+  padding: 18px !important;
+  border-radius: 24px !important;
+}
+
+.admin-ops-page .ops-action-tile p {
+  margin-bottom: 0;
+}
+
+/* Main dashboard tables: use responsive side-by-side layout without overflow overlap. */
+.admin-ops-page .ops-two-column {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.75fr) !important;
+  align-items: start;
+  gap: 18px !important;
+  margin-top: 0 !important;
+}
+
+/* Approval cards: desktop shows 3 cards side-by-side instead of awkward lower gaps. */
+.admin-ops-page .ops-approval-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: start;
+  gap: 18px !important;
+  margin-top: 0 !important;
+}
+
+.admin-ops-page .ops-request-panel {
+  min-width: 0;
+  padding: clamp(18px, 2vw, 24px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+}
+
+.admin-ops-page .ops-request-grid,
+.admin-ops-page .admin-request-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 18px !important;
+}
+
+/* Critical fix: Phase 90 accidentally made the card wrapper behave like a 760px table.
+   Keep the wrapper flexible; only the actual table scrolls inside the card. */
+.admin-ops-page .admin-table,
+.admin-ops-page .ops-table-card {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible;
+  border-radius: 26px !important;
+  background: #ffffff !important;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07) !important;
+}
+
+.admin-ops-page .admin-table table,
+.admin-ops-page .ops-table-card table {
+  width: 100% !important;
+  min-width: 720px !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.admin-ops-page .ops-two-column .admin-table:first-child table {
+  min-width: 900px !important;
+}
+
+.admin-ops-page .ops-two-column .admin-table:nth-child(2) table {
+  min-width: 650px !important;
+}
+
+.admin-ops-page .ops-card-head {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  padding: 18px 18px 0;
+  background: #ffffff;
+}
+
+.admin-ops-page .admin-table table {
+  margin-top: 4px;
+}
+
+.admin-ops-page .compact-actions,
+.admin-ops-page .vertical-actions {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px !important;
+  justify-content: flex-start;
+}
+
+.admin-ops-page .vertical-actions {
+  min-width: 170px;
+}
+
+.admin-ops-page .compact-actions button,
+.admin-ops-page .vertical-actions button,
+.admin-ops-page .approve-btn,
+.admin-ops-page .reject-btn {
+  min-height: 34px !important;
+  padding: 7px 10px !important;
+  border-radius: 11px !important;
+  white-space: nowrap;
+}
+
+.admin-ops-page .ops-request-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-ops-page .ops-request-form label:last-child {
+  grid-column: 1 / -1;
+}
+
+.admin-ops-page .spaced-alert,
+.admin-ops-page .form-status {
+  margin: 0 !important;
+}
+
+/* Better wide screens */
+@media (min-width: 1500px) {
+  .admin-ops-page .ops-two-column {
+    grid-template-columns: minmax(0, 1.45fr) minmax(390px, 0.75fr) !important;
+  }
+}
+
+/* Laptop / smaller desktop */
+@media (max-width: 1320px) {
+  .admin-ops-page .ops-metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .admin-ops-page .ops-action-grid,
+  .admin-ops-page .ops-approval-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-ops-page .ops-two-column {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-ops-page .ops-two-column .admin-table table,
+  .admin-ops-page .ops-two-column .admin-table:first-child table,
+  .admin-ops-page .ops-two-column .admin-table:nth-child(2) table {
+    min-width: 760px !important;
+  }
+}
+
+/* Tablet */
+@media (max-width: 920px) {
+  .admin-ops-page .ops-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-ops-page .ops-metric-grid,
+  .admin-ops-page .ops-action-grid,
+  .admin-ops-page .ops-approval-grid,
+  .admin-ops-page .ops-request-grid,
+  .admin-ops-page .admin-request-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .admin-ops-page {
+    gap: 16px;
+  }
+
+  .admin-ops-page .ops-hero,
+  .admin-ops-page .ops-request-panel {
+    border-radius: 22px !important;
+    padding: 18px !important;
+  }
+
+  .admin-ops-page .ops-metric-grid,
+  .admin-ops-page .ops-action-grid,
+  .admin-ops-page .ops-approval-grid,
+  .admin-ops-page .ops-request-grid,
+  .admin-ops-page .admin-request-grid,
+  .admin-ops-page .ops-request-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-ops-page .ops-card-head {
+    position: static;
+    display: grid;
+    gap: 12px;
+    padding: 16px 16px 0;
+  }
+
+  .admin-ops-page .admin-table table,
+  .admin-ops-page .ops-table-card table {
+    min-width: 680px !important;
+  }
+}

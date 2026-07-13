@@ -1,0 +1,3 @@
+@import "./WorkflowCommon.css";
+.ss-offers .ss-stat-strip { margin-bottom: 18px; }
+.ss-offers .ss-data-table td:nth-child(2) { min-width: 220px; }

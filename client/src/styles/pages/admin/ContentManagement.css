@@ -1,0 +1,96 @@
+.content-manager-page .content-manager-layout,
+.seo-settings-page .seo-manager-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.content-manager-page .content-preview-card,
+.content-manager-page .content-edit-card,
+.seo-settings-page .seo-preview-card,
+.seo-settings-page .seo-edit-card,
+.content-manager-page .empty-state-card,
+.seo-settings-page .empty-state-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(15,23,42,.07);
+  padding: 18px;
+}
+
+.content-manager-page .content-section-tabs,
+.seo-settings-page .seo-section-tabs {
+  display: grid;
+  gap: 10px;
+}
+.content-manager-page .content-section-tabs button,
+.seo-settings-page .seo-section-tabs button {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  text-align: left;
+  padding: 14px;
+  cursor: pointer;
+  color: #334155;
+  font-weight: 800;
+}
+.content-manager-page .content-section-tabs button.active,
+.seo-settings-page .seo-section-tabs button.active,
+.content-manager-page .content-section-tabs button:hover,
+.seo-settings-page .seo-section-tabs button:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.content-manager-page .content-edit-heading,
+.seo-settings-page .content-edit-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.content-manager-page .content-field-grid,
+.seo-settings-page .seo-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.content-manager-page .content-field,
+.seo-settings-page .seo-field {
+  display: grid;
+  gap: 7px;
+}
+
+.content-manager-page .content-preview-actions,
+.seo-settings-page .settings-sticky-actions,
+.content-manager-page .settings-sticky-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.content-manager-page .content-preview-examples {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.content-manager-page .content-preview-examples span {
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+}
+
+@media (max-width: 980px) {
+  .content-manager-page .content-manager-layout,
+  .seo-settings-page .seo-manager-layout,
+  .content-manager-page .content-field-grid,
+  .seo-settings-page .seo-field-grid { grid-template-columns: 1fr; }
+}

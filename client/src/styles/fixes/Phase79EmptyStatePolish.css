@@ -1,0 +1,285 @@
+/* Phase 79: Empty / loading / error state polish
+   Scoped as a final overlay only. No global.css changes. */
+
+:root {
+  --ss-empty-bg: linear-gradient(135deg, rgba(248, 250, 252, 0.98), rgba(239, 246, 255, 0.78));
+  --ss-empty-border: rgba(148, 163, 184, 0.28);
+  --ss-empty-ink: #0f172a;
+  --ss-empty-muted: #64748b;
+  --ss-empty-brand: #2563eb;
+  --ss-empty-soft: #eff6ff;
+}
+
+/* Common empty/loading/error blocks used across pages */
+.empty-state,
+.empty,
+.empty-card,
+.empty-panel,
+.no-data,
+.no-results,
+.loading-state,
+.loading,
+.error-state,
+.error-card,
+.access-card,
+.not-found-card {
+  width: min(100%, 920px);
+  margin: 1rem auto;
+  padding: clamp(1.15rem, 2.4vw, 2rem);
+  border: 1px solid var(--ss-empty-border);
+  border-radius: 24px;
+  background: var(--ss-empty-bg);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  color: var(--ss-empty-ink);
+  text-align: left;
+}
+
+.empty-state.center,
+.empty.center,
+.empty-card.center,
+.empty-panel.center,
+.loading-state,
+.error-state,
+.access-card,
+.not-found-card {
+  text-align: center;
+}
+
+.empty-state h1,
+.empty-state h2,
+.empty-state h3,
+.empty-card h1,
+.empty-card h2,
+.empty-card h3,
+.empty-panel h1,
+.empty-panel h2,
+.empty-panel h3,
+.no-data h1,
+.no-data h2,
+.no-data h3,
+.no-results h1,
+.no-results h2,
+.no-results h3,
+.loading-state h1,
+.loading-state h2,
+.loading-state h3,
+.error-state h1,
+.error-state h2,
+.error-state h3,
+.access-card h1,
+.access-card h2,
+.access-card h3,
+.not-found-card h1,
+.not-found-card h2,
+.not-found-card h3 {
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.25rem, 2vw, 1.85rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  color: var(--ss-empty-ink);
+}
+
+.empty-state p,
+.empty-card p,
+.empty-panel p,
+.no-data p,
+.no-results p,
+.loading-state p,
+.error-state p,
+.access-card p,
+.not-found-card p {
+  max-width: 68ch;
+  margin: 0.35rem auto 0;
+  color: var(--ss-empty-muted);
+  line-height: 1.65;
+  font-size: 0.96rem;
+}
+
+.empty-state .btn,
+.empty-card .btn,
+.empty-panel .btn,
+.no-data .btn,
+.no-results .btn,
+.loading-state .btn,
+.error-state .btn,
+.access-card .btn,
+.not-found-card .btn,
+.empty-state button,
+.empty-card button,
+.empty-panel button,
+.no-data button,
+.no-results button,
+.loading-state button,
+.error-state button,
+.access-card button,
+.not-found-card button {
+  margin-top: 1rem;
+}
+
+/* Better visual when empty states contain plain text only */
+.empty-state::before,
+.empty-card::before,
+.empty-panel::before,
+.no-data::before,
+.no-results::before {
+  content: "";
+  display: block;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 0.85rem;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(20, 184, 166, 0.16)),
+    var(--ss-empty-soft);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.14);
+}
+
+.empty-state.center::before,
+.empty-card.center::before,
+.empty-panel.center::before,
+.no-data::before,
+.no-results::before {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Skeleton rows/cards for pages that use loading blocks */
+.skeleton,
+.skeleton-card,
+.skeleton-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #eef2f7, #f8fafc, #eef2f7);
+  background-size: 220% 100%;
+  animation: ss-skeleton 1.35s ease-in-out infinite;
+}
+
+.skeleton-card {
+  min-height: 160px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.skeleton-row {
+  min-height: 54px;
+  margin: 0.55rem 0;
+}
+
+@keyframes ss-skeleton {
+  0% { background-position: 120% 0; }
+  100% { background-position: -120% 0; }
+}
+
+/* Clean table empty rows */
+table .empty-row td,
+table .no-data-row td,
+table .empty-table-row td {
+  padding: 2rem 1rem !important;
+  color: var(--ss-empty-muted);
+  text-align: center;
+  background: #f8fafc;
+}
+
+/* Error / restricted states */
+.error-state,
+.error-card,
+.access-card {
+  border-color: rgba(239, 68, 68, 0.22);
+  background: linear-gradient(135deg, #fff7ed, #fff1f2);
+}
+
+.error-state h1,
+.error-state h2,
+.error-state h3,
+.error-card h1,
+.error-card h2,
+.error-card h3,
+.access-card h1,
+.access-card h2,
+.access-card h3 {
+  color: #991b1b;
+}
+
+/* Consistent helper text / inline alerts */
+.form-hint,
+.field-hint,
+.help-text,
+.muted-text,
+.table-hint {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.alert,
+.notice,
+.success-message,
+.error-message,
+.info-message {
+  width: 100%;
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+}
+
+.success-message,
+.alert.success,
+.notice.success {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: rgba(34, 197, 94, 0.26);
+}
+
+.error-message,
+.alert.error,
+.notice.error {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.26);
+}
+
+.info-message,
+.alert.info,
+.notice.info {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+/* Page body safe spacing after empty states */
+.app-main-content .empty-state:first-child,
+.app-main-content .empty-card:first-child,
+.app-main-content .empty-panel:first-child,
+.app-main-content .loading-state:first-child,
+.app-main-content .error-state:first-child {
+  margin-top: clamp(1rem, 2vw, 1.75rem);
+}
+
+@media (max-width: 760px) {
+  .empty-state,
+  .empty,
+  .empty-card,
+  .empty-panel,
+  .no-data,
+  .no-results,
+  .loading-state,
+  .error-state,
+  .error-card,
+  .access-card,
+  .not-found-card {
+    border-radius: 18px;
+    padding: 1.05rem;
+  }
+
+  .empty-state::before,
+  .empty-card::before,
+  .empty-panel::before,
+  .no-data::before,
+  .no-results::before {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
+}

@@ -1,0 +1,2774 @@
+/*
+  SmartSell UI stability layer
+  ----------------------------
+  This file deliberately uses route classes added by AppLayout. It corrects
+  layout, alignment and responsiveness without applying a new visual theme to
+  every page. Avoid adding unscoped page-specific selectors here.
+*/
+
+:root {
+  --ss-ui-page-max: 1380px;
+  --ss-ui-content-pad: clamp(14px, 2.2vw, 30px);
+  --ss-ui-section-gap: clamp(18px, 2.4vw, 30px);
+  --ss-ui-card-radius: 20px;
+  --ss-ui-panel-radius: 24px;
+  --ss-ui-line: rgba(15, 23, 42, 0.10);
+  --ss-ui-line-strong: rgba(15, 23, 42, 0.16);
+  --ss-ui-panel: #ffffff;
+  --ss-ui-soft: #f8fafc;
+  --ss-ui-text: #0f172a;
+  --ss-ui-muted: #64748b;
+  --ss-ui-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+  --ss-ui-shadow-hover: 0 18px 42px rgba(15, 23, 42, 0.11);
+}
+
+/* ================================================================
+   1. SHELL AND WIDTH SAFETY
+   ================================================================ */
+
+.app-shell,
+.management-workspace,
+.app-main-content {
+  min-width: 0;
+  width: 100%;
+}
+
+.app-main-content {
+  overflow-x: clip;
+}
+
+.app-main-content > * {
+  min-width: 0;
+}
+
+.public-main-content {
+  flex: 1 1 auto;
+  padding-bottom: clamp(30px, 5vw, 64px);
+}
+
+.management-main-content {
+  padding: clamp(18px, 2.2vw, 30px) var(--ss-ui-content-pad) clamp(36px, 5vw, 64px);
+}
+
+.management-main-content > :is(
+  .page,
+  .section,
+  .page-shell,
+  .page-section,
+  .management-page,
+  .compact-page,
+  .dashboard-page,
+  .admin-ops-page,
+  .um-page,
+  .listing-management-page,
+  .report-page,
+  .support-page,
+  .finance-page,
+  .fulfillment-page,
+  .delivery-dashboard-page,
+  .settings-page,
+  .seo-settings-page,
+  .content-manager-page,
+  .inbox-page,
+  .offers-page,
+  .my-requests-page,
+  .inventory-page,
+  .gallery-manager-page
+) {
+  width: min(100%, var(--ss-ui-page-max)) !important;
+  max-width: var(--ss-ui-page-max) !important;
+  margin: 0 auto !important;
+}
+
+.public-main-content > :is(
+  .customer-home-page,
+  .customer-feed-page,
+  .request-showcase-page,
+  .ss-page,
+  .auth-modern-shell,
+  .notfound-shell,
+  .page.section,
+  .smart-dashboard-page,
+  .smart-profile-page
+) {
+  min-width: 0;
+}
+
+.route-marketplace > .customer-feed-page,
+.route-services > .customer-feed-page,
+.route-storefronts > .customer-feed-page,
+.route-home > .customer-home-page {
+  width: min(var(--ss-ui-page-max), calc(100% - (var(--ss-ui-content-pad) * 2))) !important;
+  margin-inline: auto !important;
+}
+
+.route-request-anything > .request-showcase-page,
+.route-cart > .ss-page,
+.route-checkout > .ss-page,
+.route-login > .auth-modern-shell,
+.route-register > .auth-modern-shell,
+.route-products > .page.section,
+.route-services > .customer-detail-page,
+.route-services > .ss-page,
+.route-storefronts > .storefront-detail-page,
+.route-not-found > .notfound-shell {
+  width: min(1240px, calc(100% - (var(--ss-ui-content-pad) * 2))) !important;
+  margin-inline: auto !important;
+}
+
+/* Prevent flex/grid children, long IDs and URLs from widening a page. */
+.app-main-content :is(
+  .customer-feed-layout,
+  .customer-detail-grid,
+  .smart-profile-layout,
+  .smart-dashboard-grid,
+  .inbox-grid,
+  .seller-layout,
+  .business-stats-grid,
+  .business-list,
+  .finance-layout-grid,
+  .growth-grid,
+  .report-grid-two,
+  .content-manager-layout,
+  .seo-manager-layout,
+  .security-grid,
+  .um-workspace-grid,
+  .delivery-board-layout,
+  .gallery-manager-shell,
+  .inventory-panel,
+  .catalog-card,
+  .ops-two-column,
+  .ops-approval-grid
+) > * {
+  min-width: 0;
+}
+
+.app-main-content :is(p, small, td, th, label, strong, span) {
+  overflow-wrap: anywhere;
+}
+
+/* ================================================================
+   2. MANAGEMENT SIDEBAR AND TOPBAR
+   ================================================================ */
+
+.management-shell {
+  grid-template-columns: 272px minmax(0, 1fr);
+}
+
+.management-shell.sidebar-collapsed {
+  grid-template-columns: 78px minmax(0, 1fr);
+}
+
+.management-sidebar {
+  width: 100%;
+  max-width: 272px;
+  height: 100dvh;
+  min-height: 100dvh;
+}
+
+.management-shell.sidebar-collapsed .management-sidebar {
+  max-width: 78px;
+}
+
+.management-sidebar .sidebar-scroll-area {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.management-sidebar :is(.sidebar-menu a, .sidebar-mini-links a, .sidebar-logout) {
+  min-height: 44px;
+}
+
+.management-shell.sidebar-collapsed :is(
+  .sidebar-link-label,
+  .sidebar-section-title,
+  .sidebar-profile-copy,
+  .sidebar-workspace-title > div,
+  .sidebar-mini-links span
+) {
+  display: none;
+}
+
+.management-shell.sidebar-collapsed :is(
+  .sidebar-menu a,
+  .sidebar-mini-links a,
+  .sidebar-logout,
+  .sidebar-profile-card
+) {
+  justify-content: center;
+}
+
+.management-shell.sidebar-collapsed .sidebar-profile-card {
+  padding-inline: 8px;
+}
+
+.workspace-topbar {
+  min-width: 0;
+  min-height: 68px;
+  padding-inline: clamp(14px, 2vw, 24px);
+}
+
+.workspace-title-block,
+.workspace-title-block > div {
+  min-width: 0;
+}
+
+.workspace-title-block strong,
+.workspace-title-block small {
+  max-width: min(60vw, 440px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   3. SHARED PANELS, CARDS, HEADERS AND ACTIONS
+   ================================================================ */
+
+.management-main-content :is(
+  .management-page-header,
+  .page-heading-row,
+  .dashboard-hero,
+  .admin-hero,
+  .ops-hero,
+  .seller-command-hero,
+  .business-top-actions,
+  .delivery-command-hero,
+  .report-hero,
+  .inventory-hero,
+  .gallery-manager-hero,
+  .um-hero,
+  .smart-profile-hero,
+  .smart-dashboard-hero
+) {
+  min-width: 0;
+  border-radius: var(--ss-ui-panel-radius);
+}
+
+.management-main-content :is(
+  .management-panel,
+  .admin-card,
+  .business-panel,
+  .seller-panel,
+  .inventory-panel,
+  .catalog-card,
+  .gallery-manager-shell > section,
+  .ops-table-card,
+  .ops-request-panel,
+  .ops-approval-card,
+  .auth-card,
+  .finance-help-card,
+  .support-create-panel,
+  .support-board-column,
+  .support-ticket-card,
+  .report-panel,
+  .table-panel,
+  .panel-card,
+  .settings-group-card,
+  .content-edit-card,
+  .content-preview-card,
+  .seo-preview-card,
+  .um-create-card,
+  .um-filter-card,
+  .um-directory-panel,
+  .um-detail-panel,
+  .security-card,
+  .listing-filter-panel,
+  .listing-admin-card,
+  .fulfillment-card,
+  .delivery-pro-card,
+  .inbox-panel,
+  .notification-card,
+  .offer-card,
+  .request-workflow-card,
+  .review-card,
+  .order-card
+) {
+  border: 1px solid var(--ss-ui-line);
+  border-radius: var(--ss-ui-card-radius);
+  background: var(--ss-ui-panel);
+  box-shadow: var(--ss-ui-shadow);
+}
+
+.management-main-content :is(
+  .listing-admin-card,
+  .support-ticket-card,
+  .notification-card,
+  .offer-card,
+  .request-workflow-card,
+  .review-card,
+  .order-card,
+  .delivery-pro-card
+) {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+@media (hover: hover) {
+  .management-main-content :is(
+    .listing-admin-card,
+    .support-ticket-card,
+    .notification-card,
+    .offer-card,
+    .request-workflow-card,
+    .review-card,
+    .order-card,
+    .delivery-pro-card
+  ):hover {
+    transform: translateY(-2px);
+    border-color: rgba(37, 99, 235, 0.22);
+    box-shadow: var(--ss-ui-shadow-hover);
+  }
+}
+
+:is(
+  .hero-actions,
+  .header-action-cluster,
+  .inline-actions,
+  .row-actions,
+  .compact-actions,
+  .vertical-actions,
+  .button-row,
+  .business-action-cluster,
+  .seller-actions,
+  .fulfillment-actions,
+  .delivery-action-bar,
+  .notification-actions,
+  .listing-admin-actions,
+  .content-preview-actions,
+  .settings-sticky-actions,
+  .um-button-row,
+  .um-filter-actions,
+  .gm-image-actions,
+  .advanced-action-bar,
+  .request-submit-row,
+  .ss-form-actions
+) {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+/* Undo old phases that stretched every action into a large dashboard tile. */
+.management-main-content :is(
+  .compact-actions,
+  .vertical-actions,
+  .row-actions,
+  .listing-admin-actions,
+  .notification-actions,
+  .gm-image-actions
+) {
+  justify-content: flex-end;
+}
+
+.management-main-content :is(
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn,
+  .danger-btn,
+  .success-btn,
+  .approve-btn,
+  .reject-btn,
+  .btn,
+  button.small-btn
+) {
+  width: auto;
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.management-main-content :is(.compact-actions, .vertical-actions, .row-actions) > * {
+  flex: 0 0 auto;
+}
+
+/* ================================================================
+   4. TABLES AND DATA DENSITY
+   ================================================================ */
+
+.app-main-content :is(
+  .responsive-table-wrap,
+  .inventory-table-wrap,
+  .table-scroll,
+  .table-shell,
+  .ss-table-wrap,
+  .customer-table-scroll,
+  .ops-table-card,
+  .finance-table-panel,
+  .coupon-table-panel
+) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.app-main-content :is(
+  table,
+  .smart-table,
+  .admin-table,
+  .inventory-table,
+  .professional-table,
+  .ss-data-table,
+  .customer-data-table
+) {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+}
+
+.management-main-content :is(
+  .smart-table,
+  .admin-table,
+  .inventory-table,
+  .professional-table,
+  .report-table
+) {
+  min-width: 760px;
+}
+
+.app-main-content table th {
+  padding: 13px 15px;
+  color: #475569;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--ss-ui-line);
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.app-main-content table td {
+  padding: 14px 15px;
+  color: #334155;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.065);
+  vertical-align: middle;
+  line-height: 1.45;
+}
+
+.app-main-content table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.app-main-content table tbody tr {
+  transition: background 140ms ease;
+}
+
+@media (hover: hover) {
+  .app-main-content table tbody tr:hover td {
+    background: #f8fbff;
+  }
+}
+
+.app-main-content table :is(.compact-actions, .row-actions, .vertical-actions) {
+  min-width: max-content;
+}
+
+.empty-table-cell {
+  padding: 32px 18px !important;
+  color: var(--ss-ui-muted) !important;
+  text-align: center !important;
+}
+
+/* ================================================================
+   5. FORMS, FILTERS AND MODALS
+   ================================================================ */
+
+.app-main-content :is(
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea
+) {
+  max-width: 100%;
+}
+
+.management-main-content :is(
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea
+),
+.public-main-content :is(
+  .ss-page,
+  .request-showcase-page,
+  .auth-modern-shell,
+  .customer-feed-page,
+  .smart-profile-page
+) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 44px;
+  border: 1px solid #d7e0ea;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ss-ui-text);
+  outline: none;
+}
+
+.app-main-content textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.app-main-content :is(input, select, textarea):focus {
+  border-color: rgba(37, 99, 235, 0.58);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+:is(
+  .form-grid,
+  .smart-form-grid,
+  .content-field-grid,
+  .settings-grid,
+  .seo-field-grid,
+  .inventory-filter-row,
+  .advanced-form-grid,
+  .delivery-form-grid,
+  .fulfillment-form-grid,
+  .um-form-grid,
+  .request-form-grid,
+  .ss-form-grid
+) {
+  min-width: 0;
+}
+
+.inventory-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 28px);
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(5px);
+}
+
+.inventory-modal {
+  width: min(680px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 28px 90px rgba(15, 23, 42, 0.24);
+}
+
+.inventory-modal.wide {
+  width: min(980px, 100%);
+}
+
+/* ================================================================
+   6. CUSTOMER NAVIGATION, FOOTER AND LISTING CARDS
+   ================================================================ */
+
+.customer-nav-shell {
+  width: min(1280px, calc(100% - 24px));
+}
+
+.customer-nav {
+  max-width: 100%;
+}
+
+.customer-nav-links,
+.customer-nav-actions,
+.customer-auth-actions,
+.customer-account-menu {
+  min-width: 0;
+}
+
+.customer-brand img {
+  max-width: 100%;
+}
+
+.customer-footer-inner,
+.customer-footer-bottom {
+  width: min(1280px, calc(100% - (var(--ss-ui-content-pad) * 2)));
+}
+
+.customer-product-card,
+.customer-service-card,
+.customer-storefront-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ss-ui-line);
+  border-radius: var(--ss-ui-card-radius);
+  background: #fff;
+  box-shadow: var(--ss-ui-shadow);
+  transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+}
+
+@media (hover: hover) {
+  .customer-product-card:hover,
+  .customer-service-card:hover,
+  .customer-storefront-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(37, 99, 235, 0.20);
+    box-shadow: var(--ss-ui-shadow-hover);
+  }
+}
+
+.customer-product-card :is(.customer-card-media, h3 a)::after,
+.customer-service-card :is(.customer-service-media, h3 a)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.customer-product-card :is(
+  .customer-save-button,
+  .customer-card-actions,
+  .customer-card-actions *,
+  .customer-store-link,
+  .customer-card-note,
+  .customer-card-note *
+),
+.customer-service-card :is(
+  .customer-card-actions,
+  .customer-card-actions *,
+  .customer-store-link
+) {
+  position: relative;
+  z-index: 3;
+}
+
+.customer-card-body {
+  min-width: 0;
+}
+
+.customer-card-body h3,
+.customer-card-body p {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.customer-card-body h3 {
+  -webkit-line-clamp: 2;
+}
+
+.customer-card-body p {
+  -webkit-line-clamp: 3;
+}
+
+.customer-card-footer,
+.customer-card-actions {
+  min-width: 0;
+}
+
+.customer-card-actions > * {
+  flex: 1 1 auto;
+}
+
+.customer-product-grid,
+.customer-service-grid,
+.product-grid,
+.service-grid,
+.customer-storefront-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 255px), 1fr));
+  gap: clamp(16px, 2vw, 22px);
+  align-items: stretch;
+}
+
+/* ================================================================
+   7. HOME, MARKETPLACE, SERVICES AND STOREFRONTS
+   ================================================================ */
+
+.route-home .customer-home-page {
+  padding-top: clamp(18px, 2.5vw, 30px);
+}
+
+.route-home :is(
+  .customer-hero-section,
+  .customer-section-block,
+  .customer-request-banner,
+  .customer-stats-strip
+) {
+  min-width: 0;
+}
+
+.route-home .customer-hero-section {
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.75fr);
+  gap: clamp(24px, 4vw, 48px);
+  min-height: auto;
+}
+
+.route-home .customer-stats-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.route-home :is(.customer-work-grid, .customer-category-band) {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.route-marketplace .customer-feed-page,
+.route-services > .customer-feed-page,
+.route-storefronts .customer-feed-page {
+  padding-top: clamp(20px, 3vw, 34px);
+  padding-bottom: clamp(42px, 6vw, 76px);
+}
+
+.customer-feed-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 270px);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.customer-feed-search-card {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  width: 100%;
+  margin: 18px 0 !important;
+  padding: 16px !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: var(--ss-ui-shadow) !important;
+}
+
+.customer-feed-search-card :is(.customer-big-search, .customer-two-inputs, .customer-field-label) {
+  min-width: 0;
+}
+
+.customer-big-search {
+  width: 100%;
+}
+
+.customer-feed-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 270px) minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 28px);
+  align-items: start;
+}
+
+.customer-filter-rail {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100dvh - 116px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--ss-ui-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--ss-ui-shadow);
+  scrollbar-width: thin;
+}
+
+.customer-feed-main {
+  min-width: 0;
+}
+
+.customer-feed-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.customer-chip-scroll,
+.storefront-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.storefront-search-card {
+  grid-template-columns: minmax(240px, 1fr) minmax(200px, 300px) !important;
+}
+
+.customer-storefront-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+}
+
+/* ================================================================
+   8. PRODUCT, SERVICE, QUOTE, REQUEST, CART AND CHECKOUT
+   ================================================================ */
+
+.customer-detail-page {
+  padding-top: clamp(22px, 3vw, 38px);
+}
+
+.customer-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(22px, 3vw, 36px);
+  align-items: start;
+}
+
+.customer-gallery-card {
+  position: sticky;
+  top: 96px;
+}
+
+.customer-main-image {
+  aspect-ratio: 4 / 3;
+}
+
+.customer-action-panel,
+.customer-card-actions,
+.detail-action-row,
+.quote-action-row {
+  flex-wrap: wrap;
+}
+
+.customer-detail-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.customer-related-section {
+  min-width: 0;
+}
+
+.request-showcase-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(20px, 3vw, 34px);
+  align-items: start;
+}
+
+.request-showcase-panel,
+.request-form-shell {
+  border-radius: var(--ss-ui-panel-radius);
+}
+
+.request-type-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.ss-page {
+  max-width: 1240px;
+}
+
+.ss-cart-grid,
+.ss-quote-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
+  gap: clamp(20px, 3vw, 32px);
+  align-items: start;
+}
+
+.ss-checkout-stack {
+  min-width: 0;
+}
+
+.ss-cart-row {
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.ss-order-summary-modern,
+.ss-quote-service-card {
+  position: sticky;
+  top: 96px;
+}
+
+/* ================================================================
+   9. AUTH, CUSTOMER DASHBOARD AND PROFILE
+   ================================================================ */
+
+.auth-modern-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(380px, 0.78fr);
+  align-items: stretch;
+  gap: clamp(18px, 2.5vw, 30px);
+  padding-block: clamp(26px, 5vw, 64px);
+}
+
+.auth-modern-panel {
+  min-width: 0;
+  border-radius: var(--ss-ui-panel-radius);
+}
+
+.auth-modern-form,
+.auth-form-grid {
+  min-width: 0;
+}
+
+.smart-dashboard-page,
+.smart-profile-page {
+  width: min(1240px, calc(100% - (var(--ss-ui-content-pad) * 2)));
+  margin-inline: auto;
+}
+
+.smart-dashboard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.smart-profile-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: clamp(20px, 3vw, 30px);
+  align-items: start;
+}
+
+.smart-profile-side {
+  position: sticky;
+  top: 96px;
+}
+
+/* ================================================================
+   10. BUSINESS, ADMIN, DELIVERY AND OTHER MANAGEMENT ROUTES
+   ================================================================ */
+
+:is(
+  .business-stats-grid,
+  .finance-stat-grid,
+  .ops-metric-grid,
+  .ops-action-grid,
+  .inventory-stat-grid,
+  .delivery-metrics-grid,
+  .fulfillment-kpi-grid,
+  .delivery-kpi-grid,
+  .report-metric-grid,
+  .security-stats-grid,
+  .um-stat-grid,
+  .support-stats-grid,
+  .offer-stat-grid,
+  .stat-grid,
+  .stats-grid
+) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 14px;
+}
+
+.business-list,
+.review-list,
+.notification-list,
+.fulfillment-list,
+.delivery-task-stack,
+.support-ticket-list,
+.compact-ticket-list,
+.inventory-movement-list {
+  min-width: 0;
+}
+
+.business-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 16px;
+}
+
+.business-list-card {
+  min-width: 0;
+}
+
+.business-list-media,
+.listing-admin-media {
+  overflow: hidden;
+}
+
+.seller-layout,
+.finance-layout-grid,
+.growth-grid,
+.report-grid-two,
+.security-grid,
+.content-manager-layout,
+.seo-manager-layout,
+.inbox-grid,
+.delivery-board-layout,
+.gallery-manager-shell,
+.um-workspace-grid {
+  display: grid;
+  gap: clamp(18px, 2.4vw, 28px);
+  align-items: start;
+}
+
+.seller-layout {
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+}
+
+.finance-layout-grid,
+.growth-grid,
+.report-grid-two,
+.security-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.content-manager-layout,
+.seo-manager-layout {
+  grid-template-columns: minmax(190px, 240px) minmax(0, 1fr) minmax(240px, 320px);
+}
+
+.inbox-grid {
+  grid-template-columns: minmax(240px, 0.72fr) minmax(280px, 0.88fr) minmax(0, 1.4fr);
+}
+
+.delivery-board-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+}
+
+.gallery-manager-shell {
+  grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
+}
+
+.um-workspace-grid {
+  grid-template-columns: minmax(270px, 0.85fr) minmax(0, 1.15fr);
+}
+
+.ops-two-column,
+.ops-approval-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(18px, 2.4vw, 28px) !important;
+  align-items: start !important;
+}
+
+.ops-table-card,
+.ops-request-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden;
+}
+
+.ops-table-card > table,
+.ops-table-card .admin-table {
+  min-width: 780px;
+}
+
+.ops-card-head,
+.panel-header-row,
+.inventory-panel-head,
+.gm-panel-head,
+.support-panel-head,
+.report-panel-head,
+.business-list-head,
+.fulfillment-card-head,
+.delivery-pro-card-header,
+.customer-table-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.listing-admin-grid,
+.catalog-card-grid,
+.advanced-card-grid,
+.offer-grid,
+.request-workflow-grid,
+.support-board-grid,
+.gm-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.gallery-manager-page,
+.delivery-redesign-page {
+  width: min(100%, var(--ss-ui-page-max));
+  margin-inline: auto;
+}
+
+/* ================================================================
+   11. PAGINATION
+   ================================================================ */
+
+.smart-pagination {
+  clear: both;
+  width: 100%;
+  margin-top: 18px;
+  padding-top: 13px;
+  border-top: 1px solid var(--ss-ui-line);
+  background: transparent;
+  box-shadow: none;
+}
+
+.smart-pagination :is(button, select) {
+  min-height: 34px;
+  border-radius: 9px;
+}
+
+/* ================================================================
+   12. TABLET AND MOBILE
+   ================================================================ */
+
+@media (max-width: 1180px) {
+  .content-manager-layout,
+  .seo-manager-layout {
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  }
+
+  .content-manager-layout > :last-child,
+  .seo-manager-layout > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .inbox-grid {
+    grid-template-columns: minmax(230px, 0.78fr) minmax(0, 1.22fr);
+  }
+
+  .inbox-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1040px) {
+  .management-shell,
+  .management-shell.sidebar-collapsed {
+    display: block;
+  }
+
+  .management-sidebar,
+  .management-shell.sidebar-collapsed .management-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 120;
+    width: min(310px, 88vw);
+    max-width: none;
+    transform: translateX(-105%);
+    transition: transform 190ms ease;
+    box-shadow: 24px 0 70px rgba(15, 23, 42, 0.25);
+  }
+
+  .management-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .management-shell.sidebar-collapsed :is(
+    .sidebar-link-label,
+    .sidebar-section-title,
+    .sidebar-profile-copy,
+    .sidebar-workspace-title > div,
+    .sidebar-mini-links span
+  ) {
+    display: initial;
+  }
+
+  .management-shell.sidebar-collapsed :is(
+    .sidebar-menu a,
+    .sidebar-mini-links a,
+    .sidebar-logout,
+    .sidebar-profile-card
+  ) {
+    justify-content: flex-start;
+  }
+
+  .sidebar-collapse-btn {
+    display: none !important;
+  }
+
+  .sidebar-mobile-close,
+  .mobile-sidebar-toggle {
+    display: grid !important;
+  }
+
+  .sidebar-overlay.show {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    display: block;
+    border: 0;
+    background: rgba(15, 23, 42, 0.48);
+    backdrop-filter: blur(3px);
+  }
+
+  .customer-feed-layout,
+  .customer-detail-grid,
+  .request-showcase-shell,
+  .seller-layout,
+  .finance-layout-grid,
+  .growth-grid,
+  .report-grid-two,
+  .security-grid,
+  .delivery-board-layout,
+  .gallery-manager-shell,
+  .um-workspace-grid,
+  .ss-cart-grid,
+  .ss-quote-grid,
+  .smart-profile-layout,
+  .ops-two-column,
+  .ops-approval-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .customer-filter-rail,
+  .customer-gallery-card,
+  .ss-order-summary-modern,
+  .ss-quote-service-card,
+  .smart-profile-side {
+    position: static;
+    max-height: none;
+  }
+
+  .auth-modern-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-modern-copy {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --ss-ui-content-pad: 12px;
+    --ss-ui-card-radius: 16px;
+    --ss-ui-panel-radius: 20px;
+  }
+
+  .public-main-content {
+    padding-bottom: 86px;
+  }
+
+  .management-main-content {
+    padding: 14px 10px 32px;
+  }
+
+  .workspace-title-icon {
+    display: none;
+  }
+
+  .workspace-title-block strong,
+  .workspace-title-block small {
+    max-width: 52vw;
+  }
+
+  .route-home .customer-hero-section,
+  .customer-feed-hero,
+  .storefront-search-card,
+  .content-manager-layout,
+  .seo-manager-layout,
+  .inbox-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .route-home .customer-hero-section {
+    padding: 26px 20px;
+    border-radius: 24px;
+  }
+
+  .route-home .customer-stats-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customer-feed-hero {
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .customer-feed-search-card {
+    padding: 13px !important;
+  }
+
+  .customer-product-grid,
+  .customer-service-grid,
+  .product-grid,
+  .service-grid,
+  .customer-storefront-grid,
+  .listing-admin-grid,
+  .catalog-card-grid,
+  .advanced-card-grid,
+  .offer-grid,
+  .request-workflow-grid,
+  .support-board-grid,
+  .gm-image-grid,
+  .business-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customer-card-footer,
+  .customer-card-actions,
+  .ss-page-hero,
+  .management-page-header,
+  .page-heading-row,
+  .ops-card-head,
+  .panel-header-row,
+  .inventory-panel-head,
+  .gm-panel-head,
+  .support-panel-head,
+  .report-panel-head {
+    align-items: stretch;
+  }
+
+  .customer-card-footer,
+  .ss-page-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customer-card-actions > *,
+  .ss-page-hero > :last-child {
+    width: 100%;
+  }
+
+  .ss-cart-row {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .ss-cart-row > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  :is(
+    .form-grid.two-col,
+    .form-two,
+    .smart-form-grid.two,
+    .um-form-grid.two,
+    .um-form-grid.three,
+    .ss-form-grid.two,
+    .request-form-grid,
+    .content-field-grid,
+    .settings-grid,
+    .seo-field-grid,
+    .advanced-form-grid,
+    .delivery-form-grid,
+    .fulfillment-form-grid
+  ) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .app-main-content table th,
+  .app-main-content table td {
+    padding: 11px 12px;
+  }
+
+  .app-main-content :is(
+    .hero-actions,
+    .header-action-cluster,
+    .business-action-cluster,
+    .seller-actions,
+    .settings-sticky-actions,
+    .request-submit-row,
+    .ss-form-actions
+  ) > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .inventory-modal-backdrop {
+    align-items: end;
+    padding: 8px;
+  }
+
+  .inventory-modal,
+  .inventory-modal.wide {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 20px 20px 12px 12px;
+  }
+}
+
+@media (max-width: 460px) {
+  .route-home .customer-stats-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workspace-title-block small {
+    display: none;
+  }
+
+  .customer-nav-shell {
+    width: calc(100% - 14px);
+  }
+
+  .customer-product-card,
+  .customer-service-card,
+  .customer-storefront-card {
+    border-radius: 15px;
+  }
+
+  .smart-pagination-summary,
+  .smart-pagination-size,
+  .smart-pagination-controls {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .customer-product-card,
+  .customer-service-card,
+  .customer-storefront-card,
+  .management-main-content :is(
+    .listing-admin-card,
+    .support-ticket-card,
+    .notification-card,
+    .offer-card,
+    .request-workflow-card,
+    .review-card,
+    .order-card,
+    .delivery-pro-card
+  ) {
+    transition: none;
+  }
+}
+
+/* Phase 108 visual verification corrections — marketplace/service discovery */
+.route-marketplace .customer-feed-hero > div:first-child :is(h1, p),
+.route-services .customer-feed-hero > div:first-child :is(h1, p) {
+  color: #ffffff !important;
+}
+
+.route-marketplace .customer-feed-hero > div:first-child p,
+.route-services .customer-feed-hero > div:first-child p {
+  color: rgba(255, 255, 255, 0.76) !important;
+}
+
+.route-marketplace .customer-feed-hero > div:first-child .customer-eyebrow,
+.route-services .customer-feed-hero > div:first-child .customer-eyebrow {
+  color: #dbeafe !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+.route-marketplace .customer-feed-search-card,
+.route-services .customer-feed-search-card {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 1.5fr) minmax(220px, 0.6fr) auto !important;
+  align-items: end !important;
+  gap: 14px !important;
+}
+
+.route-marketplace .customer-feed-search-card > button,
+.route-services .customer-feed-search-card > button {
+  width: auto !important;
+  min-width: 112px !important;
+  min-height: 48px !important;
+  padding-inline: 18px !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+  white-space: nowrap;
+}
+
+.route-marketplace .customer-feed-search-card > button:hover,
+.route-services .customer-feed-search-card > button:hover {
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  background: #eff6ff !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 820px) {
+  .route-marketplace .customer-feed-search-card,
+  .route-services .customer-feed-search-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-marketplace .customer-feed-search-card > button,
+  .route-services .customer-feed-search-card > button {
+    width: 100% !important;
+  }
+}
+
+/* ================================================================
+   14. PHASE 108 VISUAL AUDIT CORRECTIONS
+   These rules counter old broad layout declarations only where the
+   corresponding page/component has a dedicated structure.
+   ================================================================ */
+
+/* SectionHeader is a text component. Older management rules turned its
+   three children into a horizontal toolbar, which squeezed titles and
+   produced vertical eyebrow text. */
+.management-main-content .section-header {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  align-items: initial !important;
+  justify-content: initial !important;
+  text-align: left !important;
+}
+
+.management-main-content .section-header .eyebrow {
+  margin-bottom: 10px;
+}
+
+.management-main-content .section-header h2 {
+  max-width: 900px;
+  margin: 0 0 10px !important;
+  font-size: clamp(2rem, 3.6vw, 3.45rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.management-main-content .section-header p {
+  max-width: 780px;
+  margin: 0 !important;
+}
+
+/* User management */
+.route-users .um-page .um-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 290px) !important;
+  gap: 22px !important;
+  align-items: stretch !important;
+}
+
+.route-users .um-hero .section-header {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.route-users .um-hero .section-header h2 {
+  font-size: clamp(2.15rem, 4vw, 3.8rem) !important;
+}
+
+.route-users .um-page .um-hero-panel {
+  width: auto !important;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 7px;
+  padding: 22px !important;
+  color: #fff !important;
+  background: linear-gradient(145deg, #0f172a, #1e3a8a) !important;
+}
+
+.route-users .um-page .um-hero-panel :is(strong, p) {
+  color: inherit !important;
+  margin: 0 !important;
+}
+
+.route-users .um-page .um-hero-panel strong {
+  font-size: clamp(2.3rem, 4vw, 3.7rem);
+  line-height: 1;
+}
+
+.route-users .um-page .um-hero-panel p {
+  color: #dbeafe !important;
+}
+
+.route-users .um-page .um-stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+.route-users .um-page .um-command-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr) !important;
+  gap: 18px !important;
+  align-items: start !important;
+}
+
+.route-users .um-page .um-filter-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.route-users .um-page .um-filter-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #475569;
+  background: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+/* Admin command center */
+.route-admin .admin-ops-page .ops-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 260px) !important;
+  align-items: stretch !important;
+  gap: 22px !important;
+}
+
+.route-admin .admin-ops-page .ops-priority-card {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 7px;
+  padding: 22px !important;
+}
+
+.route-admin .admin-ops-page .ops-priority-card :is(small, strong, span, a) {
+  display: block;
+  margin: 0;
+}
+
+.route-admin .admin-ops-page .ops-priority-card a {
+  margin-top: 8px;
+  color: #1d4ed8;
+  font-weight: 850;
+}
+
+.route-admin .admin-ops-page .ops-metric-grid,
+.route-admin .admin-ops-page .ops-action-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.route-admin .admin-ops-page .ops-two-column,
+.route-admin .admin-ops-page .ops-approval-grid {
+  grid-template-columns: 1fr !important;
+}
+
+.route-admin .admin-ops-page .ops-table-card {
+  overflow-x: auto !important;
+}
+
+.route-admin .admin-ops-page .ops-table-card > table {
+  min-width: 820px;
+}
+
+/* Listing management */
+.route-listings .listing-management-page .listing-hero {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+}
+
+.route-listings .listing-management-page .compact-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.route-listings .listing-management-page .listing-filter-grid {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 1.35fr) repeat(2, minmax(190px, 0.55fr)) !important;
+  gap: 12px !important;
+  align-items: end !important;
+}
+
+.route-listings .listing-management-page .listing-tabs {
+  display: inline-flex !important;
+  width: fit-content;
+  margin-top: 14px;
+}
+
+.route-listings .listing-management-page .premium-empty-state {
+  grid-column: 1 / -1;
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+/* Delivery workflow introduction */
+.route-delivery .delivery-redesign-page > .section-header {
+  max-width: 920px !important;
+  padding: clamp(22px, 3vw, 30px) !important;
+  margin: 20px 0 !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(135deg, #ffffff, #f8fbff) !important;
+  box-shadow: var(--ss-ui-shadow) !important;
+}
+
+.route-delivery .delivery-redesign-page > .section-header h2 {
+  max-width: 760px;
+  font-size: clamp(2.1rem, 4.2vw, 3.75rem) !important;
+}
+
+/* Keep common segmented controls from falling back to browser-default buttons. */
+.management-main-content .segmented-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  background: #f8fafc;
+}
+
+.management-main-content .segmented-tabs > button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 11px;
+  color: #475569;
+  background: transparent;
+  font-weight: 800;
+}
+
+.management-main-content .segmented-tabs > button.active,
+.management-main-content .segmented-tabs > button[aria-selected="true"] {
+  color: #1d4ed8;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 1120px) {
+  .route-users .um-page .um-stat-grid,
+  .route-admin .admin-ops-page .ops-metric-grid,
+  .route-admin .admin-ops-page .ops-action-grid,
+  .route-listings .listing-management-page .compact-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .route-users .um-page .um-command-grid,
+  .route-listings .listing-management-page .listing-filter-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .route-users .um-page .um-hero,
+  .route-admin .admin-ops-page .ops-hero,
+  .route-listings .listing-management-page .listing-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-users .um-page .um-stat-grid,
+  .route-admin .admin-ops-page .ops-metric-grid,
+  .route-admin .admin-ops-page .ops-action-grid,
+  .route-listings .listing-management-page .compact-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-admin .admin-ops-page .ops-table-card > table {
+    min-width: 720px;
+  }
+}
+
+/* ========================================================================== */
+/* 15. Route-level completion pass                                            */
+/* ========================================================================== */
+
+/* The shared SectionHeader was accidentally converted into a horizontal row
+   by a legacy management repair. Public pages use the same component, so keep
+   its content stacked and readable everywhere outside management-specific
+   layouts too. */
+.public-main-content .section-header {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  align-items: initial !important;
+  justify-content: initial !important;
+  text-align: left !important;
+}
+
+.public-main-content .section-header .eyebrow {
+  display: inline-flex;
+  margin: 0 0 10px !important;
+}
+
+.public-main-content .section-header h1,
+.public-main-content .section-header h2 {
+  width: auto !important;
+  max-width: 900px !important;
+  margin: 0 0 10px !important;
+  font-size: clamp(2rem, 4vw, 3.65rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.045em !important;
+  overflow-wrap: anywhere;
+}
+
+.public-main-content .section-header p {
+  width: auto !important;
+  max-width: 780px !important;
+  margin: 0 !important;
+  line-height: 1.75 !important;
+}
+
+.route-orders .customer-orders-page > .section-header,
+.route-my-reviews .customer-reviews-page > .section-header,
+.route-wishlist .customer-wishlist-page > .section-header {
+  padding: clamp(24px, 4vw, 38px) !important;
+  margin-bottom: 20px !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 26px !important;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(6, 182, 212, 0.14), transparent 28rem),
+    linear-gradient(135deg, #ffffff, #f8fbff) !important;
+  box-shadow: var(--ss-ui-shadow) !important;
+}
+
+/* Reports remain useful during an API failure instead of collapsing into a
+   single alert on a blank page. */
+.route-reports .report-loading-card,
+.route-reports .report-page > .form-status.error {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+}
+
+.route-reports .report-page > .form-status.error {
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  background: #fff7f7;
+}
+
+/* Fulfillment */
+.route-fulfillment .fulfillment-kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin: 20px 0 !important;
+}
+
+.route-fulfillment .fulfillment-kpi-grid > article {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--ss-ui-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--ss-ui-shadow-sm);
+}
+
+.route-fulfillment .fulfillment-kpi-grid > article span,
+.route-fulfillment .fulfillment-kpi-grid > article strong,
+.route-fulfillment .fulfillment-kpi-grid > article p {
+  display: block;
+}
+
+.route-fulfillment .fulfillment-kpi-grid > article span {
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.route-fulfillment .fulfillment-kpi-grid > article strong {
+  color: #0f172a;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.route-fulfillment .fulfillment-kpi-grid > article p {
+  margin: 9px 0 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.route-fulfillment .fulfillment-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 340px) !important;
+  align-items: center !important;
+  gap: 18px !important;
+  padding: 18px 20px !important;
+  margin: 0 0 18px !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: var(--ss-ui-shadow-sm) !important;
+}
+
+.route-fulfillment .fulfillment-toolbar strong {
+  color: #0f172a;
+  font-size: 1.02rem;
+}
+
+.route-fulfillment .fulfillment-toolbar p {
+  margin: 5px 0 0;
+  color: #64748b;
+}
+
+.route-fulfillment .fulfillment-toolbar select {
+  width: 100%;
+  min-height: 46px;
+}
+
+.route-fulfillment .fulfillment-list {
+  display: grid;
+  gap: 18px;
+}
+
+.route-fulfillment .fulfillment-card {
+  min-width: 0;
+  padding: clamp(18px, 2.5vw, 26px) !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 24px !important;
+  background: #fff !important;
+  box-shadow: var(--ss-ui-shadow-sm) !important;
+}
+
+.route-fulfillment .fulfillment-card-head,
+.route-fulfillment .fulfillment-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.route-fulfillment .fulfillment-card-head h3 {
+  margin: 4px 0;
+}
+
+.route-fulfillment .fulfillment-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.route-fulfillment .fulfillment-summary-grid > div {
+  min-width: 0;
+  padding: 13px;
+  border-radius: 15px;
+  background: #f8fafc;
+}
+
+.route-fulfillment .fulfillment-summary-grid span,
+.route-fulfillment .fulfillment-summary-grid strong {
+  display: block;
+}
+
+.route-fulfillment .fulfillment-summary-grid span {
+  margin-bottom: 5px;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.route-fulfillment .fulfillment-summary-grid strong {
+  overflow-wrap: anywhere;
+}
+
+.route-fulfillment .fulfillment-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.route-fulfillment .fulfillment-form-grid label,
+.route-fulfillment .fulfillment-note-label {
+  display: grid;
+  gap: 7px;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.route-fulfillment .fulfillment-note-label {
+  margin-top: 14px;
+}
+
+.route-fulfillment .fulfillment-actions {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* Support Center – the component uses support-* classes, while the old CSS
+   targeted obsolete ss-support selectors. */
+.route-support .support-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin: 20px 0 !important;
+}
+
+.route-support .support-stats-grid > article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--ss-ui-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--ss-ui-shadow-sm);
+}
+
+.route-support .support-stats-grid i {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 14px;
+  background: #eff6ff;
+  font-style: normal;
+}
+
+.route-support .support-stats-grid span {
+  min-width: 0;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.route-support .support-stats-grid strong {
+  color: #0f172a;
+  font-size: 1.7rem;
+}
+
+.route-support .support-create-panel {
+  padding: clamp(20px, 3vw, 30px) !important;
+  margin: 0 0 20px !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 24px !important;
+  background: #fff !important;
+  box-shadow: var(--ss-ui-shadow) !important;
+}
+
+.route-support .support-panel-head,
+.route-support .support-ticket-head,
+.route-support .support-column-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.route-support .support-panel-head {
+  margin-bottom: 18px;
+}
+
+.route-support .support-panel-head h2,
+.route-support .support-column-head h3 {
+  margin: 4px 0 6px;
+}
+
+.route-support .support-head-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 18px;
+  background: #eff6ff;
+  font-size: 1.5rem;
+}
+
+.route-support .support-board-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: start;
+  gap: 18px !important;
+}
+
+.route-support .support-board-column {
+  min-width: 0;
+  padding: clamp(17px, 2vw, 22px);
+  border: 1px solid var(--ss-ui-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: var(--ss-ui-shadow-sm);
+}
+
+.route-support .support-column-head {
+  align-items: center;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.route-support .support-column-head h3 {
+  margin: 0;
+}
+
+.route-support .support-column-head span {
+  display: grid;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  place-items: center;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-weight: 900;
+}
+
+.route-support .support-ticket-list {
+  display: grid;
+  gap: 14px;
+}
+
+.route-support .support-ticket-card {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fdfefe;
+}
+
+.route-support .support-ticket-head {
+  margin-bottom: 12px;
+}
+
+.route-support .support-ticket-head h3 {
+  margin: 3px 0;
+  overflow-wrap: anywhere;
+}
+
+.route-support .support-pill-stack {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+  flex-direction: column;
+}
+
+.route-support .support-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #475569;
+  background: #f1f5f9;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.route-support .soft-note {
+  padding: 24px;
+  margin: 0;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  color: #64748b;
+  text-align: center;
+  background: #f8fafc;
+}
+
+/* Inbox */
+.route-inbox .management-page-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 20px !important;
+  padding: clamp(24px, 4vw, 38px) !important;
+  margin-bottom: 20px !important;
+  border: 1px solid var(--ss-ui-line) !important;
+  border-radius: 26px !important;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(59, 130, 246, 0.14), transparent 28rem),
+    linear-gradient(135deg, #ffffff, #f8fbff) !important;
+  box-shadow: var(--ss-ui-shadow) !important;
+}
+
+.route-inbox .management-page-header h1 {
+  max-width: 780px;
+  margin: 7px 0 10px;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+.route-inbox .management-page-header p {
+  max-width: 760px;
+  margin: 0;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.route-inbox .realtime-status-card {
+  display: grid !important;
+  min-width: 170px;
+  padding: 16px 18px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 18px !important;
+  background: #eff6ff !important;
+  box-shadow: none !important;
+}
+
+.route-inbox .realtime-status-card span,
+.route-inbox .realtime-status-card strong,
+.route-inbox .realtime-status-card p {
+  display: block;
+}
+
+.route-inbox .realtime-status-card strong {
+  margin: 5px 0;
+  font-size: 2rem;
+}
+
+.route-inbox .realtime-status-card p {
+  margin: 0;
+}
+
+.route-inbox .inbox-grid {
+  display: grid !important;
+  grid-template-columns: minmax(250px, 0.8fr) minmax(280px, 0.9fr) minmax(360px, 1.55fr) !important;
+  align-items: stretch;
+  gap: 16px !important;
+  min-width: 0;
+}
+
+.route-inbox .inbox-panel {
+  min-width: 0;
+  min-height: 620px;
+  padding: 18px;
+  border: 1px solid var(--ss-ui-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: var(--ss-ui-shadow-sm);
+  overflow: hidden;
+}
+
+.route-inbox .compose-panel,
+.route-inbox .thread-list-panel {
+  align-self: start;
+}
+
+.route-inbox .stacked-form {
+  display: grid;
+  gap: 14px;
+}
+
+.route-inbox .stacked-form label {
+  display: grid;
+  gap: 7px;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.route-inbox .thread-list-head,
+.route-inbox .message-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.route-inbox .thread-list-head {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.route-inbox .thread-list-head h2,
+.route-inbox .message-panel-header h2 {
+  margin: 0;
+}
+
+.route-inbox .thread-list-head > span {
+  display: grid;
+  min-width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-weight: 900;
+}
+
+.route-inbox .context-filter-pills {
+  display: flex;
+  gap: 7px;
+  padding-bottom: 12px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.route-inbox .context-filter-pills button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #475569;
+  background: #f8fafc;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.route-inbox .context-filter-pills button.active {
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.route-inbox .thread-list {
+  display: grid;
+  gap: 8px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.route-inbox .thread-item {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100%;
+  min-height: 74px;
+  padding: 11px !important;
+  border: 1px solid transparent !important;
+  border-radius: 15px !important;
+  color: #334155 !important;
+  text-align: left;
+  background: #f8fafc !important;
+}
+
+.route-inbox .thread-item:hover,
+.route-inbox .thread-item.active {
+  border-color: #bfdbfe !important;
+  background: #eff6ff !important;
+}
+
+.route-inbox .thread-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 13px;
+  color: #1d4ed8;
+  background: #dbeafe;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.route-inbox .thread-item > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.route-inbox .thread-item strong,
+.route-inbox .thread-item small,
+.route-inbox .thread-item em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.route-inbox .thread-item mark {
+  width: max-content;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #475569;
+  background: #e2e8f0;
+  font-size: 0.67rem;
+  font-style: normal;
+}
+
+.route-inbox .message-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.route-inbox .message-panel-header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.route-inbox .message-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.route-inbox .message-list {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 330px;
+  max-height: 470px;
+  padding: 16px 3px;
+  gap: 10px;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.route-inbox .reply-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.route-inbox .empty-state-card {
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 420px;
+  place-items: center;
+  align-content: center;
+  padding: 28px;
+  text-align: center;
+}
+
+.route-inbox .empty-state-card > span {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 10px;
+  border-radius: 19px;
+  color: #1d4ed8;
+  background: #dbeafe;
+  font-weight: 950;
+}
+
+.route-inbox .empty-state-card h2,
+.route-inbox .empty-state-card p {
+  margin: 4px 0;
+}
+
+/* Inventory: six metrics should form two balanced rows, not five cards plus
+   one orphan. */
+.route-inventory .inventory-stat-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 1180px) {
+  .route-fulfillment .fulfillment-kpi-grid,
+  .route-support .support-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .route-fulfillment .fulfillment-form-grid,
+  .route-fulfillment .fulfillment-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .route-inbox .inbox-grid {
+    grid-template-columns: minmax(260px, 0.85fr) minmax(360px, 1.4fr) !important;
+  }
+
+  .route-inbox .compose-panel {
+    grid-column: 1 / -1;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 820px) {
+  .route-fulfillment .fulfillment-toolbar,
+  .route-support .support-board-grid,
+  .route-inbox .management-page-header,
+  .route-inbox .inbox-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-fulfillment .fulfillment-kpi-grid,
+  .route-support .support-stats-grid,
+  .route-inventory .inventory-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .route-inbox .inbox-panel {
+    min-height: auto;
+  }
+
+  .route-inbox .thread-list,
+  .route-inbox .message-list {
+    max-height: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .route-fulfillment .fulfillment-kpi-grid,
+  .route-fulfillment .fulfillment-form-grid,
+  .route-fulfillment .fulfillment-summary-grid,
+  .route-support .support-stats-grid,
+  .route-inventory .inventory-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-support .support-stats-grid > article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .route-support .support-stats-grid strong {
+    grid-column: 2;
+  }
+
+  .route-inbox .reply-box {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================================================== */
+/* 16. Storefront and reports finishing                                      */
+/* ========================================================================== */
+
+/* CustomerShowcase.css is bundled globally and gave the first storefront hero
+   column a dark card even though Storefronts.css designs the whole hero as one
+   light panel. Restore the intended single-surface composition. */
+.route-storefronts .storefront-hero > div:first-child {
+  min-width: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #0f172a !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.route-storefronts .storefront-hero > div:first-child .customer-eyebrow {
+  color: #1d4ed8 !important;
+  border-color: #bfdbfe !important;
+  background: #eff6ff !important;
+}
+
+.route-storefronts .storefront-hero > div:first-child h1 {
+  color: #0f172a !important;
+}
+
+.route-storefronts .storefront-hero > div:first-child p {
+  color: #64748b !important;
+}
+
+.route-storefronts .customer-store-stat-grid {
+  display: grid !important;
+  min-height: 0 !important;
+  color: #0f172a !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+}
+
+.route-storefronts .customer-store-stat-grid span {
+  color: #0f172a !important;
+}
+
+.route-storefronts .customer-error-line {
+  padding: 13px 15px;
+  margin: 0 0 14px;
+  border: 1px solid #fecaca;
+  border-radius: 15px;
+  color: #991b1b;
+  background: #fff7f7;
+}
+
+.route-storefronts .customer-empty-panel {
+  padding: clamp(26px, 4vw, 44px);
+  border: 1px dashed #cbd5e1;
+  border-radius: 22px;
+  text-align: center;
+  background: #fff;
+}
+
+.route-storefronts .customer-empty-panel strong,
+.route-storefronts .customer-empty-panel p {
+  display: block;
+  margin: 0;
+}
+
+.route-storefronts .customer-empty-panel p {
+  margin-top: 8px;
+  color: #64748b;
+}
+
+.route-reports .report-hero > .secondary-btn {
+  width: auto !important;
+  min-width: 150px;
+  align-self: center;
+  justify-self: end;
+}
+
+.route-reports .report-metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+.route-reports .report-mini-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 1120px) {
+  .route-reports .report-metric-grid,
+  .route-reports .report-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .route-storefronts .storefront-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-reports .report-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .route-reports .report-hero > .secondary-btn {
+    width: 100% !important;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .route-reports .report-metric-grid,
+  .route-reports .report-mini-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ========================================================================== */
+/* 17. Admin settings/content/SEO composition                                */
+/* ========================================================================== */
+
+.route-content .content-manager-layout,
+.route-seo .seo-manager-layout {
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr) !important;
+  gap: 18px !important;
+}
+
+.route-content .content-section-tabs button,
+.route-seo .seo-section-tabs button {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 3px 9px !important;
+  width: 100%;
+  min-width: 0;
+}
+
+.route-content .content-section-tabs button > span,
+.route-seo .seo-section-tabs button > span {
+  grid-row: 1 / span 2;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 10px;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.route-content .content-section-tabs button > strong,
+.route-content .content-section-tabs button > small,
+.route-seo .seo-section-tabs button > strong,
+.route-seo .seo-section-tabs button > small {
+  grid-column: 2;
+  display: block;
+  min-width: 0;
+}
+
+.route-content .content-section-tabs button > strong,
+.route-seo .seo-section-tabs button > strong {
+  color: #1e293b;
+  line-height: 1.25;
+}
+
+.route-content .content-section-tabs button > small,
+.route-seo .seo-section-tabs button > small {
+  margin-top: 3px;
+  color: #64748b;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.route-content .content-section-tabs button.active > strong,
+.route-seo .seo-section-tabs button.active > strong {
+  color: #1d4ed8;
+}
+
+.route-content .content-edit-heading,
+.route-seo .content-edit-heading {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  justify-content: initial !important;
+}
+
+.route-content .content-edit-heading > span,
+.route-seo .content-edit-heading > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.route-content .content-preview-card,
+.route-seo .seo-preview-card {
+  min-width: 0;
+}
+
+.route-seo .seo-social-preview > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.route-seo .seo-social-preview > div:last-child strong,
+.route-seo .seo-social-preview > div:last-child span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.route-seo .seo-social-preview > div:last-child span {
+  flex: 0 0 auto;
+  color: #64748b;
+}
+
+.route-settings .settings-header-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 320px) !important;
+  align-items: center !important;
+  gap: 22px !important;
+}
+
+.route-settings .settings-rate-card {
+  display: grid !important;
+  gap: 5px !important;
+  min-width: 0;
+  padding: 18px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: var(--ss-ui-shadow-sm) !important;
+}
+
+.route-settings .settings-rate-card span,
+.route-settings .settings-rate-card strong,
+.route-settings .settings-rate-card small {
+  display: block;
+}
+
+.route-settings .settings-rate-card span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.route-settings .settings-rate-card strong {
+  color: #0f172a;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+}
+
+.route-settings .settings-rate-card small {
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.route-settings .settings-form {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 980px) {
+  .route-content .content-manager-layout,
+  .route-seo .seo-manager-layout,
+  .route-settings .settings-header-card {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.route-content .content-preview-actions > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-size: 0.78rem;
+  font-weight: 850;
+}

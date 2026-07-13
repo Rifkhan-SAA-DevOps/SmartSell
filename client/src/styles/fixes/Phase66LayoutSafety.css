@@ -1,0 +1,403 @@
+/* Phase 66 - Layout safety layer
+   Purpose: keep SmartSell pages professional by preventing squeezed columns/cards.
+   This file is imported from AppLayout and does not replace global.css or page CSS. */
+
+:root {
+  --ss-page-max: 1280px;
+  --ss-admin-max: 1440px;
+  --ss-safe-gap: clamp(14px, 2vw, 24px);
+}
+
+/* Every main content area must be allowed to shrink internally without forcing overflow. */
+.app-main-content,
+.public-main-content,
+.management-main-content,
+.management-workspace,
+.public-shell,
+.management-shell {
+  min-width: 0;
+}
+
+/* Public/customer pages: keep page width readable and centered. */
+.public-main-content > :where(
+  .customer-home-page,
+  .customer-feed-page,
+  .service-feed-page,
+  .storefront-public-page,
+  .storefront-directory-page,
+  .customer-detail-page,
+  .product-detail-clean,
+  .service-detail-clean,
+  .ss-page,
+  .ss-cart-page,
+  .ss-checkout,
+  .ss-quote-page,
+  .ss-storefront-page,
+  .smart-dashboard-page,
+  .smart-profile-page,
+  .customer-orders-page,
+  .customer-reviews-page,
+  .customer-wishlist-page,
+  .ss-my-requests,
+  .ss-inbox,
+  .ss-notifications,
+  .ss-offers,
+  .ss-support
+) {
+  width: min(var(--ss-page-max), calc(100% - 32px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Management pages: keep full width but not squeezed or edge-to-edge. */
+.management-main-content > :where(
+  .admin-ops-page,
+  .um-page,
+  .listing-management-page,
+  .fulfillment-page,
+  .report-page,
+  .promotion-center-page,
+  .settings-page,
+  .content-manager-page,
+  .seo-settings-page,
+  .security-center-page,
+  .seller-hub-page,
+  .business-dashboard-page,
+  .finance-page,
+  .delivery-dashboard-page,
+  .smart-dashboard-page,
+  .smart-profile-page
+) {
+  width: min(var(--ss-admin-max), 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Search/filter pages: desktop can be side-by-side, but only when result cards have enough space. */
+.customer-feed-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  gap: var(--ss-safe-gap);
+  align-items: start;
+}
+
+.customer-feed-main,
+.customer-filter-rail,
+.customer-feed-page,
+.service-feed-page {
+  min-width: 0;
+}
+
+.customer-filter-rail {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+/* Product/service grids: never create tiny cards. */
+:where(
+  .customer-product-grid,
+  .customer-service-grid,
+  .enhanced-product-grid,
+  .enhanced-service-grid,
+  .product-grid,
+  .service-grid,
+  .related-grid,
+  .customer-storefront-grid,
+  .listing-admin-grid
+) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--ss-safe-gap);
+  align-items: stretch;
+  min-width: 0;
+}
+
+.enhanced-product-grid,
+.customer-product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+.enhanced-service-grid,
+.customer-service-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
+/* Forms/cards should stack unless there is enough screen space. */
+:where(
+  .form-grid,
+  .smart-form-grid,
+  .ss-form-grid,
+  .auth-form-grid,
+  .content-field-grid,
+  .seo-field-grid,
+  .settings-grid,
+  .fulfillment-form-grid,
+  .delivery-update-grid,
+  .um-form-grid,
+  .listing-filter-grid,
+  .filter-grid,
+  .customer-two-inputs,
+  .form-two,
+  .two-col-grid,
+  .ss-quote-grid,
+  .ss-detail-grid,
+  .ss-cart-grid,
+  .ss-store-layout,
+  .customer-detail-grid,
+  .service-detail-grid-clean
+) {
+  min-width: 0;
+}
+
+:where(
+  .ss-quote-grid,
+  .ss-detail-grid,
+  .ss-cart-grid,
+  .ss-store-layout,
+  .customer-detail-grid,
+  .service-detail-grid-clean,
+  .seller-layout,
+  .content-manager-layout,
+  .seo-manager-layout,
+  .finance-layout-grid
+) {
+  gap: var(--ss-safe-gap);
+}
+
+/* Admin/business layout safety: key panels should stack vertically instead of compressing. */
+:where(
+  .ops-two-column,
+  .admin-request-grid,
+  .ops-request-grid,
+  .um-command-grid,
+  .um-action-grid,
+  .content-grid,
+  .growth-grid,
+  .settings-grid,
+  .report-grid-two,
+  .finance-layout-grid,
+  .seller-layout,
+  .business-request-grid,
+  .delivery-dashboard-grid
+) {
+  grid-template-columns: 1fr !important;
+}
+
+/* Stats can use multiple columns, but with safe widths. */
+:where(
+  .stats-grid,
+  .compact-stats,
+  .ops-metric-grid,
+  .orders-kpi-grid,
+  .reviews-kpi-grid,
+  .business-stats-grid,
+  .finance-stat-grid,
+  .fulfillment-kpi-grid,
+  .delivery-kpi-grid,
+  .report-metric-grid,
+  .report-mini-grid,
+  .security-stats-grid,
+  .customer-stats-strip,
+  .customer-store-stat-grid
+) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--ss-safe-gap);
+  min-width: 0;
+}
+
+/* Tables: keep columns readable and scroll only the table container. */
+:where(
+  .responsive-table-wrap,
+  .table-scroll,
+  .table-shell,
+  .table-panel,
+  .customer-table-scroll,
+  .ss-table-wrap,
+  .finance-table-panel,
+  .coupon-table-panel,
+  .ops-table-card,
+  .customer-table-card
+) {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  border-radius: 18px;
+}
+
+:where(
+  table,
+  .smart-table,
+  .admin-table,
+  .professional-table,
+  .customer-data-table,
+  .ss-data-table,
+  .orders-table,
+  .reviews-table,
+  .report-table,
+  .audit-table,
+  .order-items-table
+) {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+:where(td, th) {
+  vertical-align: middle;
+}
+
+/* Prevent text and buttons from forcing narrow cards to break. */
+:where(
+  .row-actions,
+  .inline-actions,
+  .stacked-actions,
+  .compact-actions,
+  .customer-modal-actions,
+  .ss-modal-actions,
+  .ss-form-actions,
+  .um-button-row,
+  .listing-admin-actions,
+  .fulfillment-actions,
+  .business-top-actions,
+  .hero-actions,
+  .customer-hero-actions,
+  .ss-hero-actions
+) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+:where(button, .btn, .primary-btn, .secondary-btn, .small-btn, .customer-primary-action, .customer-outline-action, .ss-primary-btn, .ss-light-btn) {
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* Cards and panels should not overflow their parents. */
+:where(
+  .glass-card,
+  .panel-card,
+  .management-panel,
+  .business-panel,
+  .seller-panel,
+  .ss-panel,
+  .customer-table-card,
+  .customer-gallery-card,
+  .customer-price-card,
+  .customer-trust-panel,
+  .service-action-panel-clean,
+  .service-process-panel-clean,
+  .ss-quote-service-card,
+  .ss-summary-list,
+  .um-create-card,
+  .um-directory-panel,
+  .um-detail-panel,
+  .listing-admin-card,
+  .fulfillment-card,
+  .report-panel,
+  .settings-group-card,
+  .content-edit-card,
+  .seo-edit-card,
+  .security-card
+) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Tablet: filters and all heavy grids stack above/below. */
+@media (max-width: 1180px) {
+  .customer-feed-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .customer-filter-rail {
+    position: static;
+    max-height: none;
+  }
+
+  :where(
+    .ss-quote-grid,
+    .ss-detail-grid,
+    .ss-cart-grid,
+    .ss-store-layout,
+    .customer-detail-grid,
+    .service-detail-grid-clean,
+    .content-manager-layout,
+    .seo-manager-layout,
+    .seller-layout,
+    .finance-layout-grid
+  ) {
+    display: grid;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  :root { --ss-safe-gap: 14px; }
+
+  .public-main-content > :where(
+    .customer-home-page,
+    .customer-feed-page,
+    .service-feed-page,
+    .storefront-public-page,
+    .storefront-directory-page,
+    .customer-detail-page,
+    .product-detail-clean,
+    .service-detail-clean,
+    .ss-page,
+    .ss-cart-page,
+    .ss-checkout,
+    .ss-quote-page,
+    .ss-storefront-page,
+    .smart-dashboard-page,
+    .smart-profile-page,
+    .customer-orders-page,
+    .customer-reviews-page,
+    .customer-wishlist-page,
+    .ss-my-requests,
+    .ss-inbox,
+    .ss-notifications,
+    .ss-offers,
+    .ss-support
+  ) {
+    width: min(100%, calc(100% - 20px));
+  }
+
+  .management-main-content {
+    padding: 16px 10px 34px !important;
+  }
+
+  :where(
+    .customer-product-grid,
+    .customer-service-grid,
+    .enhanced-product-grid,
+    .enhanced-service-grid,
+    .product-grid,
+    .service-grid,
+    .related-grid,
+    .customer-storefront-grid,
+    .listing-admin-grid
+  ) {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(
+    table,
+    .smart-table,
+    .admin-table,
+    .professional-table,
+    .customer-data-table,
+    .ss-data-table,
+    .orders-table,
+    .reviews-table,
+    .report-table,
+    .audit-table,
+    .order-items-table
+  ) {
+    min-width: 680px;
+  }
+}

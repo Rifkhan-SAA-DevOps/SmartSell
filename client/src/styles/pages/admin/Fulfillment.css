@@ -1,0 +1,88 @@
+.fulfillment-page > .section-header,
+.fulfillment-page .section-header {
+  margin-bottom: 18px;
+}
+
+.fulfillment-page .fulfillment-kpi-grid,
+.fulfillment-page .fulfillment-list {
+  display: grid;
+  gap: 16px;
+}
+
+.fulfillment-page .delivery-kpi-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 18px 0;
+}
+
+.fulfillment-page .fulfillment-toolbar,
+.fulfillment-page .delivery-assign-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, .07);
+  padding: 18px;
+}
+
+.fulfillment-page .fulfillment-card-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+.fulfillment-page .order-status-group,
+.fulfillment-page .fulfillment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.fulfillment-page .fulfillment-summary-grid,
+.fulfillment-page .fulfillment-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.fulfillment-page .fulfillment-summary-grid span {
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 12px;
+  color: #334155;
+}
+
+.fulfillment-page .fulfillment-summary-grid strong,
+.fulfillment-page .fulfillment-note-label {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.fulfillment-page .fulfillment-items {
+  margin: 14px 0;
+  display: grid;
+  gap: 8px;
+}
+
+.fulfillment-page .fulfillment-items li,
+.fulfillment-page .mini-action-note,
+.fulfillment-page .soft-note {
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 10px 12px;
+}
+
+@media (max-width: 720px) {
+  .fulfillment-page .fulfillment-card-head,
+  .fulfillment-page .order-status-group,
+  .fulfillment-page .fulfillment-actions { justify-content: flex-start; grid-template-columns: 1fr; }
+}

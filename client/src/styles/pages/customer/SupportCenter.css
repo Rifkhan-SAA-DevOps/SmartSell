@@ -1,0 +1,4 @@
+@import "./WorkflowCommon.css";
+.ss-support .ss-stat-strip { margin-bottom: 18px; }
+.ss-support-form { margin-bottom: 18px; }
+.ss-support .ss-data-table td:nth-child(2) { min-width: 250px; }

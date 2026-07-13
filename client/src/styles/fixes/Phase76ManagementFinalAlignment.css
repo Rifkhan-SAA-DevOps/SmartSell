@@ -1,0 +1,442 @@
+/* Phase 76: final management shell alignment and responsive table safety.
+   Scoped to management shell only. No public/customer layout changes. */
+
+.management-shell {
+  --mgmt-sidebar-width: 278px;
+  --mgmt-sidebar-collapsed: 82px;
+  --mgmt-bg: #f5f7fb;
+  --mgmt-panel: #ffffff;
+  --mgmt-border: rgba(15, 23, 42, 0.1);
+  --mgmt-muted: #64748b;
+  --mgmt-text: #0f172a;
+  --mgmt-primary: #2563eb;
+  --mgmt-radius: 18px;
+  background: var(--mgmt-bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.management-shell .management-workspace {
+  min-width: 0;
+  width: 100%;
+}
+
+@media (min-width: 1025px) {
+  .management-shell {
+    display: grid;
+    grid-template-columns: var(--mgmt-sidebar-width) minmax(0, 1fr);
+  }
+
+  .management-shell.sidebar-collapsed {
+    grid-template-columns: var(--mgmt-sidebar-collapsed) minmax(0, 1fr);
+  }
+
+  .management-shell .management-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    transform: none !important;
+  }
+
+  .management-shell .mobile-sidebar-toggle,
+  .management-shell .customer-menu-toggle,
+  .management-shell .nav-toggle,
+  .management-shell .hamburger,
+  .management-shell .menu-toggle {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .management-shell {
+    display: block;
+  }
+
+  .management-shell .management-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 80;
+    width: min(320px, calc(100vw - 34px));
+    max-width: 320px;
+    transform: translateX(-110%);
+  }
+
+  .management-shell .management-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+.management-shell .workspace-topbar,
+.management-shell .management-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(14px, 2vw, 26px);
+  border-bottom: 1px solid var(--mgmt-border);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.05);
+}
+
+.management-shell .management-main-content {
+  width: 100%;
+  max-width: 1480px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: clamp(16px, 2.3vw, 30px);
+}
+
+.management-shell.sidebar-collapsed .management-main-content {
+  max-width: 1560px;
+}
+
+.management-shell .workspace-title-block {
+  min-width: 0;
+}
+
+.management-shell .workspace-title-block strong {
+  display: block;
+  color: var(--mgmt-text);
+  font-size: 0.98rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.management-shell .workspace-title-block small {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--mgmt-muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.management-shell .workspace-actions,
+.management-shell .nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.management-shell .management-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-right: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.management-shell .sidebar-topbar {
+  position: relative;
+  flex-shrink: 0;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 12px;
+}
+
+.management-shell .sidebar-collapse-btn {
+  position: absolute;
+  right: 12px;
+  top: 18px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 12px;
+  display: inline-grid;
+  place-items: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.management-shell .sidebar-collapse-btn span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(135deg);
+  margin-left: 3px;
+}
+
+.management-shell.sidebar-collapsed .sidebar-collapse-btn {
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.management-shell.sidebar-collapsed .sidebar-collapse-btn span {
+  transform: rotate(-45deg);
+  margin-left: 0;
+}
+
+.management-shell.sidebar-collapsed .sidebar-workspace-title,
+.management-shell.sidebar-collapsed .sidebar-profile-copy,
+.management-shell.sidebar-collapsed .sidebar-section-title,
+.management-shell.sidebar-collapsed .sidebar-link-label,
+.management-shell.sidebar-collapsed .sidebar-mini-links span {
+  display: none !important;
+}
+
+.management-shell.sidebar-collapsed .sidebar-topbar,
+.management-shell.sidebar-collapsed .sidebar-profile-card,
+.management-shell.sidebar-collapsed .sidebar-menu a,
+.management-shell.sidebar-collapsed .sidebar-mini-links a,
+.management-shell.sidebar-collapsed .sidebar-logout {
+  justify-content: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.management-shell .sidebar-scroll-area {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 10px 12px;
+  scrollbar-width: thin;
+}
+
+.management-shell .sidebar-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.management-shell .sidebar-scroll-area::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.28);
+}
+
+.management-shell .sidebar-menu,
+.management-shell .sidebar-mini-links {
+  display: grid;
+  gap: 6px;
+}
+
+.management-shell .sidebar-menu a,
+.management-shell .sidebar-mini-links a,
+.management-shell .sidebar-logout {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 13px;
+  white-space: nowrap;
+}
+
+.management-shell .sidebar-menu-icon,
+.management-shell .sidebar-mini-links svg {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.management-shell .sidebar-menu-icon svg,
+.management-shell .sidebar-mini-links svg,
+.management-shell .customer-icon-button svg,
+.management-shell .mobile-sidebar-toggle svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.management-shell .sidebar-logout {
+  flex-shrink: 0;
+  margin: 10px;
+}
+
+/* General management surface rules */
+.management-shell section,
+.management-shell .card,
+.management-shell .panel,
+.management-shell .admin-panel,
+.management-shell .dashboard-card,
+.management-shell .summary-card,
+.management-shell .stat-card,
+.management-shell .form-card,
+.management-shell .table-card,
+.management-shell .workspace-card {
+  min-width: 0;
+}
+
+.management-shell .table-wrap,
+.management-shell .table-shell,
+.management-shell .data-table-wrap,
+.management-shell .admin-table-wrap,
+.management-shell .responsive-table,
+.management-shell .orders-table-wrap,
+.management-shell .reviews-table-wrap,
+.management-shell .users-table-wrap,
+.management-shell .listings-table-wrap,
+.management-shell .fulfillment-table-wrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--mgmt-border);
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.management-shell table,
+.management-shell .data-table,
+.management-shell .admin-table,
+.management-shell .orders-table,
+.management-shell .reviews-table,
+.management-shell .users-table,
+.management-shell .listings-table,
+.management-shell .fulfillment-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.management-shell table th,
+.management-shell table td,
+.management-shell .data-table th,
+.management-shell .data-table td,
+.management-shell .admin-table th,
+.management-shell .admin-table td {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.management-shell table td:last-child,
+.management-shell table th:last-child,
+.management-shell .data-table td:last-child,
+.management-shell .admin-table td:last-child {
+  text-align: right;
+}
+
+.management-shell tr.clickable,
+.management-shell tr[data-clickable="true"],
+.management-shell .clickable-row {
+  cursor: pointer;
+}
+
+.management-shell tr.clickable:hover,
+.management-shell tr[data-clickable="true"]:hover,
+.management-shell .clickable-row:hover {
+  background: #f8fafc;
+}
+
+.management-shell .action-row,
+.management-shell .row-actions,
+.management-shell .table-actions,
+.management-shell .modal-actions,
+.management-shell .form-actions,
+.management-shell .card-actions,
+.management-shell .button-row,
+.management-shell .actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: max-content;
+}
+
+.management-shell .action-row button,
+.management-shell .row-actions button,
+.management-shell .table-actions button,
+.management-shell .modal-actions button,
+.management-shell .form-actions button,
+.management-shell .card-actions button,
+.management-shell .button-row button,
+.management-shell .actions button,
+.management-shell .action-row a,
+.management-shell .row-actions a,
+.management-shell .table-actions a,
+.management-shell .modal-actions a,
+.management-shell .form-actions a,
+.management-shell .card-actions a,
+.management-shell .button-row a,
+.management-shell .actions a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.management-shell .form-grid,
+.management-shell .filter-grid,
+.management-shell .settings-grid,
+.management-shell .input-grid,
+.management-shell .two-column-grid,
+.management-shell .admin-grid,
+.management-shell .business-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  min-width: 0;
+}
+
+@media (min-width: 1180px) {
+  .management-shell .form-grid.compact,
+  .management-shell .filter-grid.compact,
+  .management-shell .input-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.management-shell input,
+.management-shell select,
+.management-shell textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.management-shell .modal,
+.management-shell .dialog,
+.management-shell .detail-modal,
+.management-shell .modal-card,
+.management-shell .modal-panel {
+  max-width: min(920px, calc(100vw - 28px));
+  max-height: calc(100vh - 28px);
+  overflow: auto;
+}
+
+@media (max-width: 760px) {
+  .management-shell .workspace-topbar,
+  .management-shell .management-nav {
+    min-height: 62px;
+    padding: 10px 12px;
+  }
+
+  .management-shell .workspace-title-block small {
+    display: none;
+  }
+
+  .management-shell .management-main-content {
+    padding: 12px;
+  }
+
+  .management-shell table,
+  .management-shell .data-table,
+  .management-shell .admin-table,
+  .management-shell .orders-table,
+  .management-shell .reviews-table,
+  .management-shell .users-table,
+  .management-shell .listings-table,
+  .management-shell .fulfillment-table {
+    min-width: 760px;
+  }
+}

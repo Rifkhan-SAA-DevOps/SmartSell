@@ -1,0 +1,289 @@
+/* Phase 69: Management table/form normalization
+   Scoped safety layer. Do not move these rules into global.css. */
+
+.management-shell {
+  --panel-bg: rgba(255, 255, 255, 0.96);
+  --panel-border: rgba(148, 163, 184, 0.24);
+  --panel-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  --input-bg: #f8fafc;
+  --brand-ink: #0f172a;
+  --brand-muted: #64748b;
+  --brand-line: #e2e8f0;
+  --brand-teal: #0f766e;
+}
+
+/* Make each management page read as stacked, premium sections. */
+.management-main-content > * {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.management-main-content section,
+.management-main-content .section,
+.management-main-content .page-section,
+.management-main-content .panel,
+.management-main-content .card,
+.management-main-content .admin-card,
+.management-main-content .workspace-card,
+.management-main-content .data-panel,
+.management-main-content .table-card,
+.management-main-content .form-card {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Force dense page compositions to stack vertically instead of squeezing. */
+.management-main-content [class*="layout"],
+.management-main-content [class*="workspace"],
+.management-main-content [class*="content-grid"],
+.management-main-content [class*="command-grid"],
+.management-main-content [class*="main-grid"],
+.management-main-content [class*="two-column"],
+.management-main-content [class*="split"] {
+  min-width: 0;
+}
+
+.management-main-content .admin-page-grid,
+.management-main-content .dashboard-grid,
+.management-main-content .settings-layout,
+.management-main-content .reports-layout,
+.management-main-content .security-layout,
+.management-main-content .user-management-layout,
+.management-main-content .listing-management-layout,
+.management-main-content .fulfillment-layout,
+.management-main-content .seller-workspace-layout,
+.management-main-content .business-layout,
+.management-main-content .earnings-layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.1rem !important;
+}
+
+/* Professional forms: keep labels above fields and stop awkward tiny columns. */
+.management-main-content form {
+  max-width: 100%;
+}
+
+.management-main-content label {
+  color: var(--brand-ink);
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: -0.01em;
+}
+
+.management-main-content input,
+.management-main-content select,
+.management-main-content textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  background: var(--input-bg);
+  color: var(--brand-ink);
+  padding: 0.72rem 0.85rem;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.management-main-content textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.management-main-content input:focus,
+.management-main-content select:focus,
+.management-main-content textarea:focus {
+  border-color: rgba(15, 118, 110, 0.65);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+}
+
+.management-main-content .form-grid,
+.management-main-content .form-row,
+.management-main-content .filter-grid,
+.management-main-content .action-grid,
+.management-main-content .controls-grid,
+.management-main-content .fields-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)) !important;
+  gap: 0.9rem !important;
+}
+
+/* Buttons should wrap below instead of compressing text. */
+.management-main-content .button-row,
+.management-main-content .action-row,
+.management-main-content .table-actions,
+.management-main-content .card-actions,
+.management-main-content .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.management-main-content button,
+.management-main-content .btn,
+.management-main-content .button {
+  min-height: 40px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Tables: one clean table surface, horizontal scroll, no unreadable shrink. */
+.management-main-content .table-shell,
+.management-main-content .table-scroll,
+.management-main-content .responsive-table-wrap,
+.management-main-content .table-card,
+.management-main-content .data-table-wrap,
+.management-main-content .admin-table,
+.management-main-content .audit-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 20px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+}
+
+.management-main-content table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+}
+
+.management-main-content thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, #f8fafc, #eef2f7);
+  color: #334155;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--brand-line);
+  text-align: left;
+}
+
+.management-main-content tbody td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #edf2f7;
+  color: #0f172a;
+  vertical-align: middle;
+}
+
+.management-main-content tbody tr:hover td {
+  background: #f8fafc;
+}
+
+.management-main-content tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.management-main-content td,
+.management-main-content th {
+  white-space: nowrap;
+}
+
+.management-main-content .wrap,
+.management-main-content .wrap-cell,
+.management-main-content td.description,
+.management-main-content td.note,
+.management-main-content td.message,
+.management-main-content .cell-wrap {
+  white-space: normal !important;
+  min-width: 240px;
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+/* Pagination should be calm and aligned. */
+.management-main-content .pagination,
+.management-main-content .pager,
+.management-main-content .table-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.9rem 0;
+}
+
+.management-main-content .pagination button,
+.management-main-content .pager button,
+.management-main-content .table-pagination button {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.management-main-content .pagination button.active,
+.management-main-content .pager button.active,
+.management-main-content .table-pagination button.active {
+  background: var(--brand-teal);
+  color: #ffffff;
+  border-color: var(--brand-teal);
+}
+
+/* Modals/drawers should not overflow the viewport. */
+.management-main-content .modal-card,
+.management-main-content .dialog-card,
+.management-main-content .drawer-card,
+.management-main-content .details-modal {
+  width: min(920px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  border-radius: 24px;
+}
+
+/* Utility: on smaller screens, everything stacks. */
+@media (max-width: 900px) {
+  .management-main-content .form-grid,
+  .management-main-content .form-row,
+  .management-main-content .filter-grid,
+  .management-main-content .action-grid,
+  .management-main-content .controls-grid,
+  .management-main-content .fields-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .management-main-content .pagination,
+  .management-main-content .pager,
+  .management-main-content .table-pagination {
+    justify-content: flex-start;
+  }
+
+  .management-main-content table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 560px) {
+  .management-main-content table {
+    min-width: 680px;
+  }
+
+  .management-main-content thead th,
+  .management-main-content tbody td {
+    padding: 0.75rem 0.8rem;
+  }
+
+  .management-main-content .table-shell,
+  .management-main-content .table-scroll,
+  .management-main-content .responsive-table-wrap,
+  .management-main-content .table-card,
+  .management-main-content .data-table-wrap,
+  .management-main-content .admin-table,
+  .management-main-content .audit-table-wrap {
+    border-radius: 16px;
+  }
+}

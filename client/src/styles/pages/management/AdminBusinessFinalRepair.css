@@ -1,0 +1,701 @@
+/* Phase 90 — Admin + Business Final UI Repair
+   Scoped management polish. No backend/database/global.css changes. */
+
+:root {
+  --mgmt-bg: #f6f8fc;
+  --mgmt-panel: #ffffff;
+  --mgmt-text: #0f172a;
+  --mgmt-muted: #64748b;
+  --mgmt-border: rgba(15, 23, 42, 0.09);
+  --mgmt-soft: #f8fafc;
+  --mgmt-primary: #2563eb;
+  --mgmt-primary-dark: #1d4ed8;
+  --mgmt-success: #16a34a;
+  --mgmt-warning: #d97706;
+  --mgmt-danger: #dc2626;
+  --mgmt-radius: 20px;
+  --mgmt-radius-lg: 28px;
+  --mgmt-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+}
+
+/* Management page containers */
+.admin-dashboard,
+.admin-page,
+.business-dashboard,
+.business-page,
+.seller-hub,
+.delivery-dashboard,
+.earnings-page,
+.fulfillment-page,
+.reports-page,
+.security-center,
+.platform-settings,
+.content-management,
+.seo-settings,
+.promotion-center,
+.inventory-center,
+.advanced-catalog,
+.listing-management,
+.user-management,
+.dashboard-page:has(.admin-card),
+.page.section:has(.admin-table),
+.page.section:has(.business-card),
+.page.section:has(.inventory-card),
+.page.section:has(.catalog-card) {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.06), transparent 24%),
+    linear-gradient(180deg, #f8fbff 0%, var(--mgmt-bg) 100%);
+  min-height: calc(100vh - 72px);
+}
+
+/* Generic management panels/cards */
+.admin-card,
+.business-card,
+.management-card,
+.inventory-card,
+.catalog-card,
+.stat-card,
+.report-card,
+.settings-card,
+.security-card,
+.dashboard-card,
+.fulfillment-card,
+.payout-card,
+.delivery-card,
+.analytics-card,
+.listing-card,
+.user-card,
+.smart-form,
+.table-card,
+.modal-card,
+.drawer-card,
+.summary-card {
+  border: 1px solid var(--mgmt-border) !important;
+  border-radius: var(--mgmt-radius-lg) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: var(--mgmt-shadow) !important;
+  backdrop-filter: blur(14px);
+}
+
+.admin-card,
+.business-card,
+.management-card,
+.inventory-card,
+.catalog-card,
+.report-card,
+.settings-card,
+.security-card,
+.dashboard-card,
+.fulfillment-card,
+.payout-card,
+.delivery-card,
+.analytics-card,
+.listing-card,
+.user-card {
+  padding: clamp(18px, 2vw, 24px) !important;
+}
+
+/* Page headings */
+.admin-page h1,
+.business-page h1,
+.inventory-center h1,
+.advanced-catalog h1,
+.admin-dashboard h1,
+.business-dashboard h1,
+.seller-hub h1,
+.delivery-dashboard h1,
+.earnings-page h1,
+.fulfillment-page h1,
+.reports-page h1,
+.security-center h1,
+.platform-settings h1,
+.content-management h1,
+.seo-settings h1,
+.promotion-center h1,
+.listing-management h1,
+.user-management h1,
+.page.section > h1,
+.section-header h1,
+.section-header h2 {
+  color: var(--mgmt-text) !important;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.section-header,
+.page-header,
+.admin-header,
+.business-header,
+.management-header,
+.inventory-header,
+.catalog-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.section-header p,
+.page-header p,
+.admin-header p,
+.business-header p,
+.management-header p,
+.inventory-header p,
+.catalog-header p,
+.admin-card p,
+.business-card p,
+.management-card p {
+  color: var(--mgmt-muted);
+  line-height: 1.75;
+}
+
+/* Management grids should not squeeze */
+.admin-grid,
+.business-grid,
+.management-grid,
+.stats-grid,
+.report-grid,
+.settings-grid,
+.security-grid,
+.inventory-grid,
+.catalog-grid,
+.dashboard-grid,
+.fulfillment-grid,
+.delivery-grid,
+.earnings-grid {
+  display: grid;
+  gap: 20px !important;
+  align-items: start;
+}
+
+.stats-grid,
+.summary-grid,
+.kpi-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+}
+
+.admin-grid,
+.business-grid,
+.management-grid,
+.report-grid,
+.settings-grid,
+.security-grid,
+.inventory-grid,
+.catalog-grid,
+.dashboard-grid,
+.fulfillment-grid,
+.delivery-grid,
+.earnings-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+}
+
+/* Stat/KPI cards */
+.stat-card,
+.kpi-card,
+.summary-card {
+  padding: 20px !important;
+  min-height: 128px;
+}
+.stat-card strong,
+.kpi-card strong,
+.summary-card strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--mgmt-text);
+  font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+  letter-spacing: -0.04em;
+}
+.stat-card span,
+.kpi-card span,
+.summary-card span,
+.stat-card small,
+.kpi-card small,
+.summary-card small {
+  color: var(--mgmt-muted);
+}
+
+/* Tables */
+.admin-table-wrap,
+.table-wrap,
+.management-table-wrap,
+.inventory-table-wrap,
+.catalog-table-wrap,
+.responsive-table,
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 22px;
+  border: 1px solid var(--mgmt-border);
+  background: #fff;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.04);
+}
+
+.admin-table,
+.management-table,
+.inventory-table,
+.catalog-table,
+.smart-table,
+table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.management-table th,
+.inventory-table th,
+.catalog-table th,
+.smart-table th,
+table th {
+  position: relative;
+  text-align: left;
+  padding: 14px 16px;
+  color: #334155;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.admin-table td,
+.management-table td,
+.inventory-table td,
+.catalog-table td,
+.smart-table td,
+table td {
+  padding: 15px 16px;
+  color: var(--mgmt-text);
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+}
+
+.admin-table tr:hover td,
+.management-table tr:hover td,
+.inventory-table tr:hover td,
+.catalog-table tr:hover td,
+.smart-table tr:hover td,
+table tr:hover td {
+  background: #f8fbff;
+}
+
+.admin-table tr:last-child td,
+.management-table tr:last-child td,
+.inventory-table tr:last-child td,
+.catalog-table tr:last-child td,
+.smart-table tr:last-child td,
+table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Forms and filters */
+.smart-form,
+.admin-form,
+.business-form,
+.management-form,
+.filter-card,
+.filter-panel,
+.search-panel,
+.toolbar-card {
+  padding: 20px !important;
+  border-radius: 24px !important;
+}
+
+.form-row,
+.admin-form-row,
+.business-form-row,
+.management-form-row,
+.filter-row,
+.toolbar-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px !important;
+  align-items: end;
+}
+
+.smart-form label,
+.admin-form label,
+.business-form label,
+.management-form label,
+.filter-card label,
+.filter-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #334155;
+  font-weight: 700;
+}
+
+.smart-form input,
+.smart-form select,
+.smart-form textarea,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.business-form input,
+.business-form select,
+.business-form textarea,
+.management-form input,
+.management-form select,
+.management-form textarea,
+.filter-card input,
+.filter-card select,
+.filter-panel input,
+.filter-panel select,
+.toolbar-card input,
+.toolbar-card select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #dbe3ef;
+  border-radius: 15px;
+  background: #f8fbff;
+  color: var(--mgmt-text);
+  padding: 0 14px;
+  font: inherit;
+}
+
+.smart-form textarea,
+.admin-form textarea,
+.business-form textarea,
+.management-form textarea {
+  min-height: 120px;
+  padding: 14px;
+  resize: vertical;
+}
+
+.smart-form input:focus,
+.smart-form select:focus,
+.smart-form textarea:focus,
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus,
+.business-form input:focus,
+.business-form select:focus,
+.business-form textarea:focus,
+.management-form input:focus,
+.management-form select:focus,
+.management-form textarea:focus,
+.filter-card input:focus,
+.filter-card select:focus,
+.filter-panel input:focus,
+.filter-panel select:focus,
+.toolbar-card input:focus,
+.toolbar-card select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+/* Buttons/actions */
+.admin-actions,
+.business-actions,
+.management-actions,
+.table-actions,
+.card-actions,
+.form-actions,
+.modal-actions,
+.pagination,
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px !important;
+}
+
+.table-actions,
+.card-actions {
+  justify-content: flex-end;
+}
+
+.admin-actions button,
+.business-actions button,
+.management-actions button,
+.table-actions button,
+.card-actions button,
+.form-actions button,
+.modal-actions button,
+.pagination button,
+.action-row button,
+.primary-btn,
+.secondary-btn,
+.outline-btn,
+.danger-btn,
+button.primary,
+button.secondary {
+  min-height: 42px;
+  border-radius: 14px !important;
+  padding: 0 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.primary-btn,
+button.primary,
+.admin-actions .primary,
+.business-actions .primary,
+.management-actions .primary,
+.form-actions .primary {
+  border: 0 !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, var(--mgmt-primary) 0%, #7c3aed 100%) !important;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+}
+
+.secondary-btn,
+.outline-btn,
+button.secondary,
+.admin-actions .secondary,
+.business-actions .secondary,
+.management-actions .secondary,
+.table-actions button,
+.card-actions button,
+.pagination button {
+  border: 1px solid #dbe3ef !important;
+  color: var(--mgmt-text) !important;
+  background: #fff !important;
+}
+
+.danger-btn,
+.table-actions .danger,
+.card-actions .danger,
+button.danger {
+  border-color: rgba(220, 38, 38, 0.2) !important;
+  color: var(--mgmt-danger) !important;
+  background: #fff5f5 !important;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.outline-btn:hover,
+.danger-btn:hover,
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Status badges */
+.status-badge,
+.badge,
+.role-badge,
+.state-badge,
+.approval-badge,
+.inventory-badge,
+.catalog-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.status-badge.pending,
+.badge.pending,
+.state-badge.pending,
+.approval-badge.pending {
+  color: #92400e;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+.status-badge.approved,
+.badge.approved,
+.state-badge.approved,
+.status-badge.active,
+.badge.active {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.status-badge.rejected,
+.badge.rejected,
+.state-badge.rejected,
+.status-badge.blocked,
+.badge.blocked,
+.status-badge.archived,
+.badge.archived {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.status-badge.draft,
+.badge.draft,
+.state-badge.draft {
+  color: #334155;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Modals and drawers */
+.modal-backdrop,
+.drawer-backdrop,
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.54);
+  backdrop-filter: blur(6px);
+}
+
+.modal,
+.modal-panel,
+.drawer,
+.detail-drawer,
+.admin-modal,
+.business-modal,
+.management-modal {
+  border-radius: 28px !important;
+  background: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28) !important;
+}
+
+.modal,
+.modal-panel,
+.admin-modal,
+.business-modal,
+.management-modal {
+  max-width: min(920px, calc(100vw - 28px));
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
+/* Sidebar management polish */
+.sidebar,
+.app-sidebar,
+.management-sidebar {
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+}
+.sidebar a,
+.app-sidebar a,
+.management-sidebar a,
+.sidebar button,
+.app-sidebar button,
+.management-sidebar button {
+  border-radius: 14px;
+}
+.sidebar a.active,
+.app-sidebar a.active,
+.management-sidebar a.active {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+/* Empty/loading/error blocks */
+.empty-state,
+.loading-state,
+.error-state,
+.restricted-state,
+.no-data,
+.table-empty {
+  padding: 22px !important;
+  border-radius: 22px !important;
+  background: #f8fbff !important;
+  border: 1px dashed #cbd5e1 !important;
+  color: var(--mgmt-muted) !important;
+  text-align: center;
+}
+
+/* Inventory + advanced catalog specific */
+.inventory-center .catalog-card,
+.advanced-catalog .catalog-card,
+.inventory-center .inventory-card,
+.advanced-catalog .inventory-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.inventory-center .catalog-card h3,
+.advanced-catalog .catalog-card h3,
+.inventory-center .inventory-card h3,
+.advanced-catalog .inventory-card h3 {
+  margin: 0;
+  color: var(--mgmt-text);
+}
+
+/* Mobile/tablet */
+@media (max-width: 1100px) {
+  .section-header,
+  .page-header,
+  .admin-header,
+  .business-header,
+  .management-header,
+  .inventory-header,
+  .catalog-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .table-actions,
+  .card-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-grid,
+  .business-grid,
+  .management-grid,
+  .stats-grid,
+  .report-grid,
+  .settings-grid,
+  .security-grid,
+  .inventory-grid,
+  .catalog-grid,
+  .dashboard-grid,
+  .fulfillment-grid,
+  .delivery-grid,
+  .earnings-grid,
+  .form-row,
+  .admin-form-row,
+  .business-form-row,
+  .management-form-row,
+  .filter-row,
+  .toolbar-row {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-card,
+  .business-card,
+  .management-card,
+  .inventory-card,
+  .catalog-card,
+  .smart-form,
+  .table-card,
+  .modal-card {
+    border-radius: 22px !important;
+    padding: 16px !important;
+  }
+  .admin-actions,
+  .business-actions,
+  .management-actions,
+  .table-actions,
+  .card-actions,
+  .form-actions,
+  .modal-actions,
+  .pagination,
+  .action-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .admin-actions button,
+  .business-actions button,
+  .management-actions button,
+  .table-actions button,
+  .card-actions button,
+  .form-actions button,
+  .modal-actions button,
+  .pagination button,
+  .action-row button,
+  .primary-btn,
+  .secondary-btn,
+  .outline-btn,
+  .danger-btn {
+    width: 100%;
+  }
+}

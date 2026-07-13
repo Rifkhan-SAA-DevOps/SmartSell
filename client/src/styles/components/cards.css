@@ -1,0 +1,15 @@
+:where(.ss-card, .stat-card, .panel-card, .dashboard-card) {
+  border-radius: var(--ss-radius-lg);
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-border);
+  box-shadow: var(--ss-shadow-md);
+}
+.ss-card-pad { padding: clamp(18px, 2.4vw, 24px); }
+:where(.ss-card, .panel-card, .dashboard-card) h2,
+:where(.ss-card, .panel-card, .dashboard-card) h3 {
+  color: var(--ss-text);
+}
+:where(.ss-card, .panel-card, .dashboard-card) p {
+  color: var(--ss-muted);
+  line-height: 1.7;
+}

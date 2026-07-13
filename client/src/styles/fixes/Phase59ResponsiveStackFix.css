@@ -1,0 +1,343 @@
+/* =========================================================
+   Phase 59 — Stacked Responsive Layout Fix
+   Scope only: admin/management pages + public Marketplace/Services feeds.
+   Purpose: stop squeezed side-by-side layouts and card shrink.
+========================================================= */
+
+/* ---------- Shared safe sizing ---------- */
+.management-main-content,
+.public-main-content,
+.customer-feed-main,
+.customer-feed-page,
+.admin-ops-page,
+.um-page,
+.listing-management-page,
+.fulfillment-page,
+.report-page,
+.settings-page,
+.content-manager-page,
+.seo-settings-page,
+.security-center-page {
+  min-width: 0;
+}
+
+/* ---------- Admin / management pages: stack sections below each other ---------- */
+.management-main-content .ops-two-column,
+.management-main-content .um-command-grid,
+.management-main-content .um-workspace-grid,
+.management-main-content .content-manager-layout,
+.management-main-content .seo-manager-layout,
+.management-main-content .settings-grid,
+.management-main-content .two-col-grid,
+.management-main-content .two-col,
+.management-main-content .compact-two,
+.management-main-content .report-grid-two,
+.management-main-content .content-grid,
+.management-main-content .management-grid,
+.management-main-content .finance-layout-grid,
+.management-main-content .fulfillment-form-grid,
+.management-main-content .growth-grid,
+.management-main-content .form-two,
+.management-main-content .delivery-management-page .delivery-layout,
+.management-main-content .business-layout,
+.management-main-content .profile-settings-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+.management-main-content .admin-ops-page,
+.management-main-content .um-page,
+.management-main-content .listing-management-page,
+.management-main-content .fulfillment-page,
+.management-main-content .report-page,
+.management-main-content .settings-page,
+.management-main-content .content-manager-page,
+.management-main-content .seo-settings-page,
+.management-main-content .security-center-page,
+.management-main-content .page,
+.management-main-content .page-shell,
+.management-main-content .section,
+.management-main-content .management-page {
+  width: 100% !important;
+  max-width: 1260px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.management-main-content .ops-hero,
+.management-main-content .admin-hero,
+.management-main-content .um-hero,
+.management-main-content .listing-hero,
+.management-main-content .report-hero,
+.management-main-content .content-manager-hero,
+.management-main-content .seo-manager-hero,
+.management-main-content .management-page-header,
+.management-main-content .page-heading-row {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-items: start !important;
+  gap: 18px !important;
+}
+
+.management-main-content .ops-priority-card,
+.management-main-content .um-hero-panel,
+.management-main-content .hero-icon-card,
+.management-main-content .settings-header-card,
+.management-main-content .seo-preview-card,
+.management-main-content .content-preview-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.management-main-content .ops-metric-grid,
+.management-main-content .ops-action-grid,
+.management-main-content .stats-grid,
+.management-main-content .stat-grid,
+.management-main-content .compact-stats,
+.management-main-content .report-metric-grid,
+.management-main-content .security-stats-grid,
+.management-main-content .fulfillment-kpi-grid,
+.management-main-content .delivery-kpi-grid,
+.management-main-content .um-stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  align-items: stretch !important;
+}
+
+.management-main-content .ops-approval-grid,
+.management-main-content .ops-request-grid,
+.management-main-content .admin-request-grid,
+.management-main-content .listing-admin-grid,
+.management-main-content .growth-list-grid,
+.management-main-content .support-board-grid,
+.management-main-content .category-admin-list {
+  grid-template-columns: 1fr !important;
+}
+
+.management-main-content .listing-admin-card,
+.management-main-content .fulfillment-card,
+.management-main-content .business-list-card,
+.management-main-content .ops-request-card,
+.management-main-content .support-ticket-card,
+.management-main-content .category-admin-item,
+.management-main-content .delivery-task-card {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.management-main-content .listing-admin-card {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) !important;
+}
+
+.management-main-content .listing-admin-main,
+.management-main-content .ops-request-card,
+.management-main-content .fulfillment-card,
+.management-main-content .um-directory-panel,
+.management-main-content .um-detail-panel,
+.management-main-content .um-create-card,
+.management-main-content .report-panel,
+.management-main-content .table-panel,
+.management-main-content .panel-card,
+.management-main-content .management-panel {
+  min-width: 0 !important;
+}
+
+.management-main-content .responsive-table-wrap,
+.management-main-content .table-scroll,
+.management-main-content .table-shell,
+.management-main-content .admin-table,
+.management-main-content .professional-table,
+.management-main-content .smart-table,
+.management-main-content .report-table,
+.management-main-content .audit-table,
+.management-main-content .coupon-table-panel {
+  width: 100% !important;
+  overflow-x: auto !important;
+  border-radius: 18px;
+}
+
+.management-main-content table {
+  min-width: 860px !important;
+}
+
+/* ---------- Marketplace / Services: no left filter rail squeezing cards ---------- */
+.customer-feed-page {
+  width: min(1240px, calc(100% - 28px)) !important;
+  margin-inline: auto !important;
+}
+
+.customer-feed-layout,
+.customer-feed-layout.service-layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 22px !important;
+  align-items: start !important;
+}
+
+.customer-filter-rail {
+  position: static !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important;
+  align-items: end !important;
+  gap: 14px !important;
+}
+
+.customer-filter-title,
+.customer-filter-group,
+.customer-field-label,
+.customer-service-tip,
+.customer-checkbox-line {
+  min-width: 0 !important;
+}
+
+.customer-segment-list {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)) !important;
+}
+
+.customer-feed-main {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.customer-product-grid,
+.customer-service-grid {
+  display: grid !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+}
+
+.customer-product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(295px, 1fr)) !important;
+}
+
+.customer-service-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+}
+
+.customer-product-card,
+.customer-service-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.customer-product-card .customer-card-body,
+.customer-service-card .customer-card-body {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.customer-card-body h3,
+.customer-card-body p,
+.customer-store-link,
+.customer-card-info-grid,
+.customer-card-footer,
+.customer-price-block,
+.customer-card-actions {
+  min-width: 0 !important;
+}
+
+.customer-card-body p {
+  min-height: auto !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.customer-card-footer {
+  margin-top: auto !important;
+}
+
+.customer-card-actions {
+  flex: 0 0 auto !important;
+}
+
+.customer-card-actions a,
+.customer-card-actions button {
+  white-space: nowrap !important;
+}
+
+.customer-feed-search-card,
+.service-search-card {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+}
+
+.customer-feed-search-card .customer-big-search,
+.service-search-card .customer-big-search {
+  width: 100% !important;
+}
+
+.customer-feed-toolbar {
+  align-items: flex-start !important;
+}
+
+@media (min-width: 900px) {
+  .customer-feed-search-card,
+  .service-search-card {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, .35fr) auto !important;
+    align-items: end !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .management-main-content .listing-admin-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .management-main-content .listing-admin-media {
+    min-height: 220px !important;
+  }
+
+  .management-main-content .ops-metric-grid,
+  .management-main-content .ops-action-grid,
+  .management-main-content .stats-grid,
+  .management-main-content .stat-grid,
+  .management-main-content .compact-stats,
+  .management-main-content .report-metric-grid,
+  .management-main-content .security-stats-grid,
+  .management-main-content .fulfillment-kpi-grid,
+  .management-main-content .delivery-kpi-grid,
+  .management-main-content .um-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .customer-feed-page {
+    width: min(100% - 18px, 1240px) !important;
+  }
+
+  .customer-filter-rail {
+    grid-template-columns: 1fr !important;
+  }
+
+  .customer-product-grid,
+  .customer-service-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .customer-card-footer,
+  .customer-card-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  .customer-card-actions {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .customer-price-block {
+    width: 100% !important;
+  }
+}

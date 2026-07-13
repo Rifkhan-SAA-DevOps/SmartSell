@@ -1,0 +1,451 @@
+/* Phase 77: management table, modal, pagination and action alignment polish.
+   This file is intentionally scoped to management pages only. */
+
+.management-shell {
+  --phase77-border: rgba(15, 23, 42, 0.1);
+  --phase77-muted: #64748b;
+  --phase77-text: #0f172a;
+  --phase77-soft: #f8fafc;
+  --phase77-primary: #2563eb;
+  --phase77-primary-soft: rgba(37, 99, 235, 0.09);
+  --phase77-radius: 18px;
+}
+
+/* Keep every page surface from collapsing into tiny widths. */
+.management-shell .management-main-content > *,
+.management-shell .admin-workspace,
+.management-shell .admin-page,
+.management-shell .business-page,
+.management-shell .workspace-page,
+.management-shell .page-shell,
+.management-shell .page-section,
+.management-shell .content-section {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Professional table shell. */
+.management-shell .table-wrap,
+.management-shell .table-shell,
+.management-shell .data-table-wrap,
+.management-shell .admin-table-wrap,
+.management-shell .users-table-wrap,
+.management-shell .listings-table-wrap,
+.management-shell .fulfillment-table-wrap,
+.management-shell .orders-table-wrap,
+.management-shell .reviews-table-wrap,
+.management-shell .security-table-wrap,
+.management-shell .payout-table-wrap,
+.management-shell .report-table-wrap {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--phase77-border);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+  -webkit-overflow-scrolling: touch;
+}
+
+.management-shell .table-wrap::after,
+.management-shell .table-shell::after,
+.management-shell .data-table-wrap::after,
+.management-shell .admin-table-wrap::after {
+  content: "";
+  position: sticky;
+  right: 0;
+  display: block;
+  width: 28px;
+  min-width: 28px;
+  height: 1px;
+  margin-left: auto;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #fff);
+}
+
+.management-shell table,
+.management-shell .data-table,
+.management-shell .admin-table,
+.management-shell .users-table,
+.management-shell .listings-table,
+.management-shell .fulfillment-table,
+.management-shell .orders-table,
+.management-shell .reviews-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+}
+
+.management-shell table thead th,
+.management-shell .data-table thead th,
+.management-shell .admin-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--phase77-border);
+  white-space: nowrap;
+}
+
+.management-shell table tbody td,
+.management-shell .data-table tbody td,
+.management-shell .admin-table tbody td {
+  color: var(--phase77-text);
+  font-size: 0.9rem;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.management-shell table tbody tr:last-child td,
+.management-shell .data-table tbody tr:last-child td,
+.management-shell .admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.management-shell table tbody tr,
+.management-shell .data-table tbody tr,
+.management-shell .admin-table tbody tr {
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.management-shell tr.clickable,
+.management-shell tr[data-clickable="true"],
+.management-shell .clickable-row {
+  cursor: pointer;
+}
+
+.management-shell tr.clickable:hover td,
+.management-shell tr[data-clickable="true"]:hover td,
+.management-shell .clickable-row:hover td,
+.management-shell table tbody tr:hover td {
+  background: #f8fbff;
+}
+
+/* Align table actions instead of letting buttons jump around. */
+.management-shell table td:last-child,
+.management-shell table th:last-child,
+.management-shell .data-table td:last-child,
+.management-shell .data-table th:last-child,
+.management-shell .admin-table td:last-child,
+.management-shell .admin-table th:last-child {
+  text-align: right;
+}
+
+.management-shell .row-actions,
+.management-shell .table-actions,
+.management-shell .action-row,
+.management-shell .card-actions,
+.management-shell .modal-actions,
+.management-shell .form-actions,
+.management-shell .button-row,
+.management-shell .actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.management-shell td .row-actions,
+.management-shell td .table-actions,
+.management-shell td .action-row,
+.management-shell td .actions {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  min-width: max-content;
+}
+
+.management-shell .row-actions button,
+.management-shell .table-actions button,
+.management-shell .action-row button,
+.management-shell .card-actions button,
+.management-shell .modal-actions button,
+.management-shell .form-actions button,
+.management-shell .button-row button,
+.management-shell .actions button,
+.management-shell .row-actions a,
+.management-shell .table-actions a,
+.management-shell .action-row a,
+.management-shell .card-actions a,
+.management-shell .modal-actions a,
+.management-shell .form-actions a,
+.management-shell .button-row a,
+.management-shell .actions a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 11px;
+  white-space: nowrap;
+}
+
+/* Badges and status chips. */
+.management-shell .badge,
+.management-shell .status-badge,
+.management-shell .role-badge,
+.management-shell .pill,
+.management-shell .chip,
+.management-shell .tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.management-shell .status-approved,
+.management-shell .status-active,
+.management-shell .status-paid,
+.management-shell .status-delivered,
+.management-shell .badge-success {
+  border-color: rgba(22, 163, 74, 0.22);
+  background: #ecfdf5;
+  color: #15803d;
+}
+
+.management-shell .status-pending,
+.management-shell .status-new,
+.management-shell .status-processing,
+.management-shell .badge-warning {
+  border-color: rgba(217, 119, 6, 0.22);
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.management-shell .status-rejected,
+.management-shell .status-cancelled,
+.management-shell .status-blocked,
+.management-shell .badge-danger {
+  border-color: rgba(220, 38, 38, 0.2);
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Pagination should sit below tables and not float awkwardly. */
+.management-shell .pagination,
+.management-shell .pager,
+.management-shell .table-pagination,
+.management-shell .pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 2px 0;
+  color: var(--phase77-muted);
+  font-size: 0.88rem;
+}
+
+.management-shell .pagination button,
+.management-shell .pager button,
+.management-shell .table-pagination button,
+.management-shell .pagination-row button {
+  min-width: 38px;
+  min-height: 36px;
+  border-radius: 11px;
+}
+
+/* Modal/detail panels: centered, readable, not full-page collapsed. */
+.management-shell .modal-backdrop,
+.management-shell .dialog-backdrop,
+.management-shell .detail-modal-backdrop,
+.management-shell .smart-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.management-shell .modal,
+.management-shell .dialog,
+.management-shell .detail-modal,
+.management-shell .modal-card,
+.management-shell .modal-panel,
+.management-shell .smart-modal {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: #fff;
+  box-shadow: 0 32px 90px rgba(15, 23, 42, 0.34);
+}
+
+.management-shell .modal-header,
+.management-shell .dialog-header,
+.management-shell .detail-modal-header,
+.management-shell .modal-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--phase77-border);
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.management-shell .modal-body,
+.management-shell .dialog-body,
+.management-shell .detail-modal-body,
+.management-shell .modal-card-body {
+  padding: 20px;
+}
+
+.management-shell .modal-footer,
+.management-shell .dialog-footer,
+.management-shell .detail-modal-footer,
+.management-shell .modal-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  border-top: 1px solid var(--phase77-border);
+  background: #f8fafc;
+}
+
+.management-shell .modal-close,
+.management-shell .dialog-close,
+.management-shell .close-button,
+.management-shell .icon-close {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  padding: 0;
+  border-radius: 12px;
+}
+
+/* Forms inside management pages must stack safely. */
+.management-shell .form-grid,
+.management-shell .filter-grid,
+.management-shell .settings-grid,
+.management-shell .input-grid,
+.management-shell .admin-form-grid,
+.management-shell .business-form-grid,
+.management-shell .modal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.management-shell label,
+.management-shell .field,
+.management-shell .form-field {
+  min-width: 0;
+}
+
+.management-shell input,
+.management-shell select,
+.management-shell textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 900px) {
+  .management-shell .form-grid,
+  .management-shell .filter-grid,
+  .management-shell .settings-grid,
+  .management-shell .input-grid,
+  .management-shell .admin-form-grid,
+  .management-shell .business-form-grid,
+  .management-shell .modal-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .management-shell table,
+  .management-shell .data-table,
+  .management-shell .admin-table,
+  .management-shell .users-table,
+  .management-shell .listings-table,
+  .management-shell .fulfillment-table,
+  .management-shell .orders-table,
+  .management-shell .reviews-table {
+    min-width: 820px;
+  }
+
+  .management-shell .modal,
+  .management-shell .dialog,
+  .management-shell .detail-modal,
+  .management-shell .modal-card,
+  .management-shell .modal-panel,
+  .management-shell .smart-modal {
+    width: calc(100vw - 22px);
+    max-height: calc(100vh - 22px);
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  .management-shell .management-main-content {
+    padding: 10px;
+  }
+
+  .management-shell .table-wrap,
+  .management-shell .table-shell,
+  .management-shell .data-table-wrap,
+  .management-shell .admin-table-wrap {
+    border-radius: 14px;
+  }
+
+  .management-shell table,
+  .management-shell .data-table,
+  .management-shell .admin-table,
+  .management-shell .users-table,
+  .management-shell .listings-table,
+  .management-shell .fulfillment-table,
+  .management-shell .orders-table,
+  .management-shell .reviews-table {
+    min-width: 760px;
+  }
+
+  .management-shell table thead th,
+  .management-shell .data-table thead th,
+  .management-shell .admin-table thead th,
+  .management-shell table tbody td,
+  .management-shell .data-table tbody td,
+  .management-shell .admin-table tbody td {
+    padding: 12px;
+  }
+
+  .management-shell .modal-header,
+  .management-shell .dialog-header,
+  .management-shell .detail-modal-header,
+  .management-shell .modal-card-header,
+  .management-shell .modal-body,
+  .management-shell .dialog-body,
+  .management-shell .detail-modal-body,
+  .management-shell .modal-card-body,
+  .management-shell .modal-footer,
+  .management-shell .dialog-footer,
+  .management-shell .detail-modal-footer,
+  .management-shell .modal-card-footer {
+    padding: 14px;
+  }
+}

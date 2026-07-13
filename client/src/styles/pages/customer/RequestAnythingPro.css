@@ -1,0 +1,153 @@
+
+.request-showcase-page {
+  padding: 24px clamp(16px, 2.5vw, 32px) 56px;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 35%, #f8fbff 100%);
+}
+.request-showcase-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.1fr);
+  gap: 24px;
+  align-items: start;
+}
+.request-showcase-panel {
+  border-radius: 32px;
+  padding: 28px;
+  position: sticky;
+  top: 92px;
+}
+.request-showcase-panel .request-panel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(37,99,235,0.08);
+  color: #2563eb;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.request-benefit-list {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0 24px;
+}
+.request-benefit-list article {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+}
+.request-benefit-list article svg {
+  width: 42px; height: 42px; padding: 10px;
+  border-radius: 14px;
+  color: #2563eb; background: rgba(37,99,235,0.08);
+}
+.request-benefit-list b { display: block; color: #0f172a; margin-bottom: 5px; }
+.request-benefit-list p { margin: 0; color: #64748b; line-height: 1.65; }
+.request-highlight-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+  color: white;
+}
+.request-highlight-card strong { display: block; margin-bottom: 6px; }
+.request-highlight-card small { color: rgba(255,255,255,0.75); }
+.request-form-shell {
+  border-radius: 32px;
+  padding: 28px;
+}
+.request-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.request-form-header h2 { margin: 0 0 8px; font-size: 2rem; color: #0f172a; }
+.request-form-header p { margin: 0; color: #64748b; line-height: 1.75; }
+.request-track-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.request-type-grid.request-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 14px 0 24px;
+}
+.request-icon-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid #dbe3ef;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.request-icon-card:hover,
+.request-icon-card.active { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(15,23,42,0.08); border-color: #3b82f6; }
+.request-svg-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px; height: 48px;
+  border-radius: 16px;
+  color: #2563eb;
+  background: rgba(37,99,235,0.08);
+}
+.request-svg-icon svg { width: 24px; height: 24px; }
+.request-icon-card strong { color: #0f172a; font-size: 1rem; }
+.request-icon-card small { color: #64748b; line-height: 1.6; }
+.request-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.request-form-grid .full-span { grid-column: 1 / -1; }
+.request-form-shell label {
+  display: grid;
+  gap: 8px;
+  color: #334155;
+  font-weight: 600;
+}
+.request-form-shell textarea { min-height: 140px; padding: 14px 16px; resize: vertical; }
+.request-submit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+}
+.form-status {
+  margin: 0;
+  color: #2563eb;
+  font-weight: 600;
+}
+@media (max-width: 1100px) {
+  .request-showcase-shell { grid-template-columns: 1fr; }
+  .request-showcase-panel { position: static; }
+}
+@media (max-width: 720px) {
+  .request-type-grid.request-icon-grid,
+  .request-form-grid { grid-template-columns: 1fr; }
+  .request-form-header,
+  .request-submit-row { flex-direction: column; align-items: stretch; }
+}

@@ -1,0 +1,7 @@
+@import "./WorkflowCommon.css";
+.ss-checkout-stack { display: grid; gap: 18px; }
+.ss-coupon-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; }
+.ss-summary-lines { display: grid; gap: 10px; margin: 18px 0; }
+.ss-summary-lines p { display: flex; justify-content: space-between; margin: 0; color: #64748b; }
+.ss-summary-lines .ss-grand-total { padding-top: 14px; border-top: 1px solid #e5edf4; color: #0f172a; font-size: 1.15rem; }
+@media (max-width: 720px) { .ss-coupon-row { grid-template-columns: 1fr; } }

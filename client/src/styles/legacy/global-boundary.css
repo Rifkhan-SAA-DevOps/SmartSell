@@ -1,0 +1,116 @@
+/*
+  Phase 91 — Global CSS boundary layer
+  This file is intentionally small. It does not replace global.css yet.
+  It protects newer scoped UI pages from old broad global selectors while we migrate safely.
+*/
+
+:root {
+  --ss-page-max: 1180px;
+  --ss-page-pad: clamp(16px, 2.5vw, 32px);
+  --ss-safe-border: rgba(15, 23, 42, 0.08);
+  --ss-safe-muted: #64748b;
+  --ss-safe-text: #0f172a;
+}
+
+/* Safer sizing for pages that already use modern scoped wrappers. */
+.customer-home-page,
+.customer-feed-page,
+.ms-discovery-page,
+.request-showcase-page,
+.catalog-page,
+.inventory-page,
+.admin-page,
+.management-page,
+.dashboard-page,
+.business-dashboard-page {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+/* Stop old global table/card rules from causing page overflow on modern pages. */
+.ms-discovery-page *,
+.request-showcase-page *,
+.customer-home-page *,
+.customer-feed-page *,
+.catalog-page *,
+.inventory-page *,
+.management-page *,
+.admin-page *,
+.business-dashboard-page * {
+  min-width: 0;
+}
+
+/* New scoped pages should control their own page width, not inherit old .section behavior. */
+.ms-discovery-page .section,
+.request-showcase-page .section,
+.customer-home-page .section,
+.customer-feed-page .section,
+.catalog-page .section,
+.inventory-page .section {
+  width: auto;
+  margin: 0;
+}
+
+/* Keep action rows readable after old global button styles. */
+.ms-discovery-page button,
+.request-showcase-page button,
+.customer-home-page button,
+.customer-feed-page button,
+.catalog-page button,
+.inventory-page button,
+.management-page button {
+  white-space: nowrap;
+}
+
+/* Standard horizontal overflow only for tables, not full pages. */
+.management-page table,
+.admin-page table,
+.business-dashboard-page table,
+.catalog-page table,
+.inventory-page table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.management-page .table-scroll,
+.admin-page .table-scroll,
+.business-dashboard-page .table-scroll,
+.catalog-page .table-scroll,
+.inventory-page .table-scroll,
+.management-page .table-responsive,
+.admin-page .table-responsive,
+.business-dashboard-page .table-responsive,
+.catalog-page .table-responsive,
+.inventory-page .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Shared image safety for listing/card UIs. */
+.customer-product-card img,
+.customer-service-card img,
+.ms-discovery-page img,
+.catalog-page img,
+.inventory-page img {
+  object-fit: cover;
+}
+
+/* Mobile protection while old global.css is being split. */
+@media (max-width: 760px) {
+  .management-main-content,
+  .public-main-content {
+    min-width: 0;
+  }
+
+  .ms-discovery-page,
+  .request-showcase-page,
+  .customer-home-page,
+  .customer-feed-page,
+  .catalog-page,
+  .inventory-page,
+  .management-page,
+  .admin-page,
+  .business-dashboard-page {
+    overflow-x: hidden;
+  }
+}

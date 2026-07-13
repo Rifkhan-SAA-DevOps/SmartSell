@@ -1,0 +1,18 @@
+@import "./WorkflowCommon.css";
+.ss-inbox { max-width: 1160px; }
+.ss-thread-list { display: grid; gap: 10px; }
+.ss-thread-row { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; text-align: left; border: 1px solid #e5edf4; background: #fff; border-radius: 16px; padding: 13px; cursor: pointer; }
+.ss-thread-row.active { border-color: #0ea5e9; background: #f0f9ff; }
+.ss-thread-row > span { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: #e0f2fe; color: #075985; font-weight: 900; }
+.ss-thread-row strong, .ss-thread-row small, .ss-thread-row p { display: block; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-thread-row small, .ss-thread-row p { color: #64748b; }
+.ss-thread-row b { background: #ef4444; color: #fff; border-radius: 999px; min-width: 24px; height: 24px; display: grid; place-items: center; }
+.ss-message-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; border-bottom: 1px solid #e5edf4; padding-bottom: 16px; margin-bottom: 16px; }
+.ss-message-head h2 { margin: 8px 0 4px; }
+.ss-message-list { display: grid; gap: 12px; max-height: 440px; overflow: auto; padding-right: 4px; }
+.ss-message-bubble { width: min(78%, 620px); padding: 13px 15px; border-radius: 18px; background: #f1f5f9; }
+.ss-message-bubble.mine { margin-left: auto; background: #e0f2fe; }
+.ss-message-bubble p { margin: 6px 0; color: #334155; }
+.ss-message-bubble small { color: #64748b; }
+.ss-reply-box { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin-top: 16px; }
+@media (max-width: 720px) { .ss-thread-row { grid-template-columns: 40px minmax(0, 1fr); } .ss-thread-row b { grid-column: 2; } .ss-message-head, .ss-reply-box { display: grid; grid-template-columns: 1fr; } .ss-message-bubble { width: 100%; } }

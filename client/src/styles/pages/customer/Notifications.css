@@ -1,0 +1,4 @@
+@import "./WorkflowCommon.css";
+.ss-notification-table td:nth-child(3) { min-width: 300px; }
+.ss-notification-table tr.is-unread td { background: #fffbeb; }
+.ss-code-badge { width: 42px; height: 32px; padding: 0; border-radius: 10px; }

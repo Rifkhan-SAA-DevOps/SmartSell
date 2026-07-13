@@ -1,0 +1,52 @@
+/* Phase 52 — scoped service quote polish */
+.ss-quote-page { width:min(1180px, calc(100% - 32px)); margin:26px auto 72px; }
+.ss-breadcrumb { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:0 0 18px; color:#64748b; font-size:.9rem; font-weight:850; }
+.ss-breadcrumb a { color:#2563eb; }
+.ss-kicker { display:inline-flex; width:fit-content; padding:7px 12px; border-radius:999px; border:1px solid #bfdbfe; background:#eef7ff; color:#075985; font-size:.72rem; font-weight:950; letter-spacing:.055em; text-transform:uppercase; }
+.ss-quote-hero { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:20px; align-items:stretch; padding:clamp(24px,4vw,44px); border-radius:34px; border:1px solid rgba(148,163,184,.18); background:radial-gradient(circle at 86% 8%,rgba(6,182,212,.18),transparent 32%),linear-gradient(135deg,#fff 0%,#f8fbff 55%,#eff8ff 100%); box-shadow:0 22px 55px rgba(15,23,42,.08); }
+.ss-quote-copy h1 { margin:12px 0 10px; color:#0f172a; font-size:clamp(2rem,4vw,3.75rem); line-height:.98; letter-spacing:-.06em; }
+.ss-quote-copy p { margin:0; max-width:740px; color:#64748b; line-height:1.75; }
+.ss-quote-steps { display:grid; align-content:center; gap:10px; padding:16px; border-radius:24px; background:#0f172a; color:#fff; box-shadow:0 20px 44px rgba(15,23,42,.18); }
+.ss-quote-steps div { display:flex; gap:10px; align-items:center; padding:10px; border-radius:16px; background:rgba(255,255,255,.08); font-weight:900; }
+.ss-mini-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:11px; color:#0f172a; background:#fff; font-weight:950; font-size:.72rem; }
+.ss-quote-grid { display:grid; grid-template-columns:340px minmax(0,1fr); gap:22px; align-items:start; margin-top:22px; }
+.ss-quote-service-card,.ss-quote-form { border:1px solid rgba(148,163,184,.20); border-radius:28px; background:#fff; box-shadow:0 18px 45px rgba(15,23,42,.07); }
+.ss-quote-service-card { overflow:hidden; position:sticky; top:92px; }
+.ss-quote-media { position:relative; aspect-ratio:4/3; background:#e0f2fe; }
+.ss-quote-media img { width:100%; height:100%; object-fit:cover; display:block; }
+.ss-quote-media span { position:absolute; left:14px; bottom:14px; max-width:calc(100% - 28px); padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.9); border:1px solid rgba(226,232,240,.9); color:#0f172a; font-weight:950; font-size:.78rem; }
+.ss-quote-service-body { display:grid; gap:14px; padding:20px; }
+.ss-quote-service-body h2 { margin:0; color:#0f172a; font-size:1.35rem; letter-spacing:-.035em; }
+.ss-quote-service-body p { margin:0; color:#64748b; line-height:1.7; }
+.ss-info-list { display:grid; gap:10px; }
+.ss-info-list div { display:flex; justify-content:space-between; gap:12px; padding:12px; border-radius:16px; background:#f8fafc; border:1px solid #edf2f7; }
+.ss-info-list span { color:#64748b; font-weight:850; }
+.ss-info-list b { color:#0f172a; font-weight:950; text-align:right; }
+.ss-quote-form { padding:24px; }
+.ss-form-heading { display:flex; gap:14px; align-items:flex-start; margin-bottom:20px; }
+.ss-form-mark { display:grid; place-items:center; flex:0 0 auto; width:44px; height:44px; border-radius:16px; color:#fff; background:linear-gradient(135deg,#2563eb,#06b6d4); font-weight:950; box-shadow:0 16px 28px rgba(37,99,235,.22); }
+.ss-form-heading h2 { margin:0 0 5px; color:#0f172a; font-size:1.22rem; letter-spacing:-.03em; }
+.ss-form-heading p { margin:0; color:#64748b; line-height:1.55; }
+.ss-form-grid.two { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.ss-quote-form label { display:grid; gap:8px; margin-bottom:16px; color:#334155; font-size:.84rem; font-weight:900; }
+.ss-quote-form input,.ss-quote-form textarea { width:100%; min-height:46px; border:1px solid rgba(148,163,184,.45); border-radius:16px; padding:13px 14px; background:#f8fafc; color:#0f172a; font:inherit; outline:0; }
+.ss-quote-form textarea { resize:vertical; }
+.ss-quote-form input:focus,.ss-quote-form textarea:focus { background:#fff; border-color:rgba(14,165,233,.78); box-shadow:0 0 0 4px rgba(14,165,233,.12); }
+.ss-form-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; }
+.ss-form-status { margin:14px 0 0; color:#0369a1; font-weight:850; }
+.ss-success-panel { margin-top:16px; padding:14px; border-radius:18px; background:#ecfdf5; border:1px solid #bbf7d0; color:#166534; }
+.ss-success-panel p { margin:5px 0 12px; color:#166534; line-height:1.55; }
+@media (max-width:980px) { .ss-quote-hero,.ss-quote-grid { grid-template-columns:1fr; } .ss-quote-service-card { position:static; } }
+@media (max-width:680px) { .ss-quote-page { width:min(100% - 22px,1180px); margin-top:16px; } .ss-quote-hero { padding:22px; border-radius:24px; } .ss-quote-form,.ss-quote-service-card { border-radius:22px; } .ss-quote-form { padding:16px; } .ss-form-grid.two { grid-template-columns:1fr; } .ss-form-actions .primary-btn,.ss-form-actions .secondary-btn { width:100%; justify-content:center; } }
+
+/* Phase 58: quote page stack-below fix. */
+.ss-quote-page { width: min(100% - 28px, 1120px) !important; max-width: 1120px !important; margin-inline: auto !important; }
+.ss-quote-hero,
+.ss-quote-grid,
+.ss-form-grid.two {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+}
+.ss-quote-service-card { position: static !important; width: 100% !important; }
+@media (max-width: 720px) { .ss-quote-page { width: min(100% - 18px, 1120px) !important; } }

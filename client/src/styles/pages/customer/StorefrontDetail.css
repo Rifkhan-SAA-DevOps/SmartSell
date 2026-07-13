@@ -1,0 +1,423 @@
+/* Phase 62 — Storefront / provider detail UI polish
+   Scoped to StorefrontDetail.jsx classes only.
+*/
+
+.ss-page {
+  width: min(1220px, calc(100% - 32px));
+  margin: 28px auto 72px;
+}
+
+.ss-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: .9rem;
+  font-weight: 850;
+}
+
+.ss-breadcrumb a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.ss-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 30px;
+  padding: 7px 12px;
+  border: 1px solid rgba(191, 219, 254, .9);
+  border-radius: 999px;
+  background: rgba(239, 246, 255, .92);
+  color: #1d4ed8;
+  font-size: .72rem;
+  font-weight: 950;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.ss-store-cover {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: end;
+  min-height: clamp(300px, 34vw, 430px);
+  padding: clamp(28px, 5vw, 54px);
+  border-radius: 38px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255,255,255,.22), transparent 25%),
+    radial-gradient(circle at 90% 0%, rgba(6, 182, 212, .36), transparent 36%),
+    linear-gradient(135deg, #020617 0%, #0f172a 36%, #1d4ed8 72%, #06b6d4 100%);
+  box-shadow: 0 34px 95px rgba(15, 23, 42, .20);
+}
+
+.ss-store-cover::before,
+.ss-store-cover::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.ss-store-cover::before {
+  right: -80px;
+  top: -90px;
+  width: 260px;
+  height: 260px;
+  background: rgba(255,255,255,.12);
+}
+
+.ss-store-cover::after {
+  left: -90px;
+  bottom: -120px;
+  width: 300px;
+  height: 300px;
+  background: rgba(6,182,212,.12);
+}
+
+.ss-store-cover-content {
+  position: relative;
+  z-index: 1;
+  max-width: 840px;
+}
+
+.ss-store-cover-content h1 {
+  margin: 14px 0 12px;
+  color: #fff;
+  font-size: clamp(2rem, 4.4vw, 4.6rem);
+  line-height: .96;
+  letter-spacing: -.065em;
+}
+
+.ss-store-cover-content p {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(255,255,255,.82);
+  font-size: clamp(1rem, 1.25vw, 1.16rem);
+  line-height: 1.75;
+}
+
+.ss-store-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ss-store-meta-row span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  color: #fff;
+  font-size: .86rem;
+  font-weight: 850;
+  backdrop-filter: blur(12px);
+}
+
+.ss-store-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.ss-store-profile-card,
+.ss-store-main,
+.ss-store-about-panel,
+.ss-empty-panel,
+.ss-skeleton-card {
+  border: 1px solid rgba(203, 213, 225, .9);
+  border-radius: 30px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, .09);
+}
+
+.ss-store-profile-card {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.ss-store-avatar {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 28px;
+  color: #fff;
+  background: linear-gradient(135deg, #0f172a, #2563eb 58%, #06b6d4);
+  box-shadow: 0 18px 38px rgba(37, 99, 235, .25);
+  font-size: 1.4rem;
+  font-weight: 1000;
+  letter-spacing: -.05em;
+}
+
+.ss-store-profile-card h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.5rem;
+  letter-spacing: -.045em;
+  line-height: 1.1;
+}
+
+.ss-store-profile-card > p {
+  margin: -6px 0 4px;
+  color: #64748b;
+  line-height: 1.65;
+}
+
+.ss-store-stats {
+  display: grid;
+  gap: 10px;
+}
+
+.ss-store-stats > div,
+.ss-store-about-grid > div {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.ss-store-stats span,
+.ss-store-about-grid span {
+  display: block;
+  color: #94a3b8;
+  font-size: .72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 5px;
+}
+
+.ss-store-stats b,
+.ss-store-about-grid b {
+  display: block;
+  color: #0f172a;
+  font-size: .95rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.ss-store-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.ss-store-actions .primary-btn,
+.ss-store-actions .secondary-btn,
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.primary-btn {
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  box-shadow: 0 16px 32px rgba(37,99,235,.22);
+}
+
+.secondary-btn {
+  color: #0f172a;
+  background: #fff;
+  border-color: #cbd5e1;
+}
+
+.full-btn { width: 100%; }
+.small-btn { min-height: 42px; padding-inline: 14px; }
+
+.ss-store-main {
+  min-width: 0;
+  padding: clamp(18px, 2vw, 26px);
+}
+
+.ss-store-tabs {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  margin: 0 0 22px;
+  border-radius: 18px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.ss-store-tabs button {
+  border: 0;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 950;
+}
+
+.ss-store-tabs button.active {
+  color: #0f172a;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(15,23,42,.08);
+}
+
+.ss-panel-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.ss-panel-heading h2 {
+  margin: 8px 0 0;
+  color: #0f172a;
+  font-size: clamp(1.35rem, 2.2vw, 2.05rem);
+  letter-spacing: -.045em;
+}
+
+.ss-count-pill {
+  flex: 0 0 auto;
+  padding: 9px 13px;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: .8rem;
+  font-weight: 950;
+}
+
+.ss-store-listing-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
+  gap: 18px !important;
+  margin-top: 14px;
+}
+
+.ss-store-about-panel {
+  padding: clamp(18px, 2.3vw, 28px);
+}
+
+.ss-store-about-panel h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  letter-spacing: -.04em;
+}
+
+.ss-store-about-panel p {
+  margin: 0 0 18px;
+  color: #64748b;
+  line-height: 1.75;
+}
+
+.ss-store-about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ss-empty-panel,
+.ss-skeleton-card {
+  padding: clamp(28px, 5vw, 56px);
+  text-align: center;
+}
+
+.ss-empty-panel.compact { padding: 28px; }
+.ss-empty-panel h1,
+.ss-empty-panel h2,
+.ss-empty-panel h3 { margin: 0 0 10px; color: #0f172a; letter-spacing: -.04em; }
+.ss-empty-panel p { margin: 0 auto 18px; color: #64748b; line-height: 1.7; max-width: 640px; }
+
+@media (max-width: 1100px) {
+  .ss-store-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-store-profile-card {
+    position: static;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .ss-store-profile-card .ss-store-stats,
+  .ss-store-profile-card .ss-store-actions {
+    grid-column: 1 / -1;
+  }
+
+  .ss-store-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .ss-page {
+    width: min(100% - 24px, 1220px);
+    margin-top: 18px;
+  }
+
+  .ss-store-cover {
+    min-height: 340px;
+    border-radius: 28px;
+  }
+
+  .ss-store-profile-card {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-store-stats,
+  .ss-store-about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ss-store-listing-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ss-store-cover,
+  .ss-store-profile-card,
+  .ss-store-main,
+  .ss-store-about-panel {
+    border-radius: 24px;
+  }
+
+  .ss-store-cover {
+    padding: 20px;
+  }
+
+  .ss-store-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .ss-store-meta-row span {
+    width: 100%;
+    justify-content: center;
+  }
+}

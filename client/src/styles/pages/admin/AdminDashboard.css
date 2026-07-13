@@ -1,0 +1,149 @@
+.admin-ops-page .ops-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  border-radius: 28px;
+  border: 1px solid #dbeafe;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, .16), transparent 36%),
+    linear-gradient(135deg, #ffffff 0%, #f8fbff 50%, #eff6ff 100%);
+  box-shadow: 0 26px 70px rgba(15, 23, 42, .08);
+  padding: clamp(22px, 3vw, 38px);
+  margin-bottom: 22px;
+}
+
+.admin-ops-page .ops-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.admin-ops-page .ops-metric-grid,
+.admin-ops-page .ops-action-grid,
+.admin-ops-page .ops-approval-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.admin-ops-page .ops-metric-card,
+.admin-ops-page .ops-action-tile,
+.admin-ops-page .ops-priority-card,
+.admin-ops-page .admin-table,
+.admin-ops-page .ops-request-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, .07);
+}
+
+.admin-ops-page .ops-metric-card,
+.admin-ops-page .ops-action-tile {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px;
+  text-decoration: none;
+}
+
+.admin-ops-page .ops-metric-card > span,
+.admin-ops-page .ops-action-tile > span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 16px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 950;
+  letter-spacing: -.02em;
+}
+
+.admin-ops-page .ops-metric-card strong {
+  display: block;
+  margin: 5px 0 3px;
+  color: #0f172a;
+  font-size: 27px;
+  letter-spacing: -.04em;
+}
+
+.admin-ops-page .ops-card-head,
+.admin-ops-page .ops-request-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 18px 18px 0;
+}
+
+.admin-ops-page .ops-priority-card,
+.admin-ops-page .ops-request-card {
+  padding-bottom: 18px;
+  overflow: hidden;
+}
+
+.admin-ops-page .ops-meta-grid,
+.admin-ops-page .ops-request-panel,
+.admin-ops-page .ops-request-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 16px 18px 0;
+}
+
+.admin-ops-page .ops-meta-grid span,
+.admin-ops-page .ops-request-panel span {
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.admin-ops-page .ops-meta-grid strong,
+.admin-ops-page .ops-request-panel strong {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.admin-ops-page .ops-request-message {
+  margin: 16px 18px 0;
+  border-left: 4px solid #2563eb;
+  background: #eff6ff;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.admin-ops-page .ops-request-actions,
+.admin-ops-page .compact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-ops-page .ops-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 1050px) {
+  .admin-ops-page .ops-hero,
+  .admin-ops-page .ops-two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-ops-page .ops-hero-actions {
+    justify-content: flex-start;
+  }
+}

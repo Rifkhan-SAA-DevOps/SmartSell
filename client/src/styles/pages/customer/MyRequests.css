@@ -1,0 +1,2 @@
+@import "./WorkflowCommon.css";
+.ss-my-requests .ss-data-table td:first-child { min-width: 260px; }

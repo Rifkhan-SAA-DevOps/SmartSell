@@ -1,0 +1,309 @@
+/* Phase 74 — Admin remaining pages responsive table/form polish
+   This file is intentionally scoped to management/admin/business surfaces.
+   It does not touch public/customer feed pages. */
+
+.management-main-content {
+  min-width: 0;
+}
+
+/* Generic admin/business page guardrails */
+.management-main-content .page,
+.management-main-content .section,
+.management-main-content .page-section,
+.management-main-content .report-page,
+.management-main-content .promotion-center-page,
+.management-main-content .settings-page,
+.management-main-content .content-manager-page,
+.management-main-content .seo-settings-page,
+.management-main-content .security-center-page,
+.management-main-content .finance-page {
+  width: min(100%, 1380px);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.management-main-content .management-page-header,
+.management-main-content .page-heading-row,
+.management-main-content .report-hero,
+.management-main-content .settings-header-card,
+.management-main-content .content-manager-hero,
+.management-main-content .seo-manager-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
+  padding: clamp(18px, 2.2vw, 26px);
+  border-radius: 26px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.07);
+  margin-bottom: 18px;
+}
+
+.management-main-content .management-page-header > *,
+.management-main-content .page-heading-row > *,
+.management-main-content .report-hero > * {
+  min-width: 0;
+}
+
+.management-main-content .eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Make remaining admin pages stack downwards instead of squeezing columns */
+.management-main-content .report-grid-two,
+.management-main-content .report-grid-two.align-start,
+.management-main-content .growth-grid,
+.management-main-content .growth-list-grid,
+.management-main-content .content-manager-layout,
+.management-main-content .seo-manager-layout,
+.management-main-content .security-grid,
+.management-main-content .content-grid.two-col-grid,
+.management-main-content .finance-layout-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+  min-width: 0 !important;
+}
+
+/* Stat areas: professional grid with safe card width */
+.management-main-content .report-metric-grid,
+.management-main-content .report-mini-grid,
+.management-main-content .stats-grid,
+.management-main-content .security-stats-grid,
+.management-main-content .finance-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)) !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+}
+
+.management-main-content .report-panel,
+.management-main-content .panel-card,
+.management-main-content .business-panel,
+.management-main-content .settings-group-card,
+.management-main-content .content-edit-card,
+.management-main-content .content-preview-card,
+.management-main-content .seo-edit-card,
+.management-main-content .seo-preview-card,
+.management-main-content .finance-form-card,
+.management-main-content .finance-help-card,
+.management-main-content .admin-table,
+.management-main-content .report-panel.table-panel,
+.management-main-content .coupon-table-panel,
+.management-main-content .finance-table-panel {
+  min-width: 0 !important;
+  width: 100% !important;
+  border-radius: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.06);
+}
+
+/* Forms: stack safely and avoid tiny columns */
+.management-main-content .form-two,
+.management-main-content .settings-grid,
+.management-main-content .content-field-grid,
+.management-main-content .seo-field-grid,
+.management-main-content .smart-form .form-grid,
+.management-main-content .growth-form .form-two {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)) !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+}
+
+.management-main-content label,
+.management-main-content .settings-field,
+.management-main-content .content-field,
+.management-main-content .seo-field {
+  min-width: 0 !important;
+}
+
+.management-main-content input,
+.management-main-content select,
+.management-main-content textarea {
+  max-width: 100%;
+}
+
+/* Tabs/side lists should become horizontal chips instead of sidebars */
+.management-main-content .content-section-tabs,
+.management-main-content .seo-section-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.management-main-content .content-section-tabs button,
+.management-main-content .seo-section-tabs button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Tables: real width, horizontal scroll, no compressed buttons */
+.management-main-content .table-scroll,
+.management-main-content .responsive-table-wrap,
+.management-main-content .table-shell,
+.management-main-content .admin-table,
+.management-main-content .finance-table-panel {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.management-main-content table,
+.management-main-content .smart-table,
+.management-main-content .professional-table,
+.management-main-content .report-table,
+.management-main-content .audit-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.management-main-content th,
+.management-main-content td {
+  white-space: nowrap;
+}
+
+.management-main-content td .row-actions,
+.management-main-content .row-actions,
+.management-main-content .stacked-actions,
+.management-main-content .settings-sticky-actions,
+.management-main-content .form-title-line,
+.management-main-content .business-list-head,
+.management-main-content .report-panel-head,
+.management-main-content .panel-card-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  min-width: 0 !important;
+}
+
+.management-main-content .row-actions button,
+.management-main-content .stacked-actions button,
+.management-main-content .settings-sticky-actions button,
+.management-main-content .business-list-head button,
+.management-main-content .form-title-line button,
+.management-main-content .primary-btn,
+.management-main-content .secondary-btn,
+.management-main-content .ghost-btn,
+.management-main-content .approve-btn,
+.management-main-content .reject-btn,
+.management-main-content .small-btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Long list items: stack below each other neatly */
+.management-main-content .category-admin-list,
+.management-main-content .security-checklist,
+.management-main-content .security-advice-list,
+.management-main-content .admin-activity-feed {
+  display: grid !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+}
+
+.management-main-content .category-admin-item,
+.management-main-content .admin-activity-item,
+.management-main-content .security-check-item {
+  min-width: 0 !important;
+  display: grid;
+  gap: 8px;
+}
+
+/* Keep chart sections readable */
+.management-main-content .trend-bars {
+  min-width: 760px;
+}
+
+.management-main-content .report-panel.wide-panel {
+  overflow-x: auto;
+}
+
+/* Mobile/tablet: everything below/below */
+@media (max-width: 1080px) {
+  .management-main-content .management-page-header,
+  .management-main-content .page-heading-row,
+  .management-main-content .report-hero,
+  .management-main-content .settings-header-card,
+  .management-main-content .content-manager-hero,
+  .management-main-content .seo-manager-hero {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .management-main-content .form-two,
+  .management-main-content .settings-grid,
+  .management-main-content .content-field-grid,
+  .management-main-content .seo-field-grid,
+  .management-main-content .smart-form .form-grid,
+  .management-main-content .growth-form .form-two {
+    grid-template-columns: 1fr !important;
+  }
+
+  .management-main-content table,
+  .management-main-content .smart-table,
+  .management-main-content .professional-table,
+  .management-main-content .report-table,
+  .management-main-content .audit-table {
+    min-width: 840px;
+  }
+}
+
+@media (max-width: 640px) {
+  .management-main-content .report-metric-grid,
+  .management-main-content .report-mini-grid,
+  .management-main-content .stats-grid,
+  .management-main-content .security-stats-grid,
+  .management-main-content .finance-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .management-main-content .report-panel,
+  .management-main-content .panel-card,
+  .management-main-content .business-panel,
+  .management-main-content .settings-group-card,
+  .management-main-content .content-edit-card,
+  .management-main-content .content-preview-card,
+  .management-main-content .seo-edit-card,
+  .management-main-content .seo-preview-card,
+  .management-main-content .finance-form-card,
+  .management-main-content .finance-help-card {
+    border-radius: 18px;
+  }
+
+  .management-main-content table,
+  .management-main-content .smart-table,
+  .management-main-content .professional-table,
+  .management-main-content .report-table,
+  .management-main-content .audit-table {
+    min-width: 780px;
+  }
+}

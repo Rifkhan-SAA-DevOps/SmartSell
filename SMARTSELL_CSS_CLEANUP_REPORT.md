@@ -1,0 +1,241 @@
+# SmartSell CSS Cleanup Report
+
+Generated: 2026-07-12T05:11:46.114Z
+
+## Summary
+
+- global.css selectors found: 817
+- risky broad selectors found: 54
+- class selectors that may be unused: 232
+
+## Risky broad selectors to migrate first
+
+These selectors are broad and can accidentally affect many pages. Move them page-by-page into scoped CSS files.
+
+- `a`
+- `button`
+- `input`
+- `select`
+- `textarea`
+- `button`
+- `button:disabled`
+- `img`
+- `.section`
+- `.page-shell`
+- `.btn`
+- `.btn-primary`
+- `.btn-outline`
+- `.btn-danger-soft`
+- `.btn-soft`
+- `.btn:hover`
+- `.section-header h2`
+- `.section-header p`
+- `.status-pill`
+- `.status-pill`
+- `.status-approved`
+- `.status-active`
+- `.status-paid`
+- `.status-delivered`
+- `.status-completed`
+- `.status-pending`
+- `.status-new`
+- `.status-processing`
+- `.status-quoted`
+- `.status-assigned`
+- `.status-rejected`
+- `.status-blocked`
+- `.status-cancelled`
+- `.status-failed`
+- `.status-archived`
+- `.table-panel`
+- `.table-shell`
+- `.section-mini-head`
+- `.section-mini-head h2`
+- `.section-mini-head p`
+- `.form-grid`
+- `input`
+- `select`
+- `textarea`
+- `textarea`
+- `input:focus`
+- `select:focus`
+- `textarea:focus`
+- `.table-scroll`
+- `.table-shell`
+- `.section`
+- `.page-shell`
+- `.section-header h2`
+- `.form-grid`
+
+## Possibly unused global classes
+
+These may be safe to remove later, but check manually first because dynamic class names are not always detected.
+
+- `.management-shell`
+- `.management-page`
+- `.compact-page`
+- `.dashboard-page`
+- `.um-page`
+- `.support-page`
+- `.storefront-directory-page`
+- `.marketplace-discovery-page`
+- `.service-detail-page`
+- `.detail-page`
+- `.cart-layout`
+- `.checkout-layout`
+- `.inbox-page`
+- `.notification-layout`
+- `.offers-page`
+- `.request-page`
+- `.my-requests-page`
+- `.public-nav`
+- `.brand`
+- `.nav-links`
+- `.nav-menu-toggle`
+- `.nav-backdrop`
+- `.sidebar-overlay`
+- `.realtime-dot`
+- `.icon-nav-link`
+- `.cart-link`
+- `.nav-user`
+- `.nav-logout`
+- `.nav-cta`
+- `.success-btn`
+- `.detail-mini-btn`
+- `.cart-mini-btn`
+- `.inline-action-link`
+- `.detail-primary-action`
+- `.btn-danger-soft`
+- `.btn-soft`
+- `.nav-action-icon`
+- `.cart-icon`
+- `.inbox-icon`
+- `.bell-icon`
+- `.app-sidebar`
+- `.sidebar-collapsed`
+- `.hero`
+- `.admin-hero`
+- `.cockpit-hero`
+- `.um-hero`
+- `.listing-hero`
+- `.profile-settings-hero`
+- `.compact-hero`
+- `.offer-hero`
+- `.storefront-detail-hero`
+- `.request-track-banner`
+- `.pro-request-banner`
+- `.hero-badge`
+- `.pro-badge`
+- `.status-pill`
+- `.context-chip`
+- `.support-pill`
+- `.um-role-chip`
+- `.service-detail-badge`
+- `.detail-type-badge`
+- `.status-approved`
+- `.status-active`
+- `.status-paid`
+- `.status-delivered`
+- `.status-completed`
+- `.status-pending`
+- `.status-new`
+- `.status-processing`
+- `.status-quoted`
+- `.status-assigned`
+- `.status-rejected`
+- `.status-blocked`
+- `.status-cancelled`
+- `.status-failed`
+- `.status-archived`
+- `.hero-icon-card`
+- `.um-hero-icon`
+- `.empty-icon`
+- `.profile-panel-icon`
+- `.cockpit-action-icon`
+- `.ops-metric-card`
+- `.ops-action-tile`
+- `.um-stat-icon`
+- `.category-grid`
+- `.admin-grid`
+- `.stat-grid`
+- `.compact-stat-grid`
+- `.compact-stats`
+- `.cockpit-action-grid`
+- `.um-stat-grid`
+- `.um-command-grid`
+- `.delivery-kpi-grid`
+- `.fulfillment-kpi-grid`
+- `.storefront-grid`
+- `.request-workflow-grid`
+- `.pro-request-workflow-grid`
+- `.offer-stat-grid`
+- `.offer-grid`
+- `.support-stats-grid`
+- `.management-panel`
+- `.admin-card`
+- `.product-card`
+- `.service-card`
+- `.category-card`
+- `.mini-stat-card`
+- `.um-stat-card`
+- `.um-create-card`
+- `.um-directory-panel`
+- `.um-detail-panel`
+- `.listing-filter-panel`
+- `.listing-admin-card`
+- `.cockpit-action-card`
+- `.cockpit-profile-card`
+- `.support-create-panel`
+- `.support-ticket-card`
+- `.security-card`
+- `.profile-form-panel`
+- `.profile-progress-card`
+- `.storefront-card`
+- `.detail-gallery-card`
+- `.detail-info-card`
+- `.detail-price-panel`
+- `.detail-section-card`
+- `.detail-seller-card`
+- `.service-info-card`
+- `.service-gallery-card`
+- `.service-price-panel`
+- `.quote-form-card`
+- `.quote-summary-card`
+- `.notification-card`
+- `.inbox-panel`
+- `.thread-list-panel`
+- `.message-panel`
+- `.offer-card`
+- `.fulfillment-card`
+- `.cart-item`
+- `.cart-summary`
+- `.checkout-main-form`
+- `.checkout-offer-summary`
+- `.empty-state`
+- `.empty-cart-card`
+- `.premium-empty-state`
+- `.report-metric-card`
+- `.panel-header-row`
+- `.message-panel-header`
+- `.thread-list-head`
+- `.support-panel-head`
+- `.cockpit-section-head`
+- `.pro-listing-card`
+- `.pro-service-card`
+- `.product-image`
+- `.pro-listing-media`
+- `.pro-service-media`
+- `.business-list-media`
+- `.listing-admin-media`
+- `.product-body`
+- `.pro-listing-body`
+- `.pro-service-body`
+- `.listing-admin-main`
+
+## Safe cleanup order
+
+1. Move customer page styles from global.css into `client/src/styles/pages/customer/...`.
+2. Move admin/business page styles into `client/src/styles/pages/management/...`.
+3. Move reusable card/button/table/form styles into `client/src/styles/components/...`.
+4. Run this audit again.
+5. Remove migrated selectors from global.css only after checking the page in browser.

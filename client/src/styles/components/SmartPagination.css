@@ -1,0 +1,143 @@
+/*
+  Lightweight pagination.
+  Pagination is navigation, not another large dashboard card.
+*/
+
+.smart-pagination {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 0 0;
+  border: 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.smart-pagination.align-left {
+  justify-content: flex-start;
+}
+
+.smart-pagination.align-right {
+  justify-content: flex-end;
+}
+
+.smart-pagination.compact {
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+.smart-pagination-summary,
+.smart-pagination-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.smart-pagination-summary strong {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.smart-pagination-controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.smart-pagination button,
+.smart-pagination select {
+  min-height: 34px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 9px;
+  background: #ffffff;
+  color: #334155;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.smart-pagination button {
+  min-width: 34px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.smart-pagination button:hover:not(:disabled),
+.smart-pagination button:focus-visible {
+  border-color: rgba(37, 99, 235, 0.42);
+  color: #1d4ed8;
+  outline: none;
+}
+
+.smart-pagination button.active {
+  color: #ffffff;
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.smart-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.smart-page-ellipsis {
+  color: #94a3b8;
+  font-weight: 800;
+  padding: 0 2px;
+}
+
+.smart-pagination-size select {
+  padding: 0 28px 0 9px;
+}
+
+/* Pagination placed directly inside a CSS grid must occupy the full row. */
+.product-grid > .smart-pagination,
+.customer-product-grid > .smart-pagination,
+.customer-service-grid > .smart-pagination,
+.offer-grid > .smart-pagination,
+.listing-admin-grid > .smart-pagination,
+.business-list > .smart-pagination,
+.review-list > .smart-pagination,
+.notification-list > .smart-pagination,
+.thread-list > .smart-pagination,
+.support-ticket-list > .smart-pagination,
+.gm-image-grid > .smart-pagination {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .smart-pagination {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .smart-pagination-summary,
+  .smart-pagination-size {
+    width: auto;
+  }
+
+  .smart-pagination-controls {
+    order: 3;
+    width: 100%;
+  }
+}
+
+@media (max-width: 460px) {
+  .smart-pagination-summary,
+  .smart-pagination-size {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,179 @@
+.seller-hub-page,
+.seller-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.seller-actions,
+.hero-actions.seller-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0 24px;
+}
+
+.seller-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin: 18px 0 24px;
+}
+
+.seller-panel,
+.seller-form-card,
+.seller-upload-card,
+.upload-preview-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 22px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07);
+}
+
+.seller-panel {
+  padding: 22px;
+}
+
+.seller-panel h3,
+.seller-form-card h3,
+.seller-upload-card h3 {
+  margin: 0 0 12px;
+  color: #0f172a;
+}
+
+.seller-panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #475569;
+  line-height: 1.9;
+}
+
+.accent-panel {
+  background: linear-gradient(135deg, #eff6ff, #f0fdfa);
+}
+
+.accent-panel p {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  color: #475569;
+  margin: 10px 0;
+}
+
+.accent-panel p strong {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  flex: 0 0 auto;
+}
+
+.seller-workspace-grid,
+.seller-form-grid,
+.seller-product-service-grid,
+.seller-submission-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.seller-form-card,
+.seller-upload-card {
+  padding: 22px;
+}
+
+.seller-form-card form,
+.seller-upload-card form {
+  display: grid;
+  gap: 14px;
+}
+
+.seller-form-card label,
+.seller-upload-card label {
+  display: grid;
+  gap: 8px;
+  color: #334155;
+  font-weight: 850;
+}
+
+.seller-form-card input,
+.seller-form-card select,
+.seller-form-card textarea,
+.seller-upload-card input,
+.seller-upload-card select,
+.seller-upload-card textarea {
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 14px;
+  padding: 12px 13px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+}
+
+.form-row,
+.seller-field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.upload-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.upload-preview-card {
+  overflow: hidden;
+  margin: 0;
+}
+
+.upload-preview-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  display: block;
+}
+
+.upload-preview-card figcaption {
+  padding: 10px;
+  color: #64748b;
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-info-note,
+.form-status {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  margin: 10px 0 0;
+  font-weight: 700;
+}
+
+.error-status {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+@media (max-width: 720px) {
+  .form-row,
+  .seller-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-actions > *,
+  .seller-form-card button,
+  .seller-upload-card button {
+    width: 100%;
+  }
+}

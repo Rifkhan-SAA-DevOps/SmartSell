@@ -1,0 +1,253 @@
+/* Phase 78 — Final responsive QA layer
+   Purpose: keep management/customer pages readable without touching global.css.
+   This file should remain a safety layer only: spacing, overflow, action alignment, and modal sizing. */
+
+/* Safer page width and vertical rhythm */
+.app-main-content,
+.management-main-content,
+.public-main-content {
+  min-width: 0;
+}
+
+.management-main-content > *,
+.public-main-content > * {
+  min-width: 0;
+}
+
+.management-main-content {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Prevent any imported grid section from forcing tiny columns */
+.management-main-content :is(.grid, .cards-grid, .stats-grid, .metrics-grid, .summary-grid, .dashboard-grid, .form-grid, .settings-grid, .content-grid, .seo-grid, .reports-grid, .finance-grid),
+.public-main-content :is(.grid, .cards-grid, .stats-grid, .metrics-grid, .summary-grid, .dashboard-grid, .form-grid) {
+  min-width: 0;
+}
+
+/* Tables: readable by default, scroll container handles overflow */
+.management-main-content :is(.table-wrap, .table-scroll, .admin-table-wrap, .responsive-table, .data-table-wrap),
+.public-main-content :is(.table-wrap, .table-scroll, .responsive-table, .data-table-wrap) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 18px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.management-main-content table,
+.public-main-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 860px;
+}
+
+.management-main-content th,
+.public-main-content th {
+  white-space: nowrap;
+}
+
+.management-main-content td,
+.public-main-content td {
+  vertical-align: middle;
+}
+
+/* Clickable row affordance */
+.management-main-content tr.clickable-row,
+.public-main-content tr.clickable-row,
+.management-main-content tbody tr[role="button"],
+.public-main-content tbody tr[role="button"] {
+  cursor: pointer;
+}
+
+.management-main-content tbody tr:hover,
+.public-main-content tbody tr:hover {
+  background: rgba(14, 165, 233, 0.045);
+}
+
+/* Buttons: no more crushed action cells */
+.management-main-content :is(.table-actions, .row-actions, .action-row, .modal-actions, .form-actions),
+.public-main-content :is(.table-actions, .row-actions, .action-row, .modal-actions, .form-actions) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: max-content;
+}
+
+.management-main-content td :is(button, .btn, .button),
+.public-main-content td :is(button, .btn, .button) {
+  white-space: nowrap;
+}
+
+/* Cards and panels should use vertical stacking unless page explicitly opts into a safe feed grid */
+.management-main-content :is(.panel, .card, .admin-card, .business-card, .settings-card, .report-card),
+.public-main-content :is(.panel, .card, .customer-card, .workflow-card) {
+  min-width: 0;
+}
+
+/* Forms: responsive below/below behavior */
+.management-main-content :is(form, .form-panel, .filter-panel, .settings-form) :is(.form-grid, .field-grid, .input-grid),
+.public-main-content :is(form, .form-panel, .filter-panel) :is(.form-grid, .field-grid, .input-grid) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+}
+
+.management-main-content :is(input, select, textarea),
+.public-main-content :is(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Modal standardization */
+.management-main-content :is(.modal-backdrop, .detail-modal-backdrop, .dialog-backdrop),
+.public-main-content :is(.modal-backdrop, .detail-modal-backdrop, .dialog-backdrop) {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(8px);
+}
+
+.management-main-content :is(.modal, .detail-modal, .dialog-panel),
+.public-main-content :is(.modal, .detail-modal, .dialog-panel) {
+  width: min(980px, 100%);
+  max-height: min(86vh, 860px);
+  overflow: auto;
+  border-radius: 24px;
+}
+
+/* Pagination: consistent alignment */
+.management-main-content :is(.pagination, .pager, .table-pagination),
+.public-main-content :is(.pagination, .pager, .table-pagination) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Public feed guard: desktop filters side-by-side only when enough space exists */
+.feed-shell,
+.feed-layout,
+.marketplace-layout,
+.services-layout {
+  min-width: 0;
+}
+
+.feed-layout,
+.marketplace-layout,
+.services-layout {
+  align-items: start;
+}
+
+.feed-results,
+.results-grid,
+.products-grid,
+.services-grid,
+.storefronts-grid {
+  min-width: 0;
+}
+
+.products-grid,
+.services-grid,
+.storefronts-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 292px), 1fr));
+}
+
+/* Sidebar/topbar final guard */
+@media (min-width: 1025px) {
+  .management-shell .mobile-menu-btn,
+  .management-shell .navbar-menu-toggle,
+  .management-shell .hamburger-btn,
+  .management-shell .management-drawer-toggle {
+    display: none !important;
+  }
+
+  .management-shell.sidebar-collapsed .sidebar-collapse-btn,
+  .management-shell.sidebar-collapsed .sidebar-toggle-btn {
+    left: auto;
+    right: -16px;
+    transform: translateY(-50%);
+  }
+}
+
+/* Tablet/mobile: below/below, never squeezed */
+@media (max-width: 1024px) {
+  .management-main-content table,
+  .public-main-content table {
+    min-width: 760px;
+  }
+
+  .feed-layout,
+  .marketplace-layout,
+  .services-layout {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .filter-rail,
+  .feed-filters,
+  .marketplace-filters,
+  .services-filters {
+    position: static !important;
+    width: 100% !important;
+    max-height: none !important;
+  }
+
+  .products-grid,
+  .services-grid,
+  .storefronts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .management-main-content,
+  .public-main-content {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .management-main-content table,
+  .public-main-content table {
+    min-width: 680px;
+  }
+
+  .management-main-content :is(.page-hero, .page-header, .admin-hero, .workflow-hero),
+  .public-main-content :is(.page-hero, .page-header, .customer-hero, .workflow-hero) {
+    padding: 18px !important;
+    border-radius: 20px !important;
+  }
+
+  .management-main-content :is(.pagination, .pager, .table-pagination),
+  .public-main-content :is(.pagination, .pager, .table-pagination) {
+    justify-content: stretch;
+  }
+
+  .management-main-content :is(.pagination button, .pager button, .table-pagination button),
+  .public-main-content :is(.pagination button, .pager button, .table-pagination button) {
+    flex: 1 1 auto;
+  }
+
+  .management-main-content :is(.modal-backdrop, .detail-modal-backdrop, .dialog-backdrop),
+  .public-main-content :is(.modal-backdrop, .detail-modal-backdrop, .dialog-backdrop) {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .management-main-content :is(.modal, .detail-modal, .dialog-panel),
+  .public-main-content :is(.modal, .detail-modal, .dialog-panel) {
+    max-height: 88vh;
+    border-radius: 22px 22px 12px 12px;
+  }
+}
