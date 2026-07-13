@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import CustomerDiscoveryBar from "../components/CustomerDiscoveryBar.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import SEOHead from "../components/SEOHead.jsx";
@@ -46,9 +47,19 @@ function LocationIcon() {
 }
 
 export default function Marketplace() {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState(() => {
+    const requestedType = searchParams.get("type") || "all";
+    return {
+      ...initialFilters,
+      q: searchParams.get("q") || "",
+      type: typeFilters.some((item) => item.value === requestedType) ? requestedType : "all",
+      category: searchParams.get("category") || "all",
+      location: searchParams.get("location") || "",
+    };
+  });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

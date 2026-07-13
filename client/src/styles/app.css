@@ -1,3 +1,4 @@
+
 /*
   SmartSell application CSS entrypoint.
 
@@ -49,3 +50,6 @@
 
 /* Customer account workspace: dashboard, orders, wishlist, reviews, requests, offers, profile, notifications, inbox, and support. */
 @import "./pages/customer/CustomerAccount.css";
+
+/* Final customer shared shell, authentication, home, footer, and state pages. */
+@import "./pages/customer/CustomerSharedExperience.css";

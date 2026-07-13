@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import CustomerDiscoveryBar from "../components/CustomerDiscoveryBar.jsx";
 import ServiceCard from "../components/ServiceCard.jsx";
 import SEOHead from "../components/SEOHead.jsx";
@@ -35,9 +36,14 @@ function BudgetIcon() {
 }
 
 export default function Services() {
+  const [searchParams] = useSearchParams();
   const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState(() => ({
+    ...initialFilters,
+    q: searchParams.get("q") || "",
+    category: searchParams.get("category") || "all",
+  }));
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

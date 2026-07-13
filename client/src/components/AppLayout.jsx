@@ -79,6 +79,7 @@ export default function AppLayout({ children }) {
 
   useEffect(() => {
     setSidebarOpen(false);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname]);
 
   useEffect(() => {
@@ -100,11 +101,12 @@ export default function AppLayout({ children }) {
   }, [sidebarOpen]);
 
   if (!isManagement) {
+    const hideFooter = ["/login", "/register"].includes(pathname);
     return (
-      <div className="app-shell public-shell">
+      <div className={`app-shell public-shell ${hideFooter ? "public-shell-auth" : ""}`}>
         <Navbar showManagementSidebar={false} />
         <main className={`app-main-content public-main-content ${routeClass}`} data-route={pathname}>{children}</main>
-        <Footer />
+        {!hideFooter && <Footer />}
       </div>
     );
   }
