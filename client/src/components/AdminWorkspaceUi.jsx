@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import useAccessibleDialog from "../hooks/useAccessibleDialog.js";
 
 const ICON_PATHS = {
   activity: "M3 12h4l2.5-7 5 14 2.5-7H21",
@@ -82,37 +84,34 @@ export function AdminEmptyState({ icon = "list", title, description, action }) {
 }
 
 export function AdminModal({ open, title, eyebrow, onClose, children, footer, size = "large" }) {
-  useEffect(() => {
-    if (!open) return undefined;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    function handleKeyDown(event) {
-      if (event.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open, onClose]);
+  const titleId = useId();
+  const dialogRef = useAccessibleDialog({ open, onClose });
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="admin-modal-layer-v2" role="presentation">
       <button className="admin-modal-backdrop-v2" type="button" aria-label="Close dialog" onClick={onClose} />
-      <section className={`admin-modal-v2 size-${size}`} role="dialog" aria-modal="true" aria-label={title}>
+      <section
+        ref={dialogRef}
+        className={`admin-modal-v2 size-${size}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+      >
         <header>
           <div>
             {eyebrow && <span>{eyebrow}</span>}
-            <h2>{title}</h2>
+            <h2 id={titleId}>{title}</h2>
           </div>
           <button className="admin-modal-close-v2" type="button" onClick={onClose} aria-label="Close dialog"><AdminIcon name="close" /></button>
         </header>
         <div className="admin-modal-body-v2">{children}</div>
         {footer && <footer>{footer}</footer>}
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -186,25 +185,26 @@ export function AdminPagination({ pagination }) {
 
   return (
     <div className="admin-pagination-v2">
-      <div>
+      <div aria-live="polite" aria-atomic="true">
         <strong>{pagination.start}–{pagination.end}</strong>
         <span>of {pagination.total}</span>
+        <span className="sr-only">Page {pagination.page} of {pagination.totalPages}</span>
       </div>
       <label>
         <span>Rows</span>
-        <select value={pagination.size} onChange={(event) => pagination.setSize(event.target.value)}>
+        <select value={pagination.size} onChange={(event) => pagination.setSize(event.target.value)} aria-label="Rows per page">
           <option value="10">10</option>
           <option value="20">20</option>
           <option value="50">50</option>
         </select>
       </label>
-      <nav aria-label="Pagination">
+      <nav aria-label="Admin records pagination">
         <button type="button" disabled={pagination.page === 1} onClick={() => pagination.setPage(pagination.page - 1)} aria-label="Previous page">‹</button>
-        {start > 1 && <button type="button" onClick={() => pagination.setPage(1)}>1</button>}
-        {start > 2 && <span>…</span>}
-        {pages.map((value) => <button type="button" key={value} className={value === pagination.page ? "active" : ""} onClick={() => pagination.setPage(value)}>{value}</button>)}
-        {end < pagination.totalPages - 1 && <span>…</span>}
-        {end < pagination.totalPages && <button type="button" onClick={() => pagination.setPage(pagination.totalPages)}>{pagination.totalPages}</button>}
+        {start > 1 && <button type="button" onClick={() => pagination.setPage(1)} aria-label={`Page 1 of ${pagination.totalPages}`}>1</button>}
+        {start > 2 && <span aria-hidden="true">…</span>}
+        {pages.map((value) => <button type="button" key={value} className={value === pagination.page ? "active" : ""} onClick={() => pagination.setPage(value)} aria-current={value === pagination.page ? "page" : undefined} aria-label={`Page ${value} of ${pagination.totalPages}`}>{value}</button>)}
+        {end < pagination.totalPages - 1 && <span aria-hidden="true">…</span>}
+        {end < pagination.totalPages && <button type="button" onClick={() => pagination.setPage(pagination.totalPages)} aria-label={`Page ${pagination.totalPages} of ${pagination.totalPages}`}>{pagination.totalPages}</button>}
         <button type="button" disabled={pagination.page === pagination.totalPages} onClick={() => pagination.setPage(pagination.page + 1)} aria-label="Next page">›</button>
       </nav>
     </div>

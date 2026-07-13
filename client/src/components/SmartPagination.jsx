@@ -15,15 +15,23 @@ export default function SmartPagination({ pagination, label = "items", align = "
 
   return (
     <nav className={`smart-pagination ${compact ? "compact" : ""} align-${align}`} aria-label={`${label} pagination`}>
-      <div className="smart-pagination-summary">
+      <div className="smart-pagination-summary" aria-live="polite" aria-atomic="true">
         <strong>{pagination.startItem}-{pagination.endItem}</strong>
         <span>of {pagination.totalItems} {label}</span>
+        <span className="sr-only">Page {current} of {totalPages}</span>
       </div>
 
       <div className="smart-pagination-controls">
-        <button type="button" onClick={pagination.previousPage} disabled={pagination.page <= 1}>Prev</button>
+        <button
+          type="button"
+          onClick={pagination.previousPage}
+          disabled={pagination.page <= 1}
+          aria-label={`Previous ${label} page`}
+        >
+          Prev
+        </button>
         {pages.map((item) => item === "left-ellipsis" || item === "right-ellipsis" ? (
-          <span className="smart-page-ellipsis" key={item}>…</span>
+          <span className="smart-page-ellipsis" key={item} aria-hidden="true">…</span>
         ) : (
           <button
             type="button"
@@ -31,16 +39,28 @@ export default function SmartPagination({ pagination, label = "items", align = "
             className={item === current ? "active" : ""}
             onClick={() => pagination.setPage(item)}
             aria-current={item === current ? "page" : undefined}
+            aria-label={`Page ${item} of ${totalPages}`}
           >
             {item}
           </button>
         ))}
-        <button type="button" onClick={pagination.nextPage} disabled={pagination.page >= pagination.totalPages}>Next</button>
+        <button
+          type="button"
+          onClick={pagination.nextPage}
+          disabled={pagination.page >= pagination.totalPages}
+          aria-label={`Next ${label} page`}
+        >
+          Next
+        </button>
       </div>
 
       <label className="smart-pagination-size">
         <span>Show</span>
-        <select value={pagination.pageSize} onChange={(event) => pagination.setPageSize(event.target.value)}>
+        <select
+          value={pagination.pageSize}
+          onChange={(event) => pagination.setPageSize(event.target.value)}
+          aria-label={`${label} per page`}
+        >
           {pagination.pageSizes.map((size) => <option key={size} value={size}>{size}</option>)}
         </select>
       </label>

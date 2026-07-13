@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useId } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
+import useAccessibleDialog from "../hooks/useAccessibleDialog.js";
 
 const iconPaths = {
   activity: <><path d="M4 13h4l2-7 4 13 2-6h4" /></>,
@@ -106,29 +107,25 @@ export function AccountSearch({ value, onChange, placeholder = "Search" }) {
 }
 
 export function AccountModal({ open, onClose, title, eyebrow, icon = "spark", children, footer, size = "medium" }) {
-  useEffect(() => {
-    if (!open) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const handleKey = (event) => {
-      if (event.key === "Escape") onClose?.();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKey);
-    };
-  }, [open, onClose]);
+  const titleId = useId();
+  const dialogRef = useAccessibleDialog({ open, onClose });
 
   if (!open) return null;
 
   return createPortal(
     <div className="ca-modal-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose?.()}>
-      <section className={`ca-modal ca-modal--${size}`} role="dialog" aria-modal="true" aria-labelledby="ca-modal-title">
+      <section
+        ref={dialogRef}
+        className={`ca-modal ca-modal--${size}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+      >
         <header className="ca-modal__header">
           <span className="ca-modal__icon"><AccountIcon name={icon} size={22} /></span>
-          <div>{eyebrow && <span className="ca-eyebrow">{eyebrow}</span>}<h2 id="ca-modal-title">{title}</h2></div>
-          <button className="ca-modal__close" type="button" onClick={onClose} aria-label="Close"><AccountIcon name="close" size={20} /></button>
+          <div>{eyebrow && <span className="ca-eyebrow">{eyebrow}</span>}<h2 id={titleId}>{title}</h2></div>
+          <button className="ca-modal__close" type="button" onClick={onClose} aria-label="Close dialog"><AccountIcon name="close" size={20} /></button>
         </header>
         <div className="ca-modal__body">{children}</div>
         {footer && <footer className="ca-modal__footer">{footer}</footer>}

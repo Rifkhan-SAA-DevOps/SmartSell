@@ -1,4 +1,3 @@
-
 /*
   SmartSell application CSS entrypoint.
 
@@ -53,3 +52,6 @@
 
 /* Final customer shared shell, authentication, home, footer, and state pages. */
 @import "./pages/customer/CustomerSharedExperience.css";
+
+/* Final application-wide accessibility, route-state, and dialog quality layer. */
+@import "./quality/ApplicationQuality.css";

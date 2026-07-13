@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { useId } from "react";
+import { createPortal } from "react-dom";
+import useAccessibleDialog from "../hooks/useAccessibleDialog.js";
 
 const ICON_PATHS = {
   add: "M12 5v14M5 12h14",
@@ -93,30 +95,26 @@ export function BusinessEmptyState({ icon = "box", title, description, action })
 }
 
 export function BusinessModal({ open, title, eyebrow, onClose, children, footer, size = "large" }) {
-  useEffect(() => {
-    if (!open) return undefined;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    function onKeyDown(event) {
-      if (event.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, onClose]);
+  const titleId = useId();
+  const dialogRef = useAccessibleDialog({ open, onClose });
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="business-modal-layer-v2" role="presentation">
       <button className="business-modal-backdrop-v2" type="button" aria-label="Close details" onClick={onClose} />
-      <section className={`business-modal-v2 size-${size}`} role="dialog" aria-modal="true" aria-label={title}>
+      <section
+        ref={dialogRef}
+        className={`business-modal-v2 size-${size}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+      >
         <header>
           <div>
             {eyebrow && <span>{eyebrow}</span>}
-            <h2>{title}</h2>
+            <h2 id={titleId}>{title}</h2>
           </div>
           <button className="business-modal-close-v2" type="button" onClick={onClose} aria-label="Close modal">
             <BusinessIcon name="close" />
@@ -125,7 +123,8 @@ export function BusinessModal({ open, title, eyebrow, onClose, children, footer,
         <div className="business-modal-body-v2">{children}</div>
         {footer && <footer>{footer}</footer>}
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -151,8 +150,8 @@ export function BusinessSearchToolbar({ value, onChange, placeholder, filter, fi
 export function BusinessInfoGrid({ items }) {
   return (
     <div className="business-info-grid-v2">
-      {items.map((item) => (
-        <div key={`${item.label}-${item.value}`}>
+      {items.map((item, index) => (
+        <div key={`${item.label}-${index}`}>
           <span>{item.label}</span>
           <strong>{item.value ?? "—"}</strong>
         </div>
