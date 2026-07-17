@@ -559,3 +559,344 @@
   .public-shell .home-highlight-slide { transition: none; }
   .public-shell .home-highlight-slide > img { transition: none; }
 }
+
+/* Phase 127 — photography-style Flash Sale gallery with synchronized product shelf. */
+.public-shell .home-flash-sale-section { overflow: hidden; }
+.public-shell .home-flash-gallery {
+  padding: clamp(18px, 2.4vw, 28px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.62fr) minmax(300px, .72fr);
+  gap: 18px;
+  background: linear-gradient(145deg, #fff8fa, #fff 54%, #fff8f2);
+}
+.public-shell .home-flash-gallery-stage {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid #eadce3;
+  border-radius: 18px;
+  background: #25121e;
+  box-shadow: 0 18px 42px rgba(92,29,58,.12);
+}
+.public-shell .home-flash-gallery-feature {
+  position: relative;
+  min-height: 500px;
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  text-decoration: none;
+  isolation: isolate;
+}
+.public-shell .home-flash-gallery-feature > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .65s ease, opacity .3s ease;
+  animation: home-flash-main-image .46s ease both;
+}
+.public-shell .home-flash-gallery-feature:hover > img { transform: scale(1.035); }
+.public-shell .home-flash-gallery-shade {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(23,7,16,.86) 0%, rgba(23,7,16,.63) 38%, rgba(23,7,16,.14) 76%),
+    linear-gradient(0deg, rgba(23,7,16,.72) 0%, transparent 58%);
+}
+.public-shell .home-flash-gallery-badge,
+.public-shell .home-flash-gallery-position {
+  position: absolute;
+  z-index: 3;
+  top: 18px;
+  min-height: 32px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 9px;
+  color: #fff;
+  background: rgba(42,12,28,.58);
+  backdrop-filter: blur(12px);
+  font-size: .59rem;
+  font-weight: 850;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+.public-shell .home-flash-gallery-badge { left: 18px; max-width: calc(100% - 132px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.public-shell .home-flash-gallery-position { right: 18px; }
+.public-shell .home-flash-gallery-copy {
+  position: absolute;
+  z-index: 3;
+  left: clamp(24px,4vw,54px);
+  right: clamp(24px,4vw,54px);
+  bottom: clamp(26px,4vw,48px);
+  max-width: 650px;
+  animation: home-flash-copy-enter .42s ease both;
+}
+.public-shell .home-flash-gallery-copy > small {
+  color: #ffd8e4;
+  font-size: .64rem;
+  font-weight: 850;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+}
+.public-shell .home-flash-gallery-copy h3 {
+  max-width: 610px;
+  margin: 10px 0 11px;
+  color: #fff;
+  font-size: clamp(2rem,4vw,3.8rem);
+  line-height: .97;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+.public-shell .home-flash-gallery-copy > p {
+  max-width: 550px;
+  margin: 0;
+  color: rgba(255,255,255,.78);
+  font-size: .76rem;
+  line-height: 1.6;
+}
+.public-shell .home-flash-gallery-meta {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.public-shell .home-flash-gallery-meta > span {
+  min-height: 29px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 8px;
+  color: rgba(255,255,255,.88);
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(8px);
+  font-size: .61rem;
+  font-weight: 720;
+}
+.public-shell .home-flash-gallery-meta svg { width: 13px; height: 13px; }
+.public-shell .home-flash-gallery-price {
+  margin-top: 22px;
+  padding-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-top: 1px solid rgba(255,255,255,.18);
+}
+.public-shell .home-flash-gallery-price strong { color: #fff; font-size: clamp(1.35rem,2vw,1.85rem); }
+.public-shell .home-flash-gallery-price b { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: .69rem; }
+.public-shell .home-flash-gallery-price svg { width: 15px; height: 15px; }
+.public-shell .home-flash-gallery-timer {
+  min-height: 72px;
+  padding: 13px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  color: #fff;
+  background: linear-gradient(120deg,#5a1739,#9e2c56);
+}
+.public-shell .home-flash-gallery-timer > span { font-size: .62rem; font-weight: 830; letter-spacing: .06em; text-transform: uppercase; }
+.public-shell .home-flash-gallery-timer > div { display: flex; gap: 7px; }
+.public-shell .home-flash-gallery-timer b {
+  min-width: 49px;
+  padding: 7px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 8px;
+  background: rgba(255,255,255,.1);
+}
+.public-shell .home-flash-gallery-timer b strong { font-size: .8rem; line-height: 1; }
+.public-shell .home-flash-gallery-timer b small { margin-top: 3px; color: rgba(255,255,255,.68); font-size: .47rem; font-weight: 700; text-transform: uppercase; }
+.public-shell .home-flash-gallery-timer > p { margin: 0; color: rgba(255,255,255,.76); font-size: .61rem; }
+
+.public-shell .home-flash-shelf {
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr) auto;
+  gap: 13px;
+  border: 1px solid #eadfe5;
+  border-radius: 18px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 14px 36px rgba(92,29,58,.07);
+}
+.public-shell .home-flash-shelf > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.public-shell .home-flash-shelf > header span,
+.public-shell .home-flash-shelf > header strong,
+.public-shell .home-flash-shelf > header p { display: block; }
+.public-shell .home-flash-shelf > header span { color: #a22f58; font-size: .55rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+.public-shell .home-flash-shelf > header strong { margin-top: 4px; color: #3c2130; font-size: .86rem; }
+.public-shell .home-flash-shelf > header p { max-width: 190px; margin: 4px 0 0; color: #94818b; font-size: .56rem; line-height: 1.45; }
+.public-shell .home-flash-shelf-controls { flex: 0 0 auto; display: flex; gap: 6px; }
+.public-shell .home-flash-shelf-controls button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5dbe1;
+  border-radius: 8px;
+  color: #7e5368;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+.public-shell .home-flash-shelf-controls button:hover { border-color: #d9aabd; color: #9f2c57; background: #fff4f7; }
+.public-shell .home-flash-shelf-controls svg { width: 15px; height: 15px; }
+.public-shell .home-flash-shelf-viewport { min-height: 0; overflow: hidden; }
+.public-shell .home-flash-shelf-track {
+  display: grid;
+  gap: 9px;
+  animation: home-flash-shelf-enter .44s cubic-bezier(.22,.72,.23,1) both;
+}
+.public-shell .home-flash-shelf-track > button {
+  width: 100%;
+  min-height: 102px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 96px minmax(0,1fr) 20px;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid #eee5ea;
+  border-radius: 12px;
+  color: inherit;
+  background: #fbf9fa;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.public-shell .home-flash-shelf-track > button:hover { transform: translateX(-3px); border-color: #dfc0cd; background: #fff; }
+.public-shell .home-flash-shelf-track > button.is-active {
+  border-color: #ca6e91;
+  background: linear-gradient(100deg,#fff1f6,#fff 70%);
+  box-shadow: inset 4px 0 #ad315d, 0 7px 18px rgba(130,37,76,.07);
+}
+.public-shell .home-flash-shelf-media { position: relative; display: block; height: 84px; overflow: hidden; border-radius: 9px; background: #eee4e9; }
+.public-shell .home-flash-shelf-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .28s ease; }
+.public-shell .home-flash-shelf-track > button:hover img { transform: scale(1.04); }
+.public-shell .home-flash-shelf-media i {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  min-width: 25px;
+  min-height: 23px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: #fff;
+  background: rgba(44,15,30,.72);
+  font-size: .5rem;
+  font-style: normal;
+  font-weight: 850;
+}
+.public-shell .home-flash-shelf-copy { min-width: 0; }
+.public-shell .home-flash-shelf-copy small,
+.public-shell .home-flash-shelf-copy strong,
+.public-shell .home-flash-shelf-copy b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.public-shell .home-flash-shelf-copy small { color: #a77d91; font-size: .51rem; font-weight: 760; text-transform: uppercase; }
+.public-shell .home-flash-shelf-copy strong { margin-top: 4px; color: #432c39; font-size: .68rem; }
+.public-shell .home-flash-shelf-copy b { margin-top: 7px; color: #a42f58; font-size: .63rem; }
+.public-shell .home-flash-shelf-track > button > svg { width: 15px; height: 15px; color: #b49ca7; }
+.public-shell .home-flash-shelf-track > button.is-active > svg { color: #a62f58; }
+.public-shell .home-flash-shelf-progress { height: 4px; overflow: hidden; border-radius: 999px; background: #eee5e9; }
+.public-shell .home-flash-shelf-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#a82e59,#ed6d75); transition: width .42s ease; }
+
+@keyframes home-flash-main-image { from { opacity: .72; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
+@keyframes home-flash-copy-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes home-flash-shelf-enter { from { opacity: .55; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1080px) {
+  .public-shell .home-flash-gallery { grid-template-columns: minmax(0,1.35fr) minmax(275px,.75fr); }
+  .public-shell .home-flash-gallery-feature { min-height: 450px; }
+  .public-shell .home-flash-shelf-track > button { grid-template-columns: 82px minmax(0,1fr) 18px; }
+  .public-shell .home-flash-shelf-media { height: 75px; }
+}
+@media (max-width: 900px) {
+  .public-shell .home-flash-gallery { grid-template-columns: minmax(0,1fr); }
+  .public-shell .home-flash-gallery-feature { min-height: 460px; }
+  .public-shell .home-flash-shelf-track { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .public-shell .home-flash-shelf-track > button { grid-template-columns: 82px minmax(0,1fr) 18px; }
+}
+@media (max-width: 620px) {
+  .public-shell .home-flash-gallery { padding: 13px; gap: 12px; }
+  .public-shell .home-flash-gallery-stage,
+  .public-shell .home-flash-shelf { border-radius: 14px; }
+  .public-shell .home-flash-gallery-feature { min-height: 430px; }
+  .public-shell .home-flash-gallery-shade { background: linear-gradient(0deg,rgba(23,7,16,.88) 0%,rgba(23,7,16,.58) 53%,rgba(23,7,16,.1) 100%); }
+  .public-shell .home-flash-gallery-copy { left: 20px; right: 20px; bottom: 24px; }
+  .public-shell .home-flash-gallery-copy h3 { font-size: clamp(1.75rem,10vw,2.55rem); }
+  .public-shell .home-flash-gallery-copy > p { font-size: .7rem; }
+  .public-shell .home-flash-gallery-price { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .public-shell .home-flash-gallery-timer { align-items: flex-start; flex-direction: column; }
+  .public-shell .home-flash-gallery-timer > div { width: 100%; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .public-shell .home-flash-gallery-timer b { min-width: 0; }
+  .public-shell .home-flash-shelf-track { grid-template-columns: minmax(0,1fr); }
+  .public-shell .home-flash-shelf-track > button { grid-template-columns: 86px minmax(0,1fr) 18px; }
+  .public-shell .home-flash-shelf > header p { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-shell .home-flash-gallery-feature > img,
+  .public-shell .home-flash-gallery-copy,
+  .public-shell .home-flash-shelf-track { animation: none; transition: none; }
+}
+
+
+/* Preserve the distinct paged Under Rs. 1,000 carousel from Phase 125. */
+.public-shell .home-budget-carousel { position: relative; min-width: 0; }
+.public-shell .home-budget-carousel-controls {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.public-shell .home-budget-carousel-controls > span { color: #8d744d; font-size: .62rem; font-weight: 720; }
+.public-shell .home-budget-carousel-controls > span strong { color: #9d5a08; font-size: .82rem; }
+.public-shell .home-budget-carousel-controls > div { display: flex; gap: 7px; }
+.public-shell .home-budget-carousel-controls button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #ead8bc;
+  border-radius: 8px;
+  color: #9d5a08;
+  background: #fff;
+  cursor: pointer;
+}
+.public-shell .home-budget-carousel-controls button:hover { border-color: #d9b77f; background: #fffaf1; }
+.public-shell .home-budget-carousel-controls svg { width: 16px; height: 16px; }
+.public-shell .home-budget-carousel-viewport { overflow: hidden; }
+.public-shell .home-budget-carousel-track { display: flex; transition: transform .48s cubic-bezier(.22,.72,.23,1); }
+.public-shell .home-budget-carousel-page {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 14px;
+}
+.public-shell .home-budget-carousel-page .home-offer-card { width: 100%; flex-basis: auto; }
+.public-shell .home-budget-carousel-dots { margin-top: 14px; display: flex; justify-content: center; gap: 6px; }
+.public-shell .home-budget-carousel-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 999px; background: #ddc9aa; cursor: pointer; transition: width .18s ease, background .18s ease; }
+.public-shell .home-budget-carousel-dots button.active { width: 24px; background: #b16a12; }
+@media (max-width: 980px) { .public-shell .home-budget-carousel-page { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 620px) {
+  .public-shell .home-budget-carousel-page { grid-template-columns: minmax(0,1fr); }
+  .public-shell .home-budget-carousel-controls { justify-content: space-between; }
+}
+@media (prefers-reduced-motion: reduce) { .public-shell .home-budget-carousel-track { transition: none; } }

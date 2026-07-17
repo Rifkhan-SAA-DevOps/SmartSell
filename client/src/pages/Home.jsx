@@ -29,7 +29,7 @@ const fallbackContent = {
 };
 
 const DEFAULT_MERCHANDISING = {
-  carousel: { enabled: true, direction: "ltr", speedSeconds: 34, pauseOnHover: true },
+  carousel: { enabled: true, direction: "ltr", speedSeconds: 34, pauseOnHover: true, flashAutoplay: true, flashIntervalSeconds: 5, budgetAutoplay: false, budgetIntervalSeconds: 7 },
   todayOffers: {
     enabled: true,
     eyebrow: "Today's marketplace offers",
@@ -177,6 +177,147 @@ function InfiniteProductCarousel({ items, badge, settings, ariaLabel }) {
   );
 }
 
+function useRemainingTime(endAt) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (!endAt) return undefined;
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [endAt]);
+  const end = endAt ? new Date(endAt).getTime() : NaN;
+  const total = Number.isNaN(end) ? 0 : Math.max(0, end - now);
+  return {
+    days: Math.floor(total / 86400000),
+    hours: Math.floor((total % 86400000) / 3600000),
+    minutes: Math.floor((total % 3600000) / 60000),
+    seconds: Math.floor((total % 60000) / 1000),
+    active: total > 0,
+  };
+}
+
+function FlashSaleSpotlight({ items, badge, endAt, settings, ariaLabel }) {
+  const safeItems = items?.length ? items : featuredProducts;
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const remaining = useRemainingTime(endAt);
+
+  useEffect(() => setActive(0), [safeItems.length]);
+  useEffect(() => {
+    if (!settings.flashAutoplay || paused || safeItems.length < 2) return undefined;
+    const timer = window.setInterval(
+      () => setActive((current) => (current + 1) % safeItems.length),
+      Math.max(3000, Number(settings.flashIntervalSeconds || 5) * 1000)
+    );
+    return () => window.clearInterval(timer);
+  }, [paused, safeItems.length, settings.flashAutoplay, settings.flashIntervalSeconds]);
+
+  const item = safeItems[active] || safeItems[0];
+  const link = item?.isFallback ? "/marketplace" : `/products/${item.id}`;
+  const go = (index) => setActive((index + safeItems.length) % safeItems.length);
+  const shelfItems = useMemo(() => {
+    const count = Math.min(4, safeItems.length);
+    return Array.from({ length: count }, (_, offset) => {
+      const index = (active + offset) % safeItems.length;
+      return { product: safeItems[index], index, offset };
+    });
+  }, [active, safeItems]);
+
+  return (
+    <div
+      className="home-flash-gallery"
+      aria-label={ariaLabel}
+      aria-roledescription="carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false); }}
+    >
+      <div className="home-flash-gallery-stage">
+        <Link key={item.id} className="home-flash-gallery-feature" to={link} aria-live="polite">
+          <img src={listingImage(item, fallbackBudgetProducts[0].image)} alt={item.name} />
+          <span className="home-flash-gallery-shade" />
+          <span className="home-flash-gallery-badge">{badge}</span>
+          <span className="home-flash-gallery-position">{String(active + 1).padStart(2, "0")} / {String(safeItems.length).padStart(2, "0")}</span>
+          <span className="home-flash-gallery-copy">
+            <small>{item.category?.name || item.category || item.badge || "Limited deal"}</small>
+            <h3>{item.name}</h3>
+            <p>Check seller details, availability, location, and the complete listing before ordering.</p>
+            <span className="home-flash-gallery-meta"><span><LineIcon type="pin" />{item.location || "Sri Lanka"}</span>{item.ratingAverage ? <span><LineIcon type="star" />{Number(item.ratingAverage).toFixed(1)}</span> : null}</span>
+            <span className="home-flash-gallery-price"><strong>Rs. {money(item.price)}</strong><b>View active deal <LineIcon type="arrow" /></b></span>
+          </span>
+        </Link>
+
+        <div className="home-flash-gallery-timer" aria-label={remaining.active ? "Flash sale countdown" : "Flash sale collection"}>
+          <span>{remaining.active ? "Campaign ends in" : "Limited collection"}</span>
+          {remaining.active ? (
+            <div>{[[remaining.days,"Days"],[remaining.hours,"Hours"],[remaining.minutes,"Min"],[remaining.seconds,"Sec"]].map(([value,label]) => <b key={label}><strong>{String(value).padStart(2,"0")}</strong><small>{label}</small></b>)}</div>
+          ) : (
+            <p>Available while the selected products remain approved and in stock.</p>
+          )}
+        </div>
+      </div>
+
+      <aside className="home-flash-shelf" aria-label="Flash sale product shelf">
+        <header>
+          <div><span>Active flash product</span><strong>Product shelf</strong><p>The shelf advances together with the large product.</p></div>
+          <div className="home-flash-shelf-controls"><button type="button" onClick={() => go(active - 1)} aria-label="Previous flash product"><LineIcon type="chevron-left" /></button><button type="button" onClick={() => go(active + 1)} aria-label="Next flash product"><LineIcon type="chevron-right" /></button></div>
+        </header>
+
+        <div className="home-flash-shelf-viewport">
+          <div key={active} className="home-flash-shelf-track">
+            {shelfItems.map(({ product, index, offset }) => (
+              <button
+                key={`${product.id}-${index}`}
+                type="button"
+                className={offset === 0 ? "is-active" : ""}
+                onClick={() => go(index)}
+                aria-current={offset === 0 ? "true" : undefined}
+              >
+                <span className="home-flash-shelf-media"><img src={listingImage(product, fallbackBudgetProducts[0].image)} alt="" /><i>{String(index + 1).padStart(2, "0")}</i></span>
+                <span className="home-flash-shelf-copy"><small>{offset === 0 ? "Now showing" : product.category?.name || product.category || "Product"}</small><strong>{product.name}</strong><b>Rs. {money(product.price)}</b></span>
+                <LineIcon type="arrow" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="home-flash-shelf-progress" aria-hidden="true"><span style={{ width: `${((active + 1) / safeItems.length) * 100}%` }} /></div>
+      </aside>
+    </div>
+  );
+}
+
+function BudgetProductCarousel({ items, badge, settings, ariaLabel }) {
+  const safeItems = items?.length ? items : fallbackBudgetProducts;
+  const [pageSize, setPageSize] = useState(4);
+  const [page, setPage] = useState(0);
+  useEffect(() => {
+    const update = () => setPageSize(window.innerWidth < 620 ? 1 : window.innerWidth < 980 ? 2 : 4);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const pages = useMemo(() => {
+    const result = [];
+    for (let index = 0; index < safeItems.length; index += pageSize) result.push(safeItems.slice(index, index + pageSize));
+    return result.length ? result : [[]];
+  }, [safeItems, pageSize]);
+  useEffect(() => setPage((current) => Math.min(current, pages.length - 1)), [pages.length]);
+  useEffect(() => {
+    if (!settings.budgetAutoplay || pages.length < 2) return undefined;
+    const timer = window.setInterval(() => setPage((current) => (current + 1) % pages.length), Math.max(4000, Number(settings.budgetIntervalSeconds || 7) * 1000));
+    return () => window.clearInterval(timer);
+  }, [pages.length, settings.budgetAutoplay, settings.budgetIntervalSeconds]);
+  const go = (next) => setPage((next + pages.length) % pages.length);
+  return (
+    <div className="home-budget-carousel" aria-label={ariaLabel} aria-roledescription="carousel">
+      <div className="home-budget-carousel-controls"><span><strong>{page + 1}</strong> / {pages.length}</span><div><button type="button" onClick={() => go(page - 1)} aria-label="Previous affordable products"><LineIcon type="chevron-left" /></button><button type="button" onClick={() => go(page + 1)} aria-label="Next affordable products"><LineIcon type="chevron-right" /></button></div></div>
+      <div className="home-budget-carousel-viewport"><div className="home-budget-carousel-track" style={{ transform: `translateX(-${page * 100}%)` }}>{pages.map((group, pageIndex) => <div className="home-budget-carousel-page" key={`budget-page-${pageIndex}`} aria-hidden={pageIndex !== page}>{group.map((item) => <OfferCard key={item.id} item={item} badge={badge} duplicate={pageIndex !== page} />)}</div>)}</div></div>
+      {pages.length > 1 && <div className="home-budget-carousel-dots">{pages.map((_, index) => <button key={index} type="button" className={index === page ? "active" : ""} onClick={() => setPage(index)} aria-label={`Show affordable product page ${index + 1}`} />)}</div>}
+    </div>
+  );
+}
+
 function MarketplaceHighlightCarousel({ slides, autoplay, intervalSeconds }) {
   const [active, setActive] = useState(0);
   useEffect(() => { setActive(0); }, [slides]);
@@ -308,12 +449,12 @@ export default function Home() {
 
       {flashActive && <section className="customer-section-block home-merch-section home-flash-sale-section">
         <div className="home-flash-sale-banner"><div><span><i />{merchandising.flashSale.badge}</span><h2>{merchandising.flashSale.title}</h2><p>{merchandising.flashSale.description}</p></div><Link to={safeLink(merchandising.flashSale.link, "/marketplace?sort=featured")}>Shop flash sale <LineIcon type="arrow" /></Link></div>
-        <InfiniteProductCarousel items={flashDeals} badge={merchandising.flashSale.title} settings={merchandising.carousel} ariaLabel={merchandising.flashSale.title} />
+        <FlashSaleSpotlight items={flashDeals} badge={merchandising.flashSale.badge} endAt={merchandising.flashSale.endAt} settings={merchandising.carousel} ariaLabel={merchandising.flashSale.title} />
       </section>}
 
       {merchandising.budgetCollection.enabled && <section className="customer-section-block home-merch-section home-budget-section">
         <div className="home-offer-heading"><div><span className="customer-eyebrow">{merchandising.budgetCollection.eyebrow}</span><h2>{merchandising.budgetCollection.title}</h2><p>{merchandising.budgetCollection.description}</p></div><Link to={safeLink(merchandising.budgetCollection.link, "/marketplace")}>Shop the collection <LineIcon type="arrow" /></Link></div>
-        <InfiniteProductCarousel items={budgetProducts} badge={`Under Rs. ${money(merchandising.budgetCollection.maxPrice)}`} settings={merchandising.carousel} ariaLabel={merchandising.budgetCollection.title} />
+        <BudgetProductCarousel items={budgetProducts} badge={`Under Rs. ${money(merchandising.budgetCollection.maxPrice)}`} settings={merchandising.carousel} ariaLabel={merchandising.budgetCollection.title} />
       </section>}
 
       <section className="customer-section-block home-channel-section"><div className="customer-section-heading split home-section-heading"><div><span className="customer-eyebrow">Explore SmartSell</span><h2>Start with the buying path that fits your need</h2><p>Shop directly, compare a used item, request a quotation, or describe a completely custom requirement.</p></div><Link className="customer-section-link" to="/storefronts">Browse storefronts <LineIcon type="arrow" /></Link></div><div className="home-channel-grid">{channelCards.map((item, index) => <Link key={item.title} to={item.to} className={`home-channel-card ${item.tone}`}><div className="home-channel-card-top"><span className="home-channel-number">0{index + 1}</span><span className="home-channel-label">{item.label}</span></div><span className="home-channel-icon"><LineIcon type={item.icon} /></span><h3>{item.title}</h3><p>{item.description}</p><span className="home-channel-link">Explore <LineIcon type="arrow" /></span></Link>)}</div></section>

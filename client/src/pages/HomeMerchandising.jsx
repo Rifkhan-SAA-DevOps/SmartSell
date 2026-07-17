@@ -14,7 +14,7 @@ import "../styles/pages/admin/AdminOperations.css";
 import "../styles/pages/admin/HomeMerchandising.css";
 
 const DEFAULT_CONFIG = {
-  carousel: { enabled: true, direction: "ltr", speedSeconds: 34, pauseOnHover: true },
+  carousel: { enabled: true, direction: "ltr", speedSeconds: 34, pauseOnHover: true, flashAutoplay: true, flashIntervalSeconds: 5, budgetAutoplay: false, budgetIntervalSeconds: 7 },
   todayOffers: {
     enabled: true,
     eyebrow: "Today's marketplace offers",
@@ -99,6 +99,8 @@ function ProductSelectionSummary({ products, ids }) {
 export default function HomeMerchandising() {
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState("");
   const [activeTab, setActiveTab] = useState("offers");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -106,24 +108,64 @@ export default function HomeMerchandising() {
   const [error, setError] = useState("");
   const [pickerTarget, setPickerTarget] = useState("");
   const [pickerSearch, setPickerSearch] = useState("");
+  const [pickerCategory, setPickerCategory] = useState("all");
+  const [pickerLocation, setPickerLocation] = useState("all");
+  const [pickerPrice, setPickerPrice] = useState("all");
+  const [pickerSort, setPickerSort] = useState("featured");
+  const [pickerPage, setPickerPage] = useState(1);
   const [slideEditor, setSlideEditor] = useState(null);
   const [uploading, setUploading] = useState(false);
+
+  async function loadProductOptions({ quiet = false } = {}) {
+    if (!quiet) setProductsLoading(true);
+    setProductsError("");
+
+    const requests = [
+      () => api.get("/admin/home-merchandising/products", { params: { limit: 250 } }),
+      () => api.get("/admin/listings", { params: { status: "approved", limit: 250 } }),
+      () => api.get("/products", { params: { status: "approved", limit: 250 } }),
+    ];
+
+    let lastError = null;
+    try {
+      for (const request of requests) {
+        try {
+          const response = await request();
+          const payload = response.data?.data;
+          const rows = payload?.products || payload || [];
+          const approved = (Array.isArray(rows) ? rows : []).filter((product) => product.status === "approved" || !product.status);
+          setProducts(approved);
+          return approved;
+        } catch (requestError) {
+          lastError = requestError;
+          if (![404, 405].includes(requestError.response?.status)) throw requestError;
+        }
+      }
+      throw lastError || new Error("No product source is available.");
+    } catch (productError) {
+      setProducts([]);
+      setProductsError(productError.response?.data?.message || "Approved products could not be loaded. Restart the updated backend and try again.");
+      return [];
+    } finally {
+      if (!quiet) setProductsLoading(false);
+    }
+  }
 
   async function loadData() {
     setLoading(true); setError("");
     try {
-      const [settingsResponse, listingResponse] = await Promise.all([
+      const [settingsResponse] = await Promise.all([
         api.get("/settings/admin"),
-        api.get("/admin/listings", { params: { status: "approved", limit: 250 } }),
+        loadProductOptions({ quiet: true }),
       ]);
       const rows = settingsResponse.data?.data?.settings || [];
       const stored = rows.find((setting) => setting.key === "homeMerchandising.config")?.value;
       setConfig(mergeConfig(stored));
-      setProducts((listingResponse.data?.data?.products || []).filter((product) => product.status === "approved"));
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load homepage merchandising controls.");
     } finally {
       setLoading(false);
+      setProductsLoading(false);
     }
   }
 
@@ -137,12 +179,45 @@ export default function HomeMerchandising() {
     return (!start || now >= start) && (!end || now <= end);
   }, [config.flashSale]);
 
+  const productCategory = (product) => product.category?.name || product.category || "Uncategorised";
+  const pickerCategories = useMemo(() => [...new Set(products.map(productCategory).filter(Boolean))].sort(), [products]);
+  const pickerLocations = useMemo(() => [...new Set(products.map((product) => product.location || "Sri Lanka").filter(Boolean))].sort(), [products]);
   const pickerProducts = useMemo(() => {
     const query = pickerSearch.trim().toLowerCase();
-    return products.filter((product) => !query || `${product.name} ${product.category || ""} ${product.sellerName || ""} ${product.location || ""}`.toLowerCase().includes(query));
-  }, [products, pickerSearch]);
+    const filtered = products.filter((product) => {
+      const category = productCategory(product);
+      const location = product.location || "Sri Lanka";
+      const price = Number(product.price || 0);
+      const matchesSearch = !query || `${product.name} ${category} ${product.sellerName || ""} ${location} ${product.brand || ""} ${product.sku || ""}`.toLowerCase().includes(query);
+      const matchesCategory = pickerCategory === "all" || category === pickerCategory;
+      const matchesLocation = pickerLocation === "all" || location === pickerLocation;
+      const matchesPrice = pickerPrice === "all" || (pickerPrice === "under1000" && price <= 1000) || (pickerPrice === "1000to5000" && price > 1000 && price <= 5000) || (pickerPrice === "over5000" && price > 5000);
+      return matchesSearch && matchesCategory && matchesLocation && matchesPrice;
+    });
+    return [...filtered].sort((a, b) => {
+      if (pickerSort === "price_asc") return Number(a.price || 0) - Number(b.price || 0);
+      if (pickerSort === "price_desc") return Number(b.price || 0) - Number(a.price || 0);
+      if (pickerSort === "name") return String(a.name || "").localeCompare(String(b.name || ""));
+      return Number(Boolean(b.isFeatured)) - Number(Boolean(a.isFeatured));
+    });
+  }, [products, pickerSearch, pickerCategory, pickerLocation, pickerPrice, pickerSort]);
 
   const selectedIds = pickerTarget ? config[pickerTarget]?.productIds || [] : [];
+  const pickerPageSize = 12;
+  const pickerPageCount = Math.max(1, Math.ceil(pickerProducts.length / pickerPageSize));
+  const visiblePickerProducts = pickerProducts.slice((pickerPage - 1) * pickerPageSize, pickerPage * pickerPageSize);
+
+  useEffect(() => { setPickerPage(1); }, [pickerSearch, pickerCategory, pickerLocation, pickerPrice, pickerSort, pickerTarget]);
+
+  function openProductPicker(target) {
+    setPickerTarget(target);
+    setPickerSearch("");
+    setPickerCategory("all");
+    setPickerLocation("all");
+    setPickerPrice(target === "budgetCollection" ? "under1000" : "all");
+    setPickerSort("featured");
+    setPickerPage(1);
+  }
 
   function updateSection(section, field, value) {
     setConfig((current) => ({ ...current, [section]: { ...current[section], [field]: value } }));
@@ -264,7 +339,7 @@ export default function HomeMerchandising() {
               <label className="wide">Description<textarea rows="3" value={config.todayOffers.description} onChange={(event) => updateSection("todayOffers", "description", event.target.value)} /></label>
               <label className="wide">View-all link<input value={config.todayOffers.link} onChange={(event) => updateSection("todayOffers", "link", event.target.value)} /></label>
             </div>
-            <div className="home-merch-selection-v2"><div><strong>Featured products</strong><span>{config.todayOffers.productIds.length ? `${config.todayOffers.productIds.length} manually selected` : "Automatic featured selection"}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => { setPickerTarget("todayOffers"); setPickerSearch(""); }}>Choose products</button></div>
+            <div className="home-merch-selection-v2"><div><strong>Featured products</strong><span>{config.todayOffers.productIds.length ? `${config.todayOffers.productIds.length} manually selected` : "Automatic featured selection"}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => openProductPicker("todayOffers")}>Choose products</button></div>
             <ProductSelectionSummary products={products} ids={config.todayOffers.productIds} />
           </article>
 
@@ -279,7 +354,7 @@ export default function HomeMerchandising() {
               <label className="wide">Campaign link<input value={config.flashSale.link} onChange={(event) => updateSection("flashSale", "link", event.target.value)} /></label>
             </div>
             <div className="home-merch-campaign-state-v2"><AdminStatusBadge status={flashActive ? "active" : config.flashSale.enabled ? "pending" : "inactive"} label={flashActive ? "Live now" : config.flashSale.enabled ? "Scheduled / always available" : "Disabled"} /><span>Leave both dates empty to keep the flash collection available whenever it is enabled.</span></div>
-            <div className="home-merch-selection-v2"><div><strong>Flash-sale products</strong><span>{config.flashSale.productIds.length ? `${config.flashSale.productIds.length} selected` : "Automatic featured selection"}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => { setPickerTarget("flashSale"); setPickerSearch(""); }}>Choose products</button></div>
+            <div className="home-merch-selection-v2"><div><strong>Flash-sale products</strong><span>{config.flashSale.productIds.length ? `${config.flashSale.productIds.length} selected` : "Automatic featured selection"}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => openProductPicker("flashSale")}>Choose products</button></div>
             <ProductSelectionSummary products={products} ids={config.flashSale.productIds} />
           </article>
         </div>}
@@ -293,7 +368,7 @@ export default function HomeMerchandising() {
             <label className="wide">Description<textarea rows="3" value={config.budgetCollection.description} onChange={(event) => updateSection("budgetCollection", "description", event.target.value)} /></label>
             <label className="wide">View-all link<input value={config.budgetCollection.link} onChange={(event) => updateSection("budgetCollection", "link", event.target.value)} /></label>
           </div>
-          <div className="home-merch-selection-v2"><div><strong>Budget products</strong><span>{config.budgetCollection.productIds.length ? `${config.budgetCollection.productIds.length} manually selected` : `Automatic products at or below Rs. ${money(config.budgetCollection.maxPrice)}`}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => { setPickerTarget("budgetCollection"); setPickerSearch(""); }}>Choose products</button></div>
+          <div className="home-merch-selection-v2"><div><strong>Budget products</strong><span>{config.budgetCollection.productIds.length ? `${config.budgetCollection.productIds.length} manually selected` : `Automatic products at or below Rs. ${money(config.budgetCollection.maxPrice)}`}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => openProductPicker("budgetCollection")}>Choose products</button></div>
           <ProductSelectionSummary products={products} ids={config.budgetCollection.productIds} />
         </article>}
 
@@ -305,11 +380,10 @@ export default function HomeMerchandising() {
 
         {activeTab === "motion" && <article className="admin-panel-v2 home-merch-motion-v2">
           <div><span className="admin-ops-record-icon-v2 tone-cyan"><AdminIcon name="activity" /></span><div><span className="admin-ops-eyebrow-v2">Continuous product movement</span><h2>Infinite carousel behaviour</h2><p>The public offer rails move continuously without visible scrollbars. Visitors can pause by hovering or focusing a product.</p></div></div>
-          <div className="admin-form-v2 home-merch-motion-grid-v2">
-            <label className="home-merch-check-v2"><input type="checkbox" checked={config.carousel.enabled} onChange={(event) => updateSection("carousel", "enabled", event.target.checked)} /><span>Enable automatic infinite movement</span></label>
-            <label>Movement direction<select value={config.carousel.direction} onChange={(event) => updateSection("carousel", "direction", event.target.value)}><option value="ltr">Left to right</option><option value="rtl">Right to left</option></select></label>
-            <label>One loop duration (seconds)<input type="number" min="18" max="90" value={config.carousel.speedSeconds} onChange={(event) => updateSection("carousel", "speedSeconds", Math.min(90, Math.max(18, Number(event.target.value || 34))))} /></label>
-            <label className="home-merch-check-v2"><input type="checkbox" checked={config.carousel.pauseOnHover} onChange={(event) => updateSection("carousel", "pauseOnHover", event.target.checked)} /><span>Pause on hover or keyboard focus</span></label>
+          <div className="home-merch-experience-grid-v2">
+            <section><span className="admin-ops-eyebrow-v2">Today’s Offers</span><h3>Continuous marquee</h3><p>Products flow smoothly across the page and pause when a shopper interacts.</p><div className="admin-form-v2 home-merch-motion-grid-v2"><label className="home-merch-check-v2"><input type="checkbox" checked={config.carousel.enabled} onChange={(event) => updateSection("carousel", "enabled", event.target.checked)} /><span>Enable movement</span></label><label>Direction<select value={config.carousel.direction} onChange={(event) => updateSection("carousel", "direction", event.target.value)}><option value="ltr">Left to right</option><option value="rtl">Right to left</option></select></label><label>Loop duration<input type="number" min="18" max="90" value={config.carousel.speedSeconds} onChange={(event) => updateSection("carousel", "speedSeconds", Math.min(90, Math.max(18, Number(event.target.value || 34))))} /></label><label className="home-merch-check-v2"><input type="checkbox" checked={config.carousel.pauseOnHover} onChange={(event) => updateSection("carousel", "pauseOnHover", event.target.checked)} /><span>Pause on interaction</span></label></div></section>
+            <section><span className="admin-ops-eyebrow-v2">Flash Sale</span><h3>Spotlight rotation</h3><p>One large deal rotates with a countdown, next-product queue, and arrow controls.</p><div className="admin-form-v2 home-merch-motion-grid-v2"><label className="home-merch-check-v2"><input type="checkbox" checked={config.carousel.flashAutoplay !== false} onChange={(event) => updateSection("carousel", "flashAutoplay", event.target.checked)} /><span>Autoplay spotlight</span></label><label>Rotation interval<input type="number" min="3" max="15" value={config.carousel.flashIntervalSeconds || 5} onChange={(event) => updateSection("carousel", "flashIntervalSeconds", Math.min(15, Math.max(3, Number(event.target.value || 5))))} /></label></div></section>
+            <section><span className="admin-ops-eyebrow-v2">Budget Collection</span><h3>Paged product gallery</h3><p>Shoppers move through clean pages using arrows and progress dots instead of an endless rail.</p><div className="admin-form-v2 home-merch-motion-grid-v2"><label className="home-merch-check-v2"><input type="checkbox" checked={Boolean(config.carousel.budgetAutoplay)} onChange={(event) => updateSection("carousel", "budgetAutoplay", event.target.checked)} /><span>Autoplay pages</span></label><label>Page interval<input type="number" min="4" max="20" value={config.carousel.budgetIntervalSeconds || 7} onChange={(event) => updateSection("carousel", "budgetIntervalSeconds", Math.min(20, Math.max(4, Number(event.target.value || 7))))} /></label></div></section>
           </div>
           <div className={`home-merch-motion-preview-v2 direction-${config.carousel.direction}`} style={{ "--preview-speed": `${Math.max(18, config.carousel.speedSeconds) / 2}s` }}><div>{[...products.slice(0, 5), ...products.slice(0, 5)].map((product, index) => <span key={`${product.id}-${index}`}><img src={product.image || "https://placehold.co/90x70?text=Product"} alt="" /><b>{product.name}</b></span>)}</div></div>
         </article>}
@@ -319,11 +393,25 @@ export default function HomeMerchandising() {
 
       <AdminModal open={Boolean(pickerTarget)} onClose={() => setPickerTarget("")} title="Choose products" eyebrow="Homepage collection" size="large">
         <div className="home-merch-picker-v2">
-          <label className="admin-search-v2"><AdminIcon name="search" size={18} /><input value={pickerSearch} onChange={(event) => setPickerSearch(event.target.value)} placeholder="Search approved products..." /></label>
-          <div className="home-merch-picker-summary-v2"><strong>{selectedIds.length} selected</strong><span>Choose up to 18 products. Their selected order is preserved on the Home page.</span><button type="button" onClick={() => updateSection(pickerTarget, "productIds", [])}>Use automatic selection</button></div>
-          <div className="home-merch-picker-grid-v2">{pickerProducts.map((product) => { const active = selectedIds.includes(product.id); return <button key={product.id} className={active ? "active" : ""} type="button" onClick={() => toggleProduct(product.id)}><img src={product.image || product.images?.[0]?.url || "https://placehold.co/120x100?text=Product"} alt="" /><span><strong>{product.name}</strong><small>{product.category || "Product"} · Rs. {money(product.price)}</small><em>{product.sellerName || product.location || "SmartSell"}</em></span><i>{active ? "✓" : "+"}</i></button>; })}</div>
-          {!pickerProducts.length && <AdminEmptyState icon="box" title="No products found" description="Try another search or approve products in Listing Approvals first." />}
-          <div className="admin-modal-actions-v2"><button className="admin-primary-button-v2" type="button" onClick={() => setPickerTarget("")}>Done</button></div>
+          <div className="home-merch-picker-toolbar-v2">
+            <div className="home-merch-picker-source-v2">
+              <div><strong>{productsLoading ? "Loading approved products..." : `${products.length} approved products available`}</strong><span>Filter the catalogue, then select up to 18 products for this Home collection.</span></div>
+              <button className="admin-secondary-button-v2" type="button" onClick={() => loadProductOptions()} disabled={productsLoading}><AdminIcon name="refresh" size={15} />{productsLoading ? "Refreshing..." : "Refresh products"}</button>
+            </div>
+            {productsError && <div className="home-merch-picker-error-v2"><AdminIcon name="alert" size={16} />{productsError}</div>}
+            <label className="admin-search-v2"><AdminIcon name="search" size={18} /><input value={pickerSearch} onChange={(event) => setPickerSearch(event.target.value)} placeholder="Search name, seller, category, brand, or SKU..." /></label>
+            <div className="home-merch-picker-filters-v2">
+              <label>Category<select value={pickerCategory} onChange={(event) => setPickerCategory(event.target.value)}><option value="all">All categories</option>{pickerCategories.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+              <label>Location<select value={pickerLocation} onChange={(event) => setPickerLocation(event.target.value)}><option value="all">All locations</option>{pickerLocations.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+              <label>Price<select value={pickerPrice} onChange={(event) => setPickerPrice(event.target.value)}><option value="all">Any price</option><option value="under1000">Under Rs. 1,000</option><option value="1000to5000">Rs. 1,001–5,000</option><option value="over5000">Above Rs. 5,000</option></select></label>
+              <label>Sort<select value={pickerSort} onChange={(event) => setPickerSort(event.target.value)}><option value="featured">Featured first</option><option value="price_asc">Lowest price</option><option value="price_desc">Highest price</option><option value="name">Name A–Z</option></select></label>
+            </div>
+          </div>
+          <div className="home-merch-picker-summary-v2"><strong>{selectedIds.length} selected</strong><span>{pickerProducts.length} approved products match the current filters. Choose up to 18.</span><button type="button" onClick={() => updateSection(pickerTarget, "productIds", [])}>Use automatic selection</button></div>
+          {productsLoading ? <div className="home-merch-picker-loading-v2">Loading approved products...</div> : <div className="home-merch-picker-grid-v2">{visiblePickerProducts.map((product) => { const active = selectedIds.includes(product.id); return <button key={product.id} className={active ? "active" : ""} type="button" onClick={() => toggleProduct(product.id)}><img src={product.image || product.images?.[0]?.url || "https://placehold.co/120x100?text=Product"} alt="" /><span><strong>{product.name}</strong><small>{productCategory(product)} · Rs. {money(product.price)}</small><em>{product.sellerName || "SmartSell seller"} · {product.location || "Sri Lanka"}</em></span><i>{active ? "✓" : "+"}</i></button>; })}</div>}
+          {!productsLoading && !pickerProducts.length && <AdminEmptyState icon="box" title="No approved products match" description={productsError || (products.length ? "Clear one or more filters and try again." : "No approved products are available yet. Approve products in Listing Approvals, then select Refresh products.")} />}
+          {pickerPageCount > 1 && <div className="home-merch-picker-pagination-v2"><button type="button" onClick={() => setPickerPage((page) => Math.max(1, page - 1))} disabled={pickerPage === 1}>Previous</button><span>Page <strong>{pickerPage}</strong> of {pickerPageCount}</span><button type="button" onClick={() => setPickerPage((page) => Math.min(pickerPageCount, page + 1))} disabled={pickerPage === pickerPageCount}>Next</button></div>}
+          <div className="admin-modal-actions-v2"><button className="admin-primary-button-v2" type="button" onClick={() => setPickerTarget("")}>Done selecting</button></div>
         </div>
       </AdminModal>
 

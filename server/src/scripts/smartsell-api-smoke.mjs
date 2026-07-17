@@ -8,6 +8,7 @@ const checks = [
   { label: "Product categories", url: "/promotions/categories?type=product&active=true" },
   { label: "Service categories", url: "/promotions/categories?type=service&active=true" },
   { label: "Public settings", url: "/settings/public" },
+  { label: "Storefronts", url: "/storefronts" },
 ];
 
 console.log(`SmartSell API smoke test: ${API_BASE}`);
@@ -19,7 +20,7 @@ for (const check of checks) {
   try {
     const response = await fetch(target, { headers: { "Accept": "application/json" } });
     const text = await response.text();
-    const ok = response.status >= 200 && response.status < 500;
+    const ok = response.status >= 200 && response.status < 400;
     const bodyPreview = text.replace(/\s+/g, " ").slice(0, 140);
     console.log(`${ok ? "✅" : "❌"} ${check.label}: ${response.status} ${response.statusText} — ${bodyPreview}`);
     if (!ok) failed += 1;
