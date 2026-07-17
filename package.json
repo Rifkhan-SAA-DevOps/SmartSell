@@ -7,7 +7,8 @@
     "install:all": "npm install --prefix server && npm install --prefix client",
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "server": "npm run dev --prefix server",
-    "client": "npm run dev --prefix client"
+    "client": "npm run dev --prefix client",
+     "check": "npm --prefix .. run check"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

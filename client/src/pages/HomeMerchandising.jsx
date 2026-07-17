@@ -83,16 +83,36 @@ function formatDateInput(value) {
   return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 16);
 }
 
-function ProductSelectionSummary({ products, ids }) {
-  const selected = products.filter((product) => ids.includes(product.id));
+function ProductSelectionSummary({ products, ids, onRemove, onMove }) {
+  const productMap = new Map(products.map((product) => [product.id, product]));
+  const selected = ids.map((id) => productMap.get(id)).filter(Boolean);
   if (!selected.length) return <p className="home-merch-selection-empty">No products selected. SmartSell will automatically use qualifying approved products.</p>;
   return (
-    <div className="home-merch-selected-products">
-      {selected.slice(0, 6).map((product) => (
-        <span key={product.id}><img src={product.image || product.images?.[0]?.url || "https://placehold.co/80x80?text=Product"} alt="" /><b>{product.name}</b><small>Rs. {money(product.price)}</small></span>
+    <div className="home-merch-selected-products" aria-label="Selected product display order">
+      {selected.map((product, index) => (
+        <article key={product.id}>
+          <span className="home-merch-selected-position">{String(index + 1).padStart(2, "0")}</span>
+          <img src={product.image || product.images?.[0]?.url || "https://placehold.co/80x80?text=Product"} alt="" />
+          <span className="home-merch-selected-copy"><b>{product.name}</b><small>Rs. {money(product.price)}</small></span>
+          <span className="home-merch-selected-actions">
+            <button type="button" onClick={() => onMove(index, -1)} disabled={index === 0} aria-label={`Move ${product.name} earlier`}>↑</button>
+            <button type="button" onClick={() => onMove(index, 1)} disabled={index === selected.length - 1} aria-label={`Move ${product.name} later`}>↓</button>
+            <button className="danger" type="button" onClick={() => onRemove(product.id)} aria-label={`Remove ${product.name}`}>×</button>
+          </span>
+        </article>
       ))}
-      {selected.length > 6 && <em>+{selected.length - 6} more</em>}
     </div>
+  );
+}
+
+function PreviewProductCard({ product, badge }) {
+  return (
+    <article className="home-merch-preview-product-v2">
+      <span><img src={product?.image || product?.images?.[0]?.url || "https://placehold.co/320x220?text=Product"} alt="" /><mark>{badge}</mark></span>
+      <small>{product?.category?.name || product?.category || "Marketplace"}</small>
+      <strong>{product?.name || "Approved SmartSell product"}</strong>
+      <b>Rs. {money(product?.price)}</b>
+    </article>
   );
 }
 
@@ -115,6 +135,9 @@ export default function HomeMerchandising() {
   const [pickerPage, setPickerPage] = useState(1);
   const [slideEditor, setSlideEditor] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState("desktop");
+  const [lastPublishedAt, setLastPublishedAt] = useState("");
 
   async function loadProductOptions({ quiet = false } = {}) {
     if (!quiet) setProductsLoading(true);
@@ -161,6 +184,7 @@ export default function HomeMerchandising() {
       const rows = settingsResponse.data?.data?.settings || [];
       const stored = rows.find((setting) => setting.key === "homeMerchandising.config")?.value;
       setConfig(mergeConfig(stored));
+      setLastPublishedAt(rows.find((setting) => setting.key === "homeMerchandising.config")?.updatedAt || "");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load homepage merchandising controls.");
     } finally {
@@ -170,14 +194,6 @@ export default function HomeMerchandising() {
   }
 
   useEffect(() => { loadData(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const flashActive = useMemo(() => {
-    if (!config.flashSale.enabled) return false;
-    const now = Date.now();
-    const start = config.flashSale.startAt ? new Date(config.flashSale.startAt).getTime() : null;
-    const end = config.flashSale.endAt ? new Date(config.flashSale.endAt).getTime() : null;
-    return (!start || now >= start) && (!end || now <= end);
-  }, [config.flashSale]);
 
   const productCategory = (product) => product.category?.name || product.category || "Uncategorised";
   const pickerCategories = useMemo(() => [...new Set(products.map(productCategory).filter(Boolean))].sort(), [products]);
@@ -230,6 +246,31 @@ export default function HomeMerchandising() {
       const next = ids.includes(productId) ? ids.filter((id) => id !== productId) : [...ids, productId].slice(0, 18);
       return { ...current, [pickerTarget]: { ...current[pickerTarget], productIds: next } };
     });
+  }
+
+  function removeSelectedProduct(section, productId) {
+    updateSection(section, "productIds", (config[section].productIds || []).filter((id) => id !== productId));
+  }
+
+  function moveSelectedProduct(section, index, direction) {
+    setConfig((current) => {
+      const ids = [...(current[section].productIds || [])];
+      const target = index + direction;
+      if (target < 0 || target >= ids.length) return current;
+      [ids[index], ids[target]] = [ids[target], ids[index]];
+      return { ...current, [section]: { ...current[section], productIds: ids } };
+    });
+  }
+
+  function cleanUnavailableProducts() {
+    const available = new Set(products.map((product) => product.id));
+    setConfig((current) => ({
+      ...current,
+      todayOffers: { ...current.todayOffers, productIds: current.todayOffers.productIds.filter((id) => available.has(id)) },
+      flashSale: { ...current.flashSale, productIds: current.flashSale.productIds.filter((id) => available.has(id)) },
+      budgetCollection: { ...current.budgetCollection, productIds: current.budgetCollection.productIds.filter((id) => available.has(id)) },
+    }));
+    setMessage("Unavailable product references were removed from Home collections.");
   }
 
   function moveSlide(index, direction) {
@@ -291,9 +332,16 @@ export default function HomeMerchandising() {
   }
 
   async function saveConfig() {
+    const blocker = validationIssues.find((issue) => issue.blocking);
+    if (blocker) {
+      setError(blocker.message);
+      return;
+    }
     setSaving(true); setMessage(""); setError("");
     try {
       await api.patch("/settings/admin", { settings: { "homeMerchandising.config": config } });
+      const publishedAt = new Date().toISOString();
+      setLastPublishedAt(publishedAt);
       setMessage("Homepage merchandising has been published successfully.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save homepage merchandising.");
@@ -302,6 +350,51 @@ export default function HomeMerchandising() {
     }
   }
 
+  const productMap = useMemo(() => new Map(products.map((product) => [product.id, product])), [products]);
+  const selectedProductsFor = (section) => (config[section]?.productIds || []).map((id) => productMap.get(id)).filter(Boolean);
+  const unavailableIds = useMemo(() => {
+    if (productsLoading || productsError) return [];
+    const available = new Set(products.map((product) => product.id));
+    return [...new Set([
+      ...config.todayOffers.productIds,
+      ...config.flashSale.productIds,
+      ...config.budgetCollection.productIds,
+    ].filter((id) => !available.has(id)))];
+  }, [products, productsLoading, productsError, config.todayOffers.productIds, config.flashSale.productIds, config.budgetCollection.productIds]);
+  const duplicateSelections = useMemo(() => {
+    const counts = new Map();
+    [config.todayOffers.productIds, config.flashSale.productIds, config.budgetCollection.productIds].flat().forEach((id) => counts.set(id, (counts.get(id) || 0) + 1));
+    return [...counts.entries()].filter(([, count]) => count > 1).map(([id]) => productMap.get(id)).filter(Boolean);
+  }, [config.todayOffers.productIds, config.flashSale.productIds, config.budgetCollection.productIds, productMap]);
+  const flashSchedule = useMemo(() => {
+    if (!config.flashSale.enabled) return { state: "off", label: "Disabled", detail: "The campaign is hidden from the public Home page." };
+    const now = Date.now();
+    const start = config.flashSale.startAt ? new Date(config.flashSale.startAt).getTime() : null;
+    const end = config.flashSale.endAt ? new Date(config.flashSale.endAt).getTime() : null;
+    if (start && end && end <= start) return { state: "error", label: "Invalid schedule", detail: "The end date must be later than the start date." };
+    if (start && now < start) return { state: "scheduled", label: "Scheduled", detail: `Starts ${new Date(start).toLocaleString("en-LK")}.` };
+    if (end && now > end) return { state: "ended", label: "Ended", detail: `Ended ${new Date(end).toLocaleString("en-LK")}.` };
+    return { state: "live", label: "Live now", detail: end ? `Visible until ${new Date(end).toLocaleString("en-LK")}.` : "Visible now without an end date." };
+  }, [config.flashSale]);
+  const validationIssues = useMemo(() => {
+    const issues = [];
+    const start = config.flashSale.startAt ? new Date(config.flashSale.startAt).getTime() : null;
+    const end = config.flashSale.endAt ? new Date(config.flashSale.endAt).getTime() : null;
+    if (config.todayOffers.enabled && !config.todayOffers.title.trim()) issues.push({ blocking: true, tone: "error", message: "Today’s Offers needs a section title before publishing." });
+    if (config.flashSale.enabled && !config.flashSale.title.trim()) issues.push({ blocking: true, tone: "error", message: "Flash Sale needs a campaign title before publishing." });
+    if (config.flashSale.enabled && start && end && end <= start) issues.push({ blocking: true, tone: "error", message: "Flash Sale cannot be published because its end date is not later than its start date." });
+    if (config.budgetCollection.enabled && !config.budgetCollection.title.trim()) issues.push({ blocking: true, tone: "error", message: "The budget collection needs a section title before publishing." });
+    if (config.budgetCollection.enabled && Number(config.budgetCollection.maxPrice || 0) <= 0) issues.push({ blocking: true, tone: "error", message: "The budget collection needs a maximum price greater than zero." });
+    if (unavailableIds.length) issues.push({ blocking: false, tone: "warning", message: `${unavailableIds.length} selected product reference${unavailableIds.length === 1 ? " is" : "s are"} no longer available in the approved catalogue.` });
+    if (duplicateSelections.length) issues.push({ blocking: false, tone: "info", message: `${duplicateSelections.length} product${duplicateSelections.length === 1 ? " appears" : "s appear"} in more than one Home collection.` });
+    if (config.flashSale.enabled && config.flashSale.productIds.length > 0 && config.flashSale.productIds.length < 3) issues.push({ blocking: false, tone: "warning", message: "Flash Sale works best with at least three selected products for the gallery shelf." });
+    if (config.marketplaceHighlights.enabled && config.marketplaceHighlights.slides.length === 1) issues.push({ blocking: false, tone: "info", message: "Marketplace Highlights has one slide, so carousel navigation and autoplay will not be visible." });
+    return issues;
+  }, [config, unavailableIds.length, duplicateSelections.length]);
+
+  const previewToday = selectedProductsFor("todayOffers").length ? selectedProductsFor("todayOffers") : products.slice(0, 6);
+  const previewFlash = selectedProductsFor("flashSale").length ? selectedProductsFor("flashSale") : products.slice(0, 5);
+  const previewBudget = selectedProductsFor("budgetCollection").length ? selectedProductsFor("budgetCollection") : products.filter((product) => Number(product.price || 0) <= Number(config.budgetCollection.maxPrice || 1000)).slice(0, 4);
   const selectedTotal = config.todayOffers.productIds.length + config.flashSale.productIds.length + config.budgetCollection.productIds.length;
   const enabledCollections = [config.todayOffers.enabled, config.flashSale.enabled, config.budgetCollection.enabled].filter(Boolean).length;
 
@@ -311,8 +404,8 @@ export default function HomeMerchandising() {
         eyebrow="Homepage merchandising"
         title="Home offers & highlights"
         description="Control the product rails, limited-time campaigns, affordable collections, carousel movement, and image-led marketplace highlights shown on the public Home page."
-        actions={<><Link className="admin-secondary-button-v2" to="/" target="_blank">Preview Home</Link><button className="admin-primary-button-v2" type="button" onClick={saveConfig} disabled={saving || loading}>{saving ? "Publishing..." : "Publish homepage"}</button></>}
-        meta={<><span>{enabledCollections} active offer collections</span><span>{selectedTotal} manually selected products</span><span>{config.marketplaceHighlights.slides.length} highlight slides</span></>}
+        actions={<><button className="admin-secondary-button-v2" type="button" onClick={() => setPreviewOpen(true)}><AdminIcon name="star" size={16} /> Preview changes</button><Link className="admin-secondary-button-v2" to="/" target="_blank">Open live Home</Link><button className="admin-primary-button-v2" type="button" onClick={saveConfig} disabled={saving || loading || validationIssues.some((issue) => issue.blocking)}>{saving ? "Publishing..." : "Publish homepage"}</button></>}
+        meta={<><span>{enabledCollections} active offer collections</span><span>{selectedTotal} manually selected products</span><span>{config.marketplaceHighlights.slides.length} highlight slides</span>{lastPublishedAt && <span>Published {new Date(lastPublishedAt).toLocaleString("en-LK")}</span>}</>}
       />
 
       {message && <div className="admin-alert-v2 success">{message}</div>}
@@ -323,8 +416,13 @@ export default function HomeMerchandising() {
           <AdminMetricCard icon="spark" label="Offer collections" value={enabledCollections} note="Today, flash, and budget" tone="violet" />
           <AdminMetricCard icon="box" label="Selected products" value={selectedTotal} note="Manual merchandising order" tone="blue" />
           <AdminMetricCard icon="star" label="Highlight slides" value={config.marketplaceHighlights.slides.length} note="Admin-managed images" tone="cyan" />
-          <AdminMetricCard icon="activity" label="Flash campaign" value={flashActive ? "Live" : config.flashSale.enabled ? "Scheduled" : "Off"} note={config.flashSale.title} tone={flashActive ? "emerald" : "amber"} />
+          <AdminMetricCard icon="activity" label="Flash campaign" value={flashSchedule.label} note={config.flashSale.title} tone={flashSchedule.state === "live" ? "emerald" : flashSchedule.state === "error" ? "rose" : "amber"} />
         </div>
+
+        <section className="home-merch-readiness-v2" aria-label="Homepage publishing readiness">
+          <div className="home-merch-readiness-head-v2"><span className={`home-merch-readiness-icon-v2 ${validationIssues.some((issue) => issue.blocking) ? "is-error" : validationIssues.length ? "is-warning" : "is-ready"}`}><AdminIcon name={validationIssues.some((issue) => issue.blocking) ? "alert" : "shield"} size={20} /></span><div><strong>{validationIssues.some((issue) => issue.blocking) ? "Publishing needs attention" : validationIssues.length ? "Ready with recommendations" : "Ready to publish"}</strong><p>{validationIssues.length ? "Review the notes below before making the current merchandising configuration public." : "Offer collections, campaign scheduling, and highlight settings are valid."}</p></div><button className="admin-secondary-button-v2" type="button" onClick={() => setPreviewOpen(true)}>Preview current changes</button></div>
+          {validationIssues.length > 0 && <div className="home-merch-readiness-list-v2">{validationIssues.map((issue, index) => <article key={`${issue.message}-${index}`} className={`tone-${issue.tone}`}><AdminIcon name={issue.tone === "error" || issue.tone === "warning" ? "alert" : "list"} size={15} /><span>{issue.message}</span>{unavailableIds.length && issue.message.includes("reference") ? <button type="button" onClick={cleanUnavailableProducts}>Remove unavailable</button> : null}</article>)}</div>}
+        </section>
 
         <div className="home-merch-tabs-v2" role="tablist" aria-label="Homepage merchandising areas">
           {[["offers", "Offers & flash sale"], ["budget", "Budget collection"], ["highlights", "Marketplace highlights"], ["motion", "Carousel movement"]].map(([value, label]) => <button key={value} type="button" className={activeTab === value ? "active" : ""} onClick={() => setActiveTab(value)}>{label}</button>)}
@@ -340,7 +438,7 @@ export default function HomeMerchandising() {
               <label className="wide">View-all link<input value={config.todayOffers.link} onChange={(event) => updateSection("todayOffers", "link", event.target.value)} /></label>
             </div>
             <div className="home-merch-selection-v2"><div><strong>Featured products</strong><span>{config.todayOffers.productIds.length ? `${config.todayOffers.productIds.length} manually selected` : "Automatic featured selection"}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => openProductPicker("todayOffers")}>Choose products</button></div>
-            <ProductSelectionSummary products={products} ids={config.todayOffers.productIds} />
+            <ProductSelectionSummary products={products} ids={config.todayOffers.productIds} onRemove={(id) => removeSelectedProduct("todayOffers", id)} onMove={(index, direction) => moveSelectedProduct("todayOffers", index, direction)} />
           </article>
 
           <article className="admin-panel-v2 home-merch-editor-card-v2 tone-flash">
@@ -353,9 +451,9 @@ export default function HomeMerchandising() {
               <label>Ends at<input type="datetime-local" value={formatDateInput(config.flashSale.endAt)} onChange={(event) => updateSection("flashSale", "endAt", event.target.value ? new Date(event.target.value).toISOString() : "")} /></label>
               <label className="wide">Campaign link<input value={config.flashSale.link} onChange={(event) => updateSection("flashSale", "link", event.target.value)} /></label>
             </div>
-            <div className="home-merch-campaign-state-v2"><AdminStatusBadge status={flashActive ? "active" : config.flashSale.enabled ? "pending" : "inactive"} label={flashActive ? "Live now" : config.flashSale.enabled ? "Scheduled / always available" : "Disabled"} /><span>Leave both dates empty to keep the flash collection available whenever it is enabled.</span></div>
+            <div className={`home-merch-campaign-state-v2 state-${flashSchedule.state}`}><AdminStatusBadge status={flashSchedule.state === "live" ? "active" : flashSchedule.state === "error" ? "rejected" : flashSchedule.state === "off" || flashSchedule.state === "ended" ? "inactive" : "pending"} label={flashSchedule.label} /><span><strong>{flashSchedule.label}</strong>{flashSchedule.detail}</span></div>
             <div className="home-merch-selection-v2"><div><strong>Flash-sale products</strong><span>{config.flashSale.productIds.length ? `${config.flashSale.productIds.length} selected` : "Automatic featured selection"}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => openProductPicker("flashSale")}>Choose products</button></div>
-            <ProductSelectionSummary products={products} ids={config.flashSale.productIds} />
+            <ProductSelectionSummary products={products} ids={config.flashSale.productIds} onRemove={(id) => removeSelectedProduct("flashSale", id)} onMove={(index, direction) => moveSelectedProduct("flashSale", index, direction)} />
           </article>
         </div>}
 
@@ -369,7 +467,7 @@ export default function HomeMerchandising() {
             <label className="wide">View-all link<input value={config.budgetCollection.link} onChange={(event) => updateSection("budgetCollection", "link", event.target.value)} /></label>
           </div>
           <div className="home-merch-selection-v2"><div><strong>Budget products</strong><span>{config.budgetCollection.productIds.length ? `${config.budgetCollection.productIds.length} manually selected` : `Automatic products at or below Rs. ${money(config.budgetCollection.maxPrice)}`}</span></div><button className="admin-secondary-button-v2" type="button" onClick={() => openProductPicker("budgetCollection")}>Choose products</button></div>
-          <ProductSelectionSummary products={products} ids={config.budgetCollection.productIds} />
+          <ProductSelectionSummary products={products} ids={config.budgetCollection.productIds} onRemove={(id) => removeSelectedProduct("budgetCollection", id)} onMove={(index, direction) => moveSelectedProduct("budgetCollection", index, direction)} />
         </article>}
 
         {activeTab === "highlights" && <article className="admin-panel-v2 home-merch-highlight-editor-v2">
@@ -388,8 +486,22 @@ export default function HomeMerchandising() {
           <div className={`home-merch-motion-preview-v2 direction-${config.carousel.direction}`} style={{ "--preview-speed": `${Math.max(18, config.carousel.speedSeconds) / 2}s` }}><div>{[...products.slice(0, 5), ...products.slice(0, 5)].map((product, index) => <span key={`${product.id}-${index}`}><img src={product.image || "https://placehold.co/90x70?text=Product"} alt="" /><b>{product.name}</b></span>)}</div></div>
         </article>}
 
-        <div className="home-merch-sticky-save-v2"><div><AdminIcon name="shield" size={20} /><span><strong>Public homepage control</strong><small>Changes become visible after publishing. Existing customer, seller, and admin page layouts are not affected.</small></span></div><button className="admin-primary-button-v2" type="button" onClick={saveConfig} disabled={saving}>{saving ? "Publishing..." : "Publish homepage"}</button></div>
+        <div className="home-merch-sticky-save-v2"><div><AdminIcon name="shield" size={20} /><span><strong>Public homepage control</strong><small>Preview unpublished changes first. Publishing updates only the public Home merchandising configuration.</small></span></div><button className="admin-primary-button-v2" type="button" onClick={saveConfig} disabled={saving || validationIssues.some((issue) => issue.blocking)}>{saving ? "Publishing..." : validationIssues.some((issue) => issue.blocking) ? "Resolve issues to publish" : "Publish homepage"}</button></div>
       </>}
+
+      <AdminModal open={previewOpen} onClose={() => setPreviewOpen(false)} title="Preview Home merchandising" eyebrow="Unpublished customer view" size="large">
+        <div className="home-merch-preview-v2">
+          <div className="home-merch-preview-toolbar-v2"><div><strong>Customer-side merchandising preview</strong><span>This preview uses the current unsaved admin form values and approved product catalogue.</span></div><div role="group" aria-label="Preview device"><button type="button" className={previewDevice === "desktop" ? "active" : ""} onClick={() => setPreviewDevice("desktop")}>Desktop</button><button type="button" className={previewDevice === "mobile" ? "active" : ""} onClick={() => setPreviewDevice("mobile")}>Mobile</button></div></div>
+          <div className={`home-merch-preview-canvas-v2 device-${previewDevice}`}>
+            <header><span>SmartSell Home</span><strong>Offers & marketplace highlights</strong><small>Unpublished preview</small></header>
+            {config.marketplaceHighlights.enabled && <section className="home-merch-preview-highlight-v2">{config.marketplaceHighlights.slides[0]?.imageUrl ? <img src={config.marketplaceHighlights.slides[0].imageUrl} alt="" /> : <div className="home-merch-preview-placeholder-v2"><AdminIcon name="star" size={24} /><span>Fallback marketplace highlight</span></div>}<div><small>{config.marketplaceHighlights.slides[0]?.label || "Marketplace highlight"}</small><h3>{config.marketplaceHighlights.slides[0]?.title || "Approved products, services, and storefronts"}</h3><p>{config.marketplaceHighlights.slides[0]?.subtitle || "SmartSell will show a live fallback until custom highlight slides are published."}</p></div></section>}
+            {config.todayOffers.enabled && <section className="home-merch-preview-section-v2"><div><small>{config.todayOffers.eyebrow}</small><h3>{config.todayOffers.title}</h3><p>{config.todayOffers.description}</p></div><div className="home-merch-preview-products-v2">{previewToday.slice(0, previewDevice === "mobile" ? 2 : 4).map((product) => <PreviewProductCard key={`today-${product.id}`} product={product} badge="Today's offer" />)}</div></section>}
+            {config.flashSale.enabled && <section className={`home-merch-preview-flash-v2 state-${flashSchedule.state}`}><div><small>{config.flashSale.badge}</small><h3>{config.flashSale.title}</h3><p>{flashSchedule.detail}</p></div><div className="home-merch-preview-flash-layout-v2"><PreviewProductCard product={previewFlash[0]} badge="Active deal" /><aside>{previewFlash.slice(0, 4).map((product, index) => <span key={`flash-${product.id}`} className={index === 0 ? "active" : ""}><img src={product.image || product.images?.[0]?.url || "https://placehold.co/100x80?text=Product"} alt="" /><b>{product.name}</b></span>)}</aside></div></section>}
+            {config.budgetCollection.enabled && <section className="home-merch-preview-section-v2 tone-budget"><div><small>{config.budgetCollection.eyebrow}</small><h3>{config.budgetCollection.title}</h3><p>{config.budgetCollection.description}</p></div><div className="home-merch-preview-products-v2">{previewBudget.slice(0, previewDevice === "mobile" ? 2 : 4).map((product) => <PreviewProductCard key={`budget-${product.id}`} product={product} badge={`Under Rs. ${money(config.budgetCollection.maxPrice)}`} />)}</div></section>}
+          </div>
+          <div className="admin-modal-actions-v2"><button className="admin-primary-button-v2" type="button" onClick={() => { setPreviewOpen(false); saveConfig(); }} disabled={validationIssues.some((issue) => issue.blocking)}>Publish this configuration</button><button className="admin-secondary-button-v2" type="button" onClick={() => setPreviewOpen(false)}>Continue editing</button></div>
+        </div>
+      </AdminModal>
 
       <AdminModal open={Boolean(pickerTarget)} onClose={() => setPickerTarget("")} title="Choose products" eyebrow="Homepage collection" size="large">
         <div className="home-merch-picker-v2">
