@@ -220,7 +220,11 @@ export async function createOrder(payload, user) {
 
   const productIds = requested.map((item) => item.productId);
   const products = await prisma.product.findMany({
-    where: { id: { in: productIds }, status: "approved" },
+    where: {
+      id: { in: productIds },
+      status: "approved",
+      OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }],
+    },
   });
 
   const productMap = new Map(products.map((product) => [product.id, product]));
@@ -258,10 +262,25 @@ export async function createOrder(payload, user) {
       stockSnapshots.set(item.productId, { previousStock, newStock });
 
       if (product.isStockTracked !== false) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.quantity } },
-        });
+        if (product.allowBackorder) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.quantity } },
+          });
+        } else {
+          const stockUpdate = await tx.product.updateMany({
+            where: {
+              id: item.productId,
+              status: "approved",
+              stock: { gte: item.quantity },
+              OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }],
+            },
+            data: { stock: { decrement: item.quantity } },
+          });
+          if (stockUpdate.count !== 1) {
+            throw new Error(`${product.name} no longer has enough stock. Refresh your cart and try again.`);
+          }
+        }
       }
     }
 

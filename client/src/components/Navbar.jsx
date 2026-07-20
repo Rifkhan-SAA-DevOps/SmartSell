@@ -61,7 +61,7 @@ function workspacePageTitle(pathname, role) {
 function workspaceLink(role) {
   if (["admin", "super_admin"].includes(role)) return "/admin";
   if (role === "delivery_partner") return "/delivery";
-  if (["seller", "shop", "shop_seller", "service_provider"].includes(role)) return "/business";
+  if (["seller", "shop", "service_provider"].includes(role)) return "/business";
   return "/dashboard";
 }
 
@@ -93,7 +93,7 @@ export default function Navbar({ showManagementSidebar = false, onOpenSidebar = 
   const { pathname } = useLocation();
   const [navOpen, setNavOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const isBusinessWorkspaceRole = ["seller", "shop", "shop_seller", "service_provider"].includes(user?.role);
+  const isBusinessWorkspaceRole = ["seller", "shop", "service_provider"].includes(user?.role);
   const isAdminWorkspaceRole = ["admin", "super_admin"].includes(user?.role);
   const accountRef = useRef(null);
 

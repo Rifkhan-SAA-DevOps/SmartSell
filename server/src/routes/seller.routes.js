@@ -14,7 +14,7 @@ router.get("/", requireAuth, requireRoles("admin", "super_admin"), async (req, r
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", requireAuth, requireRoles("admin", "super_admin"), async (req, res, next) => {
   try {
     const { name, phone, sellerType } = req.body;
     if (!name || !phone || !sellerType) {

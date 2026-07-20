@@ -12,7 +12,7 @@ function isAdmin(user) {
 
 function canManageProduct(user, product) {
   if (isAdmin(user)) return true;
-  if (!["seller", "shop", "shop_seller"].includes(user?.role)) return false;
+  if (!["seller", "shop"].includes(user?.role)) return false;
   return product?.createdById === user.id || product?.seller?.userId === user.id;
 }
 
@@ -288,14 +288,41 @@ export async function updateAdvancedProduct(productId, payload, user) {
   const product = await prisma.product.findUnique({ where: { id: productId }, include: { seller: true } });
   if (!product) return null;
   if (!canManageProduct(user, product)) throw new Error("You do not have permission to update this product.");
-  return updateProduct(productId, payload);
+
+  const safePayload = isAdmin(user)
+    ? payload
+    : {
+        sku: payload.sku,
+        brand: payload.brand,
+        model: payload.model,
+        lowStockThreshold: payload.lowStockThreshold,
+        isStockTracked: payload.isStockTracked,
+        allowBackorder: payload.allowBackorder,
+        listingExpiresAt: payload.listingExpiresAt,
+        ...(["approved", "rejected"].includes(product.status) ? { status: "pending" } : {}),
+      };
+
+  return updateProduct(productId, safePayload);
 }
 
 export async function updateAdvancedService(serviceId, payload, user) {
   const service = await prisma.service.findUnique({ where: { id: serviceId }, include: { provider: true } });
   if (!service) return null;
   if (!canManageService(user, service)) throw new Error("You do not have permission to update this service.");
-  return updateService(serviceId, payload);
+
+  const safePayload = isAdmin(user)
+    ? payload
+    : {
+        serviceArea: payload.serviceArea,
+        availabilityNote: payload.availabilityNote,
+        estimatedDuration: payload.estimatedDuration,
+        minNoticeHours: payload.minNoticeHours,
+        bookingMode: payload.bookingMode,
+        serviceTags: payload.serviceTags,
+        ...(["approved", "rejected"].includes(service.status) ? { status: "pending" } : {}),
+      };
+
+  return updateService(serviceId, safePayload);
 }
 
 export async function listAdvancedServices(user, filters = {}) {

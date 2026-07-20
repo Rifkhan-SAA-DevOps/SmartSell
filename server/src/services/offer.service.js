@@ -28,6 +28,40 @@ function isBusiness(user) {
   return ["seller", "shop", "service_provider", "admin", "super_admin"].includes(user?.role);
 }
 
+const OFFER_TRANSITIONS = {
+  pending: ["accepted", "rejected", "countered", "cancelled", "expired"],
+  countered: ["accepted", "rejected", "countered", "cancelled", "expired"],
+  accepted: [],
+  rejected: [],
+  cancelled: [],
+  expired: [],
+};
+
+function assertOfferTransition(existingStatus, nextStatus, { userIsAdmin, userIsSeller, userIsBuyer }) {
+  if (!nextStatus) return;
+  if (existingStatus === nextStatus) {
+    throw new Error(`Offer is already ${readableStatus(nextStatus).toLowerCase()}.`);
+  }
+
+  if (userIsBuyer) {
+    if (nextStatus !== "cancelled") throw new Error("Customer can only cancel their own offer.");
+    if (!["pending", "countered"].includes(existingStatus)) {
+      throw new Error(`This offer can no longer be cancelled because it is ${readableStatus(existingStatus).toLowerCase()}.`);
+    }
+    return;
+  }
+
+  if (userIsSeller || userIsAdmin) {
+    const allowed = OFFER_TRANSITIONS[existingStatus] || [];
+    if (!allowed.includes(nextStatus)) {
+      throw new Error(`Offer cannot move from ${readableStatus(existingStatus).toLowerCase()} to ${readableStatus(nextStatus).toLowerCase()}.`);
+    }
+    if (!userIsAdmin && nextStatus === "expired") {
+      throw new Error("Only an administrator can expire an offer manually.");
+    }
+  }
+}
+
 const offerInclude = {
   buyer: { select: { id: true, name: true, email: true, phone: true, role: true } },
   seller: { select: { id: true, name: true, email: true, phone: true, role: true, businessName: true } },
@@ -85,7 +119,11 @@ export async function createProductOffer(productId, payload, user) {
   if (!user?.id) throw new Error("Login is required before making an offer.");
 
   const product = await prisma.product.findFirst({
-    where: { id: String(productId), status: "approved" },
+    where: {
+      id: String(productId),
+      status: "approved",
+      OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }],
+    },
     include: {
       createdBy: true,
       seller: { include: { user: true } },
@@ -113,6 +151,18 @@ export async function createProductOffer(productId, payload, user) {
 
   if (sellerId && sellerId === user.id) {
     throw new Error("You cannot make an offer on your own product.");
+  }
+
+  const activeOffer = await prisma.productOffer.findFirst({
+    where: {
+      productId: product.id,
+      buyerId: user.id,
+      status: { in: ["pending", "countered"] },
+    },
+    select: { id: true, offerNo: true },
+  });
+  if (activeOffer) {
+    throw new Error(`You already have an active offer (${activeOffer.offerNo}) for this product.`);
   }
 
   const offer = await prisma.productOffer.create({
@@ -224,23 +274,22 @@ export async function updateProductOffer(offerId, payload, user) {
   const data = {};
 
   if (requestedStatus) {
-    if (userIsBuyer && !["cancelled"].includes(requestedStatus)) {
-      throw new Error("Customer can only cancel their own offer.");
-    }
-
-    if ((userIsSeller || userIsAdmin) && !["accepted", "rejected", "countered", "pending", "expired"].includes(requestedStatus)) {
-      throw new Error("Invalid offer status for seller/admin.");
-    }
-
+    assertOfferTransition(existing.status, requestedStatus, { userIsAdmin, userIsSeller, userIsBuyer });
     data.status = requestedStatus;
   }
 
   if ((userIsSeller || userIsAdmin) && payload.counterAmount !== undefined) {
+    if (!["pending", "countered"].includes(existing.status)) {
+      throw new Error(`A counter offer cannot be added after the offer is ${readableStatus(existing.status).toLowerCase()}.`);
+    }
     data.counterAmount = payload.counterAmount === "" ? null : Number(payload.counterAmount);
     if (data.counterAmount !== null && (!Number.isFinite(Number(data.counterAmount)) || Number(data.counterAmount) <= 0)) {
       throw new Error("Counter offer amount must be greater than zero.");
     }
-    if (!data.status && data.counterAmount) data.status = "countered";
+    if (!data.status && data.counterAmount) {
+      assertOfferTransition(existing.status, "countered", { userIsAdmin, userIsSeller, userIsBuyer });
+      data.status = "countered";
+    }
   }
 
   if ((userIsSeller || userIsAdmin) && payload.sellerNote !== undefined) {

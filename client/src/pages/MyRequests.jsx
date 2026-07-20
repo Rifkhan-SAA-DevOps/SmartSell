@@ -70,6 +70,6 @@ function BusinessRequestsView({ user }) {
 
 export default function MyRequests() {
   const { user } = useAuth();
-  const businessMode = ["seller", "shop", "shop_seller", "service_provider"].includes(user?.role);
+  const businessMode = ["seller", "shop", "service_provider"].includes(user?.role);
   return businessMode ? <BusinessRequestsView user={user} /> : <CustomerRequestsView />;
 }

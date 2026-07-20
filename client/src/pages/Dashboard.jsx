@@ -55,14 +55,14 @@ const adminActions = [
 function getActions(role) {
   if (["admin", "super_admin"].includes(role)) return adminActions;
   if (role === "delivery_partner") return deliveryActions;
-  if (["seller", "shop", "shop_seller", "service_provider"].includes(role)) return businessActions;
+  if (["seller", "shop", "service_provider"].includes(role)) return businessActions;
   return customerActions;
 }
 
 function getHeadline(role) {
   if (["admin", "super_admin"].includes(role)) return ["Management workspace", "Keep the SmartSell platform organized."];
   if (role === "delivery_partner") return ["Delivery workspace", "Your assignments and communication in one place."];
-  if (["seller", "shop", "shop_seller", "service_provider"].includes(role)) return ["Business workspace", "Manage listings, customers, and earnings clearly."];
+  if (["seller", "shop", "service_provider"].includes(role)) return ["Business workspace", "Manage listings, customers, and earnings clearly."];
   return ["Customer workspace", "Everything after discovery, organized beautifully."];
 }
 

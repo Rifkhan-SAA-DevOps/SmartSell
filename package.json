@@ -13,7 +13,12 @@
     "audit:api": "node scripts/smartsell-api-contract.mjs",
     "audit:workflow": "node scripts/smartsell-workflow-audit.mjs",
     "audit:server": "node scripts/smartsell-server-check.mjs",
-    "check": "npm run audit && npm run audit:css && npm run audit:api && npm run audit:workflow && npm run audit:server && npm run build --prefix client"
+    "check": "npm run audit && npm run audit:css && npm run audit:api && npm run audit:workflow && npm run audit:permissions && npm run audit:data && npm run audit:lists && npm run audit:server && npm run build --prefix client",
+    "audit:permissions": "node scripts/smartsell-permission-audit.mjs",
+    "audit:data": "node scripts/smartsell-demo-data-audit.mjs",
+    "data:seed": "npm run db:seed --prefix server",
+    "data:verify": "npm run db:verify --prefix server",
+    "audit:lists": "node scripts/smartsell-list-controls-audit.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

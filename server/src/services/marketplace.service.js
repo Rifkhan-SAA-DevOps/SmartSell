@@ -262,6 +262,13 @@ export async function listProducts(filters = {}) {
     where.status = "approved";
   }
 
+  if (where.status === "approved") {
+    where.AND = [
+      ...(where.AND || []),
+      { OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }] },
+    ];
+  }
+
   if (filters.type && filters.type !== "all") where.type = productTypeToDb(filters.type);
   if (filters.condition && filters.condition !== "all") where.condition = productConditionToDb(filters.condition);
   if (filters.featured === "true") where.isFeatured = true;
@@ -313,8 +320,12 @@ export async function listProducts(filters = {}) {
 }
 
 export async function getProduct(id) {
-  const product = await prisma.product.findUnique({
-    where: { id },
+  const product = await prisma.product.findFirst({
+    where: {
+      id,
+      status: "approved",
+      OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }],
+    },
     include: productInclude,
   });
   return serializeProduct(product);
@@ -390,6 +401,16 @@ export async function createProduct(payload, user = null) {
 
 export async function updateProduct(id, payload) {
   try {
+    if (approvalStatusToDb(payload.status) === "approved") {
+      const existing = await prisma.product.findUnique({
+        where: { id },
+        select: { createdById: true, createdBy: { select: { status: true } } },
+      });
+      if (existing?.createdById && existing.createdBy?.status !== "active") {
+        throw Object.assign(new Error("Activate and approve the listing owner before approving this product."), { statusCode: 409 });
+      }
+    }
+
     const category = payload.category || payload.categoryName
       ? await findOrCreateCategory(payload.category || payload.categoryName, "product")
       : null;
@@ -446,6 +467,13 @@ export async function listServices(filters = {}) {
     where.status = "approved";
   }
 
+  if (where.status === "approved") {
+    where.AND = [
+      ...(where.AND || []),
+      { OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }] },
+    ];
+  }
+
   if (filters.featured === "true") where.isFeatured = true;
   if (filters.category && filters.category !== "all") {
     where.category = { is: { OR: [{ slug: String(filters.category) }, { name: { equals: String(filters.category), mode: "insensitive" } }] } };
@@ -482,8 +510,12 @@ export async function listServices(filters = {}) {
 }
 
 export async function getService(id) {
-  const service = await prisma.service.findUnique({
-    where: { id },
+  const service = await prisma.service.findFirst({
+    where: {
+      id,
+      status: "approved",
+      OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }],
+    },
     include: serviceInclude,
   });
   return serializeService(service);
@@ -543,6 +575,16 @@ export async function createService(payload, user = null) {
 
 export async function updateService(id, payload) {
   try {
+    if (approvalStatusToDb(payload.status) === "approved") {
+      const existing = await prisma.service.findUnique({
+        where: { id },
+        select: { createdById: true, createdBy: { select: { status: true } } },
+      });
+      if (existing?.createdById && existing.createdBy?.status !== "active") {
+        throw Object.assign(new Error("Activate and approve the listing owner before approving this service."), { statusCode: 409 });
+      }
+    }
+
     const category = payload.category || payload.categoryName
       ? await findOrCreateCategory(payload.category || payload.categoryName, "service")
       : null;
@@ -695,7 +737,11 @@ export async function createRequest(payload, user = null) {
 
 export async function createServiceQuoteRequest(serviceId, payload, user = null) {
   const service = await prisma.service.findFirst({
-    where: { id: String(serviceId), status: "approved" },
+    where: {
+      id: String(serviceId),
+      status: "approved",
+      OR: [{ createdById: null }, { createdBy: { is: { status: "active" } } }],
+    },
     include: {
       category: true,
       provider: { include: { user: true } },

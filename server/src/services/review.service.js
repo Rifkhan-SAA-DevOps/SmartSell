@@ -162,21 +162,45 @@ export async function createReview(payload, user) {
   const comment = String(payload.comment || "").trim();
   if (!comment) throw new Error("Review comment is required.");
 
+  const isAdmin = ["admin", "super_admin"].includes(user.role);
+
   if (productId) {
-    const product = await prisma.product.findFirst({ where: { id: productId, status: "approved" } });
+    const product = await prisma.product.findFirst({
+      where: { id: productId, status: "approved" },
+      include: { seller: true },
+    });
     if (!product) throw new Error("Product was not found or is not approved yet.");
+    if (!isAdmin && (product.createdById === user.id || product.seller?.userId === user.id)) {
+      throw new Error("You cannot review your own product.");
+    }
 
-    const isAdmin = ["admin", "super_admin"].includes(user.role);
     const hasDeliveredProduct = await customerHasDeliveredProduct(user.id, productId);
-
     if (!isAdmin && !hasDeliveredProduct) {
       throw new Error("You can review this product after the order is marked delivered by admin.");
     }
   }
 
   if (serviceId) {
-    const service = await prisma.service.findFirst({ where: { id: serviceId, status: "approved" } });
+    const service = await prisma.service.findFirst({
+      where: { id: serviceId, status: "approved" },
+      include: { provider: true },
+    });
     if (!service) throw new Error("Service was not found or is not approved yet.");
+    if (!isAdmin && (service.createdById === user.id || service.provider?.userId === user.id)) {
+      throw new Error("You cannot review your own service.");
+    }
+  }
+
+  const duplicate = await prisma.review.findFirst({
+    where: {
+      userId: user.id,
+      ...(productId ? { productId } : { serviceId }),
+      status: { not: "archived" },
+    },
+    select: { id: true },
+  });
+  if (duplicate) {
+    throw new Error("You already submitted a review for this listing.");
   }
 
   const review = await prisma.review.create({

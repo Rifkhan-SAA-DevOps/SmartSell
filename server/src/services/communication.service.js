@@ -8,7 +8,7 @@ import {
 } from "./notificationDelivery.service.js";
 
 const adminRoles = ["admin", "super_admin"];
-const businessRoles = ["seller", "shop", "shop_seller", "service_provider", "delivery_partner"];
+const businessRoles = ["seller", "shop", "service_provider", "delivery_partner"];
 
 function publicUser(user) {
   if (!user) return null;

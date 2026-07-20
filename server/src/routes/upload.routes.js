@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, requireRoles } from "../middleware/auth.js";
 import { listingImageUpload, toPublicUploadUrl } from "../config/upload.js";
 
 const router = Router();
 
-router.post("/listing-images", requireAuth, (req, res) => {
+router.post("/listing-images", requireAuth, requireRoles("seller", "shop", "service_provider", "admin", "super_admin"), (req, res) => {
   listingImageUpload.array("images", 8)(req, res, (error) => {
     if (error) {
       return res.status(400).json({

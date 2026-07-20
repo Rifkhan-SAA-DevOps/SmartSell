@@ -208,22 +208,53 @@ export async function requestPayout(user, payload) {
     throw new Error("Payment account details are required.");
   }
 
-  const summary = await getFinanceSummary(user);
-  if (amount > summary.stats.availableBalance) {
-    throw new Error(`Requested amount is higher than available balance Rs. ${summary.stats.availableBalance.toLocaleString("en-LK")}.`);
-  }
+  const payout = await prisma.$transaction(async (tx) => {
+    const [commissions, payouts, recentDuplicate] = await Promise.all([
+      tx.commission.findMany({
+        where: { sellerId: user.id, status: "available" },
+        select: { sellerAmount: true },
+      }),
+      tx.payoutRequest.findMany({
+        where: { sellerId: user.id, status: { in: ["pending", "approved"] } },
+        select: { amount: true },
+      }),
+      tx.payoutRequest.findFirst({
+        where: {
+          sellerId: user.id,
+          amount,
+          method,
+          accountDetails,
+          status: "pending",
+          requestedAt: { gte: new Date(Date.now() - 60_000) },
+        },
+        select: { id: true },
+      }),
+    ]);
 
-  const payout = await prisma.payoutRequest.create({
-    data: {
-      sellerId: user.id,
-      amount,
-      method,
-      accountDetails,
-      note,
-      status: "pending",
-    },
-    include: { seller: true },
-  });
+    if (recentDuplicate) {
+      throw new Error("This payout request was already submitted. Please wait before trying again.");
+    }
+
+    const earned = commissions.reduce((sum, commission) => sum + toNumber(commission.sellerAmount), 0);
+    const reserved = payouts.reduce((sum, item) => sum + toNumber(item.amount), 0);
+    const availableBalance = Math.max(0, earned - reserved);
+
+    if (amount > availableBalance) {
+      throw new Error(`Requested amount is higher than available balance Rs. ${availableBalance.toLocaleString("en-LK")}.`);
+    }
+
+    return tx.payoutRequest.create({
+      data: {
+        sellerId: user.id,
+        amount,
+        method,
+        accountDetails,
+        note,
+        status: "pending",
+      },
+      include: { seller: true },
+    });
+  }, { isolationLevel: "Serializable" });
 
   return serializePayout(payout);
 }

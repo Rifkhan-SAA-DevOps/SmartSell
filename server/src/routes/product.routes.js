@@ -13,7 +13,7 @@ const router = Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const products = await listProducts(req.query);
+    const products = await listProducts({ ...req.query, status: "approved" });
     res.json({ success: true, data: products });
   } catch (error) {
     next(error);
@@ -30,7 +30,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.post("/", requireAuth, async (req, res, next) => {
+router.post("/", requireAuth, requireRoles("seller", "shop", "admin", "super_admin"), async (req, res, next) => {
   try {
     const { name, price } = req.body;
     if (!name || price === undefined || price === "") {

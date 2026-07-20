@@ -70,18 +70,18 @@ export default function App() {
             <Route path="/my-reviews" element={<ProtectedRoute><MyReviews /></ProtectedRoute>} />
             <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
-            <Route path="/seller-hub" element={<ProtectedRoute roles={["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"]}><SellerHub /></ProtectedRoute>} />
+            <Route path="/seller-hub" element={<ProtectedRoute roles={["seller", "shop", "service_provider", "admin", "super_admin"]}><SellerHub /></ProtectedRoute>} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<ProtectedRoute roles={["customer", "admin", "super_admin"]}><Checkout /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-            <Route path="/business" element={<ProtectedRoute roles={["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"]}><BusinessDashboard /></ProtectedRoute>} />
+            <Route path="/business" element={<ProtectedRoute roles={["seller", "shop", "service_provider", "admin", "super_admin"]}><BusinessDashboard /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute roles={["admin", "super_admin"]}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/fulfillment" element={<ProtectedRoute roles={["admin", "super_admin"]}><Fulfillment /></ProtectedRoute>} />
             <Route path="/delivery" element={<ProtectedRoute roles={["delivery_partner", "admin", "super_admin"]}><DeliveryDashboard /></ProtectedRoute>} />
-            <Route path="/earnings" element={<ProtectedRoute roles={["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"]}><Earnings /></ProtectedRoute>} />
+            <Route path="/earnings" element={<ProtectedRoute roles={["seller", "shop", "service_provider", "admin", "super_admin"]}><Earnings /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
             <Route path="/promotions" element={<ProtectedRoute roles={["admin", "super_admin"]}><PromotionCenter /></ProtectedRoute>} />
@@ -94,9 +94,9 @@ export default function App() {
             <Route path="/content" element={<ProtectedRoute roles={["admin", "super_admin"]}><ContentManagement /></ProtectedRoute>} />
             <Route path="/seo" element={<ProtectedRoute roles={["admin", "super_admin"]}><SEOSettings /></ProtectedRoute>} />
             <Route path="/security" element={<ProtectedRoute roles={["admin", "super_admin"]}><SecurityCenter /></ProtectedRoute>} />
-            <Route path="/inventory" element={<ProtectedRoute roles={["seller", "shop", "shop_seller", "admin", "super_admin"]}><InventoryCenter /></ProtectedRoute>} />
-            <Route path="/catalog-advanced" element={<ProtectedRoute roles={["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"]}><AdvancedCatalog /></ProtectedRoute>} />
-            <Route path="/gallery-management" element={<ProtectedRoute roles={["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"]}><GalleryManagement /></ProtectedRoute>} />
+            <Route path="/inventory" element={<ProtectedRoute roles={["seller", "shop", "admin", "super_admin"]}><InventoryCenter /></ProtectedRoute>} />
+            <Route path="/catalog-advanced" element={<ProtectedRoute roles={["seller", "shop", "service_provider", "admin", "super_admin"]}><AdvancedCatalog /></ProtectedRoute>} />
+            <Route path="/gallery-management" element={<ProtectedRoute roles={["seller", "shop", "service_provider", "admin", "super_admin"]}><GalleryManagement /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

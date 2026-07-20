@@ -7,7 +7,7 @@ const router = Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const services = await listServices(req.query);
+    const services = await listServices({ ...req.query, status: "approved" });
     res.json({ success: true, data: services });
   } catch (error) {
     next(error);
@@ -24,7 +24,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.post("/", requireAuth, async (req, res, next) => {
+router.post("/", requireAuth, requireRoles("service_provider", "admin", "super_admin"), async (req, res, next) => {
   try {
     const { title } = req.body;
     if (!title) return next(httpError(400, "Service title is required."));

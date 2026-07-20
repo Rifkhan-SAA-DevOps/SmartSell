@@ -101,7 +101,7 @@ router.get("/overview", async (_req, res, next) => {
     ]);
 
     const assignees = users
-      .filter((user) => ["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"].includes(user.role) && user.status !== "blocked")
+      .filter((user) => ["seller", "shop", "service_provider", "admin", "super_admin"].includes(user.role) && user.status === "active")
       .map((user) => ({
         value: user.email,
         label: `${user.businessName || user.name} (${user.role.replaceAll("_", " ")})`,

@@ -151,7 +151,9 @@ export default function SellerHub() {
   const [serviceFiles, setServiceFiles] = useState([]);
   const [productStatus, setProductStatus] = useState("");
   const [serviceStatus, setServiceStatus] = useState("");
-  const canSubmitProducts = ["seller", "shop", "shop_seller", "admin", "super_admin"].includes(user?.role);
+  const [productSubmitting, setProductSubmitting] = useState(false);
+  const [serviceSubmitting, setServiceSubmitting] = useState(false);
+  const canSubmitProducts = ["seller", "shop", "admin", "super_admin"].includes(user?.role);
   const canSubmitServices = ["service_provider", "admin", "super_admin"].includes(user?.role);
   const [activeType, setActiveType] = useState(() => user?.role === "service_provider" ? "service" : "product");
 
@@ -172,6 +174,8 @@ export default function SellerHub() {
 
   async function submitProduct(event) {
     event.preventDefault();
+    if (productSubmitting) return;
+    setProductSubmitting(true);
     setProductStatus("Uploading images and submitting product...");
     try {
       const uploadedUrls = await uploadListingImages(productFiles);
@@ -183,12 +187,16 @@ export default function SellerHub() {
       event.currentTarget.reset();
       setProductStatus(data.message || "Product submitted for admin approval.");
     } catch (error) {
-      setProductStatus(error.response?.data?.message || "Failed to submit product.");
+      setProductStatus(error.smartSellMessage || error.response?.data?.message || "Failed to submit product.");
+    } finally {
+      setProductSubmitting(false);
     }
   }
 
   async function submitService(event) {
     event.preventDefault();
+    if (serviceSubmitting) return;
+    setServiceSubmitting(true);
     setServiceStatus("Uploading images and submitting service...");
     try {
       const uploadedUrls = await uploadListingImages(serviceFiles);
@@ -200,7 +208,9 @@ export default function SellerHub() {
       event.currentTarget.reset();
       setServiceStatus(data.message || "Service submitted for admin approval.");
     } catch (error) {
-      setServiceStatus(error.response?.data?.message || "Failed to submit service.");
+      setServiceStatus(error.smartSellMessage || error.response?.data?.message || "Failed to submit service.");
+    } finally {
+      setServiceSubmitting(false);
     }
   }
 
@@ -270,7 +280,7 @@ export default function SellerHub() {
                   </section>
 
                   {productStatus && <p className="business-form-message-v2">{productStatus}</p>}
-                  <div className="listing-submit-row-v2"><span><BusinessIcon name="check" size={17} />Your listing will be sent for approval.</span><button className="business-primary-button-v2" type="submit" disabled={!canSubmitProducts}><BusinessIcon name="add" size={17} />Submit product</button></div>
+                  <div className="listing-submit-row-v2"><span><BusinessIcon name="check" size={17} />Your listing will be sent for approval.</span><button className="business-primary-button-v2" type="submit" disabled={!canSubmitProducts || productSubmitting}><BusinessIcon name="add" size={17} />{productSubmitting ? "Submitting..." : "Submit product"}</button></div>
                 </form>
               ) : (
                 <form className="listing-form-v2" onSubmit={submitService}>
@@ -306,7 +316,7 @@ export default function SellerHub() {
                   </section>
 
                   {serviceStatus && <p className="business-form-message-v2">{serviceStatus}</p>}
-                  <div className="listing-submit-row-v2"><span><BusinessIcon name="check" size={17} />Your listing will be sent for approval.</span><button className="business-primary-button-v2" type="submit" disabled={!canSubmitServices}><BusinessIcon name="add" size={17} />Submit service</button></div>
+                  <div className="listing-submit-row-v2"><span><BusinessIcon name="check" size={17} />Your listing will be sent for approval.</span><button className="business-primary-button-v2" type="submit" disabled={!canSubmitServices || serviceSubmitting}><BusinessIcon name="add" size={17} />{serviceSubmitting ? "Submitting..." : "Submit service"}</button></div>
                 </form>
               )}
             </main>

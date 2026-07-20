@@ -2,9 +2,9 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const ADMIN_ROLES = ["admin", "super_admin"];
-const BUSINESS_ROLES = ["seller", "shop", "shop_seller", "service_provider"];
+const BUSINESS_ROLES = ["seller", "shop", "service_provider"];
 const DELIVERY_ROLES = ["delivery_partner"];
-const PRODUCT_SELLER_ROLES = ["seller", "shop", "shop_seller"];
+const PRODUCT_SELLER_ROLES = ["seller", "shop"];
 
 const icons = {
   overview: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",

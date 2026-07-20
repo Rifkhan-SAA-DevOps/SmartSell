@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import { seedPhase134DemoData } from "./demo-data-phase134.js";
 
 const prisma = new PrismaClient();
 
@@ -851,9 +852,10 @@ async function main() {
   await seedFinance({ orders, products, sellerUsers: userGroups.sellerUsers });
   await seedCommunicationSupport({ customers: userGroups.customers, sellerUsers: userGroups.sellerUsers, admin: userGroups.admin, orders });
   await seedCouponsSettingsAdminActions({ admin: userGroups.admin, superAdmin: userGroups.superAdmin, products, services });
+  await seedPhase134DemoData(prisma, { admin: userGroups.admin, superAdmin: userGroups.superAdmin });
   await printCounts();
 
-  console.log("\nSmartSell full demo seed completed.");
+  console.log("\nSmartSell realistic multi-page demo seed completed.");
   console.log("Demo admin: admin@smartsell.local / Admin@12345");
   console.log("Demo customer: customer1@smartsell.local / Customer@12345");
   console.log("Demo seller: seller1@smartsell.local / Seller@12345");

@@ -11,7 +11,8 @@
     "prisma:studio": "prisma studio",
     "db:seed": "node prisma/seed.js",
     "db:reset": "prisma migrate reset",
-    "check": "npm --prefix .. run check"
+    "check": "npm --prefix .. run check",
+    "db:verify": "node prisma/verify-demo-data.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

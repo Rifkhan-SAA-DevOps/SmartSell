@@ -25,7 +25,7 @@ router.get("/", async (req, res, next) => {
 });
 
 
-router.get("/business", requireAuth, requireRoles("seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"), async (req, res, next) => {
+router.get("/business", requireAuth, requireRoles("seller", "shop", "service_provider", "admin", "super_admin"), async (req, res, next) => {
   try {
     const reviews = await listBusinessReviews(req.user);
     res.json({ success: true, data: reviews });

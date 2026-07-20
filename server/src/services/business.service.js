@@ -19,6 +19,11 @@ function approvalStatusToDb(status) {
   return allowed.includes(normalized) ? normalized : undefined;
 }
 
+function ownerListingStatus(status) {
+  const normalized = approvalStatusToDb(status);
+  return ["draft", "pending", "archived"].includes(normalized) ? normalized : undefined;
+}
+
 function productConditionToDb(condition) {
   const normalized = String(condition || "").replaceAll("-", "_");
   const allowed = ["new", "like_new", "good", "used", "needs_repair"];
@@ -177,6 +182,30 @@ function requestStatusToDb(status) {
   return allowed.includes(normalized) ? normalized : undefined;
 }
 
+const BUSINESS_REQUEST_TRANSITIONS = {
+  new: ["accepted", "cancelled"],
+  pending: ["accepted", "cancelled"],
+  quoted: ["accepted", "cancelled"],
+  accepted: ["in_progress", "cancelled"],
+  in_progress: ["completed", "cancelled"],
+  completed: [],
+  cancelled: [],
+};
+
+function assertBusinessRequestTransition(currentStatus, nextStatus, user) {
+  if (isAdmin(user)) return;
+  if (currentStatus === nextStatus) {
+    throw Object.assign(new Error(`Request is already ${String(nextStatus).replaceAll("_", " ")}.`), { statusCode: 409 });
+  }
+  const allowed = BUSINESS_REQUEST_TRANSITIONS[currentStatus] || [];
+  if (!allowed.includes(nextStatus)) {
+    throw Object.assign(
+      new Error(`Request cannot move from ${String(currentStatus).replaceAll("_", " ")} to ${String(nextStatus).replaceAll("_", " ")}.`),
+      { statusCode: 409 }
+    );
+  }
+}
+
 export async function getBusinessOverview(user) {
   if (!canManageBusiness(user)) {
     throw Object.assign(new Error("Business dashboard is available only for sellers, shops, service providers, and admins."), { statusCode: 403 });
@@ -309,7 +338,7 @@ export async function updateOwnProduct(productId, payload, user) {
   const product = await findOwnedProduct(productId, user);
   if (!product) return null;
 
-  const nextStatus = approvalStatusToDb(payload.status);
+  const nextStatus = isAdmin(user) ? approvalStatusToDb(payload.status) : ownerListingStatus(payload.status);
   const price = normalizeMoney(payload.price);
   const stock = normalizeStock(payload.stock);
   const condition = productConditionToDb(payload.condition);
@@ -343,7 +372,7 @@ export async function updateOwnService(serviceId, payload, user) {
   const service = await findOwnedService(serviceId, user);
   if (!service) return null;
 
-  const nextStatus = approvalStatusToDb(payload.status);
+  const nextStatus = isAdmin(user) ? approvalStatusToDb(payload.status) : ownerListingStatus(payload.status);
   const priceFrom = normalizeMoney(payload.priceFrom);
 
   const data = {
@@ -393,6 +422,8 @@ export async function updateAssignedRequestStatus(requestId, payload, user) {
 
   const existing = await prisma.customRequest.findFirst({ where });
   if (!existing) return null;
+
+  assertBusinessRequestTransition(existing.status, status, user);
 
   const request = await prisma.customRequest.update({
     where: { id: requestId },

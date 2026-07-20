@@ -5,7 +5,7 @@ function isAdmin(user) {
 }
 
 function isProductBusinessRole(user) {
-  return ["seller", "shop", "shop_seller"].includes(user?.role);
+  return ["seller", "shop"].includes(user?.role);
 }
 
 function isServiceBusinessRole(user) {

@@ -22,7 +22,7 @@ const roleLabels = {
   super_admin: "Super administrator",
 };
 
-const businessRoles = ["seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"];
+const businessRoles = ["seller", "shop", "service_provider", "admin", "super_admin"];
 
 function emptyProfileForm() {
   return { name: "", phone: "", businessName: "", shopName: "", location: "", description: "" };

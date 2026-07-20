@@ -5,9 +5,9 @@ import Sidebar from "./Sidebar.jsx";
 import Footer from "./Footer.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const MANAGEMENT_ROLES = ["seller", "shop", "shop_seller", "service_provider", "delivery_partner", "admin", "super_admin"];
+const MANAGEMENT_ROLES = ["seller", "shop", "service_provider", "delivery_partner", "admin", "super_admin"];
 const ADMIN_ROLES = ["admin", "super_admin"];
-const BUSINESS_ROLES = ["seller", "shop", "shop_seller", "service_provider"];
+const BUSINESS_ROLES = ["seller", "shop", "service_provider"];
 const DELIVERY_ROLES = ["delivery_partner"];
 
 const SHARED_MANAGEMENT_PATHS = ["/dashboard", "/profile", "/notifications", "/inbox", "/support"];

@@ -142,36 +142,48 @@ export function AdminInfoGrid({ items }) {
 }
 
 export function useAdminPagination(items = [], pageSize = 10, resetKeys = []) {
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(pageSize);
-  const totalPages = Math.max(1, Math.ceil(items.length / size));
+  const safeItems = Array.isArray(items) ? items : [];
+  const initialSize = Number(pageSize) > 0 ? Number(pageSize) : 10;
+  const resetKey = useMemo(() => {
+    try { return JSON.stringify(resetKeys); } catch { return String(resetKeys); }
+  }, [resetKeys]);
+  const [page, setPageState] = useState(1);
+  const [size, setSizeState] = useState(initialSize);
+  const totalPages = Math.max(1, Math.ceil(safeItems.length / size));
+  const safePage = Math.min(page, totalPages);
 
   useEffect(() => {
-    setPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, resetKeys);
+    setPageState(1);
+  }, [resetKey]);
 
   useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
+    if (page > totalPages) setPageState(totalPages);
   }, [page, totalPages]);
 
   const pageItems = useMemo(() => {
-    const start = (page - 1) * size;
-    return items.slice(start, start + size);
-  }, [items, page, size]);
+    const start = (safePage - 1) * size;
+    return safeItems.slice(start, start + size);
+  }, [safeItems, safePage, size]);
+
+  const setPage = (nextPage) => {
+    const normalized = Math.min(Math.max(1, Number(nextPage) || 1), totalPages);
+    setPageState(normalized);
+  };
 
   return {
-    page,
+    page: safePage,
     setPage,
     size,
     setSize: (next) => {
-      setSize(Number(next));
-      setPage(1);
+      const normalized = Number(next);
+      setSizeState(Number.isFinite(normalized) && normalized > 0 ? normalized : 10);
+      setPageState(1);
     },
+    resetPage: () => setPageState(1),
     totalPages,
-    total: items.length,
-    start: items.length ? (page - 1) * size + 1 : 0,
-    end: Math.min(page * size, items.length),
+    total: safeItems.length,
+    start: safeItems.length ? (safePage - 1) * size + 1 : 0,
+    end: Math.min(safePage * size, safeItems.length),
     items: pageItems,
   };
 }

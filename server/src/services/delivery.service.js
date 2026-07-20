@@ -4,6 +4,14 @@ import { httpError } from "../utils/httpError.js";
 const ADMIN_ROLES = ["admin", "super_admin"];
 const DELIVERY_ROLES = ["delivery_partner"];
 const DELIVERY_STATUSES = ["not_assigned", "assigned", "picked_up", "on_the_way", "delivered", "failed"];
+const DELIVERY_TRANSITIONS = {
+  assigned: ["picked_up", "failed"],
+  picked_up: ["on_the_way", "failed"],
+  on_the_way: ["delivered", "failed"],
+  not_assigned: [],
+  delivered: [],
+  failed: [],
+};
 
 function isAdmin(user) {
   return ADMIN_ROLES.includes(user?.role);
@@ -48,7 +56,7 @@ export async function listDeliveryPartners(currentUser) {
   if (!isAdmin(currentUser)) throw httpError(403, "Admin access is required.");
 
   return prisma.user.findMany({
-    where: { role: "delivery_partner", status: { not: "blocked" } },
+    where: { role: "delivery_partner", status: "active" },
     select: { id: true, name: true, email: true, phone: true, businessName: true, status: true, createdAt: true },
     orderBy: [{ status: "asc" }, { name: "asc" }],
   });
@@ -114,11 +122,14 @@ export async function assignDeliveryPartner(currentUser, orderId, payload) {
     if (!partner || partner.role !== "delivery_partner") {
       throw httpError(400, "Selected user is not a delivery partner.");
     }
-    if (partner.status === "blocked") throw httpError(400, "This delivery partner is blocked.");
+    if (partner.status !== "active") throw httpError(400, "Only active delivery partners can receive assignments.");
   }
 
   const order = await prisma.order.findUnique({ where: { id: orderId }, include: { customer: true } });
   if (!order) throw httpError(404, "Order was not found.");
+  if (["delivered", "cancelled"].includes(order.status) || order.deliveryStatus === "delivered") {
+    throw httpError(409, "A completed or cancelled order cannot be assigned for delivery.");
+  }
 
   const nextStatus = deliveryPartnerId ? "assigned" : "not_assigned";
   const updated = await prisma.order.update({
@@ -184,6 +195,17 @@ export async function updateDeliveryTaskStatus(currentUser, orderId, payload) {
 
   if (isDeliveryPartner(currentUser) && order.deliveryPartnerId !== currentUser.id) {
     throw httpError(403, "You can only update delivery tasks assigned to you.");
+  }
+
+  if (order.deliveryStatus === status) {
+    throw httpError(409, `Delivery is already ${status.replaceAll("_", " ")}.`);
+  }
+
+  if (isDeliveryPartner(currentUser)) {
+    const allowed = DELIVERY_TRANSITIONS[order.deliveryStatus] || [];
+    if (!allowed.includes(status)) {
+      throw httpError(409, `Delivery cannot move from ${order.deliveryStatus.replaceAll("_", " ")} to ${status.replaceAll("_", " ")}.`);
+    }
   }
 
   const data = {

@@ -168,6 +168,6 @@ function BusinessOffersView({ user }) {
 
 export default function Offers() {
   const { user } = useAuth();
-  const sellerMode = ["seller", "shop", "shop_seller"].includes(user?.role);
+  const sellerMode = ["seller", "shop"].includes(user?.role);
   return sellerMode ? <BusinessOffersView user={user} /> : <CustomerOffersView user={user} />;
 }
