@@ -24,6 +24,7 @@ import {
   BusinessStatusBadge,
 } from "../components/BusinessWorkspaceUi.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import useDebouncedValue from "../hooks/useDebouncedValue.js";
 import useSmartPagination from "../hooks/useSmartPagination.js";
 import api from "../utils/api.js";
 import "../styles/pages/business/BusinessWorkspace.css";
@@ -85,28 +86,36 @@ function CustomerOffersView({ user }) {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
   const [error, setError] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 280);
 
-  async function loadOffers() {
+  async function loadOffers(nextSearch = debouncedSearch) {
     try {
       setLoading(true);
       setError("");
-      const { data } = await api.get("/offers", { params: { status, q: search } });
+      const { data } = await api.get("/offers", { params: { status, q: nextSearch } });
       setOffers(data.data || []);
     } catch (err) {
       setError(err.response?.data?.message || "Offers could not be loaded.");
     } finally { setLoading(false); }
   }
-  useEffect(() => { loadOffers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [status]);
+  useEffect(() => { loadOffers(debouncedSearch); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [status, debouncedSearch]);
   const stats = useMemo(() => ({ pending: offers.filter((offer) => offer.status === "pending").length, countered: offers.filter((offer) => offer.status === "countered").length, accepted: offers.filter((offer) => offer.status === "accepted").length }), [offers]);
-  const pagination = useSmartPagination(offers, { initialPageSize: 10, resetKey: `${status}-${search}` });
+  const orderedOffers = useMemo(() => [...offers].sort((left, right) => {
+    if (sort === "oldest") return new Date(left.createdAt || 0) - new Date(right.createdAt || 0);
+    if (sort === "amount_high") return Number(right.offeredAmount || 0) - Number(left.offeredAmount || 0);
+    if (sort === "amount_low") return Number(left.offeredAmount || 0) - Number(right.offeredAmount || 0);
+    return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+  }), [offers, sort]);
+  const pagination = useSmartPagination(orderedOffers, { initialPageSize: 10, resetKey: `${status}-${debouncedSearch}-${sort}` });
   function handleUpdatedOffer(nextOffer) { setOffers((current) => current.map((offer) => offer.id === nextOffer.id ? nextOffer : offer)); setSelected(nextOffer); }
 
   return (
     <section className="ca-account-page ca-offers-page">
       <AccountPageHeader eyebrow="Negotiation center" title="Product offers" description="Review every offer in a clean list, then open it to see pricing, messages, and available actions." icon="money" actions={<Link className="ca-button ca-button--soft" to="/marketplace">Browse negotiable products</Link>} />
       <AccountStatGrid items={[{ label: "All offers", value: offers.length, note: "Current search result", icon: "money", tone: "cyan" }, { label: "Pending", value: stats.pending, note: "Awaiting a response", icon: "activity", tone: "violet" }, { label: "Countered", value: stats.countered, note: "Price updated", icon: "arrow", tone: "amber" }, { label: "Accepted", value: stats.accepted, note: "Agreed offers", icon: "check", tone: "emerald" }]} />
-      <AccountToolbar resultText={`${offers.length} offer${offers.length === 1 ? "" : "s"}`} actions={<button className="ca-button ca-button--primary" type="button" onClick={loadOffers}>Search</button>}><AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search offer number, customer, phone, product..." /><label className="ca-select-filter"><AccountIcon name="filter" size={17} /><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="pending">Pending</option><option value="countered">Countered</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select></label></AccountToolbar>
+      <AccountToolbar resultText={`${orderedOffers.length} offer${orderedOffers.length === 1 ? "" : "s"}`}><AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search offer number, customer, phone, product..." /><label className="ca-select-filter"><AccountIcon name="filter" size={17} /><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="pending">Pending</option><option value="countered">Countered</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select></label><label className="ca-select-filter"><AccountIcon name="arrow" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort offers"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount_high">Highest offer</option><option value="amount_low">Lowest offer</option></select></label></AccountToolbar>
       {error && <div className="ca-alert ca-alert--error">{error}</div>}
       {loading ? <div className="ca-loading">Loading offers...</div> : offers.length === 0 ? <AccountEmpty icon="money" title="No offers found" text="Customer offers for negotiable products will appear here." actionLabel="Browse marketplace" actionTo="/marketplace" /> : <><div className="ca-record-grid ca-offer-grid">{pagination.items.map((offer) => <article className="ca-summary-card tone-emerald" key={offer.id} role="button" tabIndex="0" onClick={() => setSelected(offer)} onKeyDown={(event) => (event.key === "Enter" || event.key === " ") && setSelected(offer)}><div className="ca-offer-product"><div className="ca-offer-product__image">{offer.product?.image ? <img src={offer.product.image} alt={offer.product.name} /> : <AccountIcon name="box" size={24} />}</div><div><small>{offer.offerNo}</small><h3>{offer.product?.name || "Product"}</h3><p>{offer.product?.location || "Sri Lanka"}</p></div><AccountStatus value={offer.status} label={readable(offer.status)} /></div><div className="ca-summary-card__values ca-offer-values"><span>Listed <b>{formatMoney(offer.product?.price)}</b></span><span>Your offer <b>{formatMoney(offer.offeredAmount)}</b></span><span>Counter <b>{offer.counterAmount ? formatMoney(offer.counterAmount) : "—"}</b></span></div><div className="ca-summary-card__footer"><span>{offer.customerName || "Customer"}</span><b>Open offer <AccountIcon name="chevron" size={15} /></b></div></article>)}</div><SmartPagination pagination={pagination} label="offers" compact /></>}
       <AccountModal open={Boolean(selected)} onClose={() => setSelected(null)} title={selected?.product?.name || "Offer details"} eyebrow={selected?.offerNo || "Offer"} icon="money" size="large">{selected && <><div className="ca-modal-summary-row"><div><span>Status</span><AccountStatus value={selected.status} label={readable(selected.status)} /></div><div><span>Your offer</span><strong>{formatMoney(selected.offeredAmount)}</strong></div><div><span>Counter</span><strong>{selected.counterAmount ? formatMoney(selected.counterAmount) : "Not sent"}</strong></div></div><section className="ca-modal-section"><h3>Price comparison</h3><div className="ca-price-comparison"><div><small>Listed price</small><strong>{formatMoney(selected.product?.price)}</strong></div><div className="is-highlight"><small>Customer offer</small><strong>{formatMoney(selected.offeredAmount)}</strong></div><div><small>Counter offer</small><strong>{selected.counterAmount ? formatMoney(selected.counterAmount) : "—"}</strong></div></div></section><section className="ca-modal-section"><h3>Offer information</h3><AccountDetailGrid items={[{ label: "Customer", value: selected.customerName || "Not set" }, { label: "Customer phone", value: selected.customerPhone || "Not set" }, { label: "Seller", value: selected.seller?.businessName || selected.seller?.name || "SmartSell seller" }, { label: "Seller contact", value: selected.seller?.phone || selected.seller?.email || "Not set" }, { label: "Created", value: formatDate(selected.createdAt) }, { label: "Condition", value: readable(selected.product?.condition || "Not set") }]} /></section>{selected.message && <div className="ca-note"><strong>Customer note</strong><p>{selected.message}</p></div>}{selected.sellerNote && <div className="ca-note ca-note--accent"><strong>Seller note</strong><p>{selected.sellerNote}</p></div>}<div className="ca-modal-actions"><Link className="ca-button ca-button--soft" to={`/products/${selected.productId}`} onClick={() => setSelected(null)}>View product</Link><ContextMessageButton contextType="offer" contextId={selected.id} subject={`Offer discussion: ${selected.offerNo}`} message={`Hi, I want to discuss offer ${selected.offerNo} for ${selected.product?.name || "this product"}.`} label="Open conversation" className="ca-button ca-button--primary" /></div><CustomerOfferActionPanel offer={selected} user={user} onUpdate={handleUpdatedOffer} /></>}</AccountModal>
@@ -136,6 +145,7 @@ function BusinessOffersView({ user }) {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
   const [error, setError] = useState("");
 
   async function loadOffers() {
@@ -147,17 +157,23 @@ function BusinessOffersView({ user }) {
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return offers.filter((offer) => !query || `${offer.offerNo} ${offer.product?.name} ${offer.customerName} ${offer.customerPhone}`.toLowerCase().includes(query));
-  }, [offers, search]);
+    const result = offers.filter((offer) => !query || `${offer.offerNo} ${offer.product?.name} ${offer.customerName} ${offer.customerPhone}`.toLowerCase().includes(query));
+    return [...result].sort((left, right) => {
+      if (sort === "oldest") return new Date(left.createdAt || 0) - new Date(right.createdAt || 0);
+      if (sort === "amount_high") return Number(right.offeredAmount || 0) - Number(left.offeredAmount || 0);
+      if (sort === "amount_low") return Number(left.offeredAmount || 0) - Number(right.offeredAmount || 0);
+      return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+    });
+  }, [offers, search, sort]);
   const stats = useMemo(() => ({ pending: offers.filter((item) => item.status === "pending").length, countered: offers.filter((item) => item.status === "countered").length, accepted: offers.filter((item) => item.status === "accepted").length }), [offers]);
-  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${status}-${search}` });
+  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${status}-${search}-${sort}` });
   function updateOffer(next) { setOffers((current) => current.map((item) => item.id === next.id ? next : item)); setSelected(next); }
 
   return <section className="business-workspace-v2 business-management-v2 business-offers-v2">
     <BusinessPageHeader eyebrow="Sales negotiation" title="Product offers" description="Review customer price proposals, compare them with your listed price, and keep every negotiation action inside one clean detail view." meta={<><span><BusinessIcon name="tag" size={15} />{user?.businessName || user?.name || "Your store"}</span><span><BusinessIcon name="clock" size={15} />{stats.pending} awaiting response</span></>} actions={<><Link className="business-ghost-button-v2" to="/business"><BusinessIcon name="briefcase" size={17} />Business overview</Link><button className="business-primary-button-v2" type="button" onClick={loadOffers}><BusinessIcon name="refresh" size={17} />Refresh</button></>} />
     {error && <div className="business-error-v2"><strong>Offers could not load</strong><p>{error}</p></div>}
     <div className="business-metrics-grid-v2"><BusinessMetricCard icon="tag" label="All offers" value={offers.length} note="Current negotiation records" tone="blue" /><BusinessMetricCard icon="clock" label="Pending" value={stats.pending} note="Need your response" tone="violet" /><BusinessMetricCard icon="arrow" label="Countered" value={stats.countered} note="Revised price sent" tone="amber" /><BusinessMetricCard icon="check" label="Accepted" value={stats.accepted} note="Agreed customer offers" tone="emerald" /></div>
-    <section className="business-content-panel-v2 bm-management-panel-v2"><div className="business-tab-content-v2"><BusinessSearchToolbar value={search} onChange={setSearch} placeholder="Search offer, product, customer, or phone" filter={<select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="pending">Pending</option><option value="countered">Countered</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select>}><button className="business-secondary-button-v2" type="button" onClick={loadOffers}>Search</button></BusinessSearchToolbar>
+    <section className="business-content-panel-v2 bm-management-panel-v2"><div className="business-tab-content-v2"><BusinessSearchToolbar value={search} onChange={setSearch} placeholder="Search offer, product, customer, or phone" filter={<select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="pending">Pending</option><option value="countered">Countered</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select>}><label className="business-filter-v2"><BusinessIcon name="arrow" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort offers"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount_high">Highest offer</option><option value="amount_low">Lowest offer</option></select></label></BusinessSearchToolbar>
       {loading ? <div className="business-loading-v2"><span /><p>Loading customer offers...</p></div> : !filtered.length ? <BusinessEmptyState icon="tag" title="No offers found" description={offers.length ? "Change the search term or status filter." : "Offers on negotiable products will appear here."} /> : <div className="bm-offer-list-v2">{pagination.items.map((offer) => <article className="bm-offer-row-v2" key={offer.id} role="button" tabIndex="0" onClick={() => setSelected(offer)} onKeyDown={(event) => (event.key === "Enter" || event.key === " ") && setSelected(offer)}><div className="bm-offer-media-v2">{offer.product?.image ? <img src={offer.product.image} alt={offer.product?.name || "Product"} /> : <BusinessIcon name="box" size={26} />}</div><div className="bm-row-main-v2"><div><div><small>{offer.offerNo}</small><h3>{offer.product?.name || "Product"}</h3></div><BusinessStatusBadge status={offer.status} /></div><p>{offer.customerName || "Customer"} · {offer.customerPhone || "No phone"}</p><div className="bm-price-strip-v2"><span>Listed <b>{formatMoney(offer.product?.price)}</b></span><span>Customer offer <b>{formatMoney(offer.offeredAmount)}</b></span><span>Counter <b>{offer.counterAmount ? formatMoney(offer.counterAmount) : "Not sent"}</b></span></div></div><BusinessIcon name="chevron" size={18} /></article>)}<SmartPagination pagination={pagination} label="offers" /></div>}
     </div></section>
     <BusinessModal open={Boolean(selected)} title={selected?.product?.name || "Offer details"} eyebrow={selected?.offerNo || "Customer offer"} onClose={() => setSelected(null)}>

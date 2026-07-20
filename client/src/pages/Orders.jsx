@@ -111,6 +111,7 @@ export default function Orders() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
+  const [sort, setSort] = useState("newest");
 
   useEffect(() => {
     let cancelled = false;
@@ -137,15 +138,21 @@ export default function Orders() {
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return orders.filter((order) => {
+    const result = orders.filter((order) => {
       const matchesStatus = status === "all" || order.status === status;
       const matchesSearch = !query || [order.orderNo, order.deliveryName, order.deliveryPhone, order.trackingNumber]
         .some((value) => String(value || "").toLowerCase().includes(query));
       return matchesStatus && matchesSearch;
     });
-  }, [orders, search, status]);
+    return [...result].sort((left, right) => {
+      if (sort === "oldest") return new Date(left.createdAt || 0) - new Date(right.createdAt || 0);
+      if (sort === "amount_high") return Number(right.totalAmount || 0) - Number(left.totalAmount || 0);
+      if (sort === "amount_low") return Number(left.totalAmount || 0) - Number(right.totalAmount || 0);
+      return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+    });
+  }, [orders, search, status, sort]);
 
-  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${search}-${status}` });
+  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${search}-${status}-${sort}` });
 
   return (
     <section className="ca-account-page ca-orders-page">
@@ -173,6 +180,12 @@ export default function Orders() {
           <option value="ready">Ready</option>
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
+        </select></label>
+        <label className="ca-select-filter"><AccountIcon name="arrow" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort orders">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="amount_high">Highest value</option>
+          <option value="amount_low">Lowest value</option>
         </select></label>
       </AccountToolbar>
 

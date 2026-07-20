@@ -57,6 +57,7 @@ export default function ListingManagement() {
   const [success, setSuccess] = useState("");
   const [tab, setTab] = useState("all");
   const [filters, setFilters] = useState({ q: "", status: "all", featured: "all" });
+  const [sort, setSort] = useState("newest");
   const [selected, setSelected] = useState(null);
 
   async function loadListings() {
@@ -115,8 +116,14 @@ export default function ListingManagement() {
   const records = useMemo(() => {
     const products = (tab === "all" || tab === "products") ? (data.products || []).map((item) => getListingRecord("product", item)) : [];
     const services = (tab === "all" || tab === "services") ? (data.services || []).map((item) => getListingRecord("service", item)) : [];
-    return [...products, ...services].sort((a, b) => new Date(b.item.createdAt || 0) - new Date(a.item.createdAt || 0));
-  }, [data, tab]);
+    return [...products, ...services].sort((left, right) => {
+      if (sort === "oldest") return new Date(left.item.createdAt || 0) - new Date(right.item.createdAt || 0);
+      if (sort === "price_high") return Number(right.price || 0) - Number(left.price || 0);
+      if (sort === "price_low") return Number(left.price || 0) - Number(right.price || 0);
+      if (sort === "owner") return String(left.owner || "").localeCompare(String(right.owner || ""));
+      return new Date(right.item.createdAt || 0) - new Date(left.item.createdAt || 0);
+    });
+  }, [data, tab, sort]);
 
   const stats = useMemo(() => {
     const all = [
@@ -133,7 +140,7 @@ export default function ListingManagement() {
     };
   }, [data]);
 
-  const pagination = useAdminPagination(records, 10, [tab, filters.q, filters.status, filters.featured]);
+  const pagination = useAdminPagination(records, 10, [tab, filters.q, filters.status, filters.featured, sort]);
   const selectedBusy = selected ? busyKey.startsWith(`${selected.type}:${selected.item.id}`) : false;
 
   return (
@@ -176,6 +183,7 @@ export default function ListingManagement() {
               <option value="all">All visibility</option>
               <option value="true">Featured only</option>
             </select>
+            <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort listings"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="price_high">Highest price</option><option value="price_low">Lowest price</option><option value="owner">Owner A–Z</option></select>
           </>
         )}
         actions={(

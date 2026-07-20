@@ -37,6 +37,7 @@ export default function Storefronts() {
   const [type, setType] = useState("all");
   const [q, setQ] = useState("");
   const [location, setLocation] = useState("");
+  const [sort, setSort] = useState("recommended");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -78,9 +79,17 @@ export default function Storefronts() {
     providers: storefronts.filter((item) => item.kind === "provider").length,
   }), [storefronts]);
 
-  const pagination = useSmartPagination(storefronts, {
+  const sortedStorefronts = useMemo(() => [...storefronts].sort((left, right) => {
+    if (sort === "rating") return Number(right.ratingAverage || 0) - Number(left.ratingAverage || 0);
+    if (sort === "listings") return Number(right.listingCount || 0) - Number(left.listingCount || 0);
+    if (sort === "name") return String(left.name || "").localeCompare(String(right.name || ""));
+    return Number(right.isFeatured || 0) - Number(left.isFeatured || 0)
+      || Number(right.ratingAverage || 0) - Number(left.ratingAverage || 0);
+  }), [storefronts, sort]);
+
+  const pagination = useSmartPagination(sortedStorefronts, {
     initialPageSize: 10,
-    resetKey: `${type}|${q}|${location}`,
+    resetKey: `${type}|${q}|${location}|${sort}`,
   });
 
   function openStorefront(event, item) {
@@ -99,6 +108,7 @@ export default function Storefronts() {
     setQ("");
     setLocation("");
     setType("all");
+    setSort("recommended");
   }
 
   return (
@@ -130,13 +140,19 @@ export default function Storefronts() {
         onChange={(event) => setQ(event.target.value)}
         placeholder="Seller, shop, cake maker, developer..."
         onReset={resetSearch}
-        showReset={Boolean(q || location || type !== "all")}
+        showReset={Boolean(q || location || type !== "all" || sort !== "recommended")}
       >
         <label className="customer-discovery-field">
           <span className="customer-discovery-field-icon"><LocationIcon /></span>
           <span className="customer-discovery-copy">
             <small>Location</small>
             <input value={location} onChange={(event) => setLocation(event.target.value)} placeholder="Any city or area" />
+          </span>
+        </label>
+        <label className="customer-discovery-field customer-discovery-sort-field">
+          <span className="customer-discovery-copy">
+            <small>Sort storefronts</small>
+            <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort storefronts"><option value="recommended">Recommended</option><option value="rating">Best rated</option><option value="listings">Most listings</option><option value="name">Name A–Z</option></select>
           </span>
         </label>
       </CustomerDiscoveryBar>

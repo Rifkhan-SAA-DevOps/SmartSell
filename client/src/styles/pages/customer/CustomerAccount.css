@@ -1768,3 +1768,20 @@
     text-align: center;
   }
 }
+
+/* Phase 135: the Inbox sort control belongs to the directory header and must
+   not inherit a full-page form width. */
+.ca-thread-panel .ca-inbox-sort {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  margin: 0;
+}
+
+.ca-thread-panel .ca-inbox-sort select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}

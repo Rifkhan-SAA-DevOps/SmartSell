@@ -1,6 +1,6 @@
 # SmartSell Route/UI Regression Audit
 
-Generated: 2026-07-20T08:30:46.755Z
+Generated: 2026-07-20T08:56:42.346Z
 Project root: `I:\SmartSell\smartsell`
 
 ✅ Root audit script configured

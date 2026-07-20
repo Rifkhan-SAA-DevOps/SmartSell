@@ -70,6 +70,7 @@ export default function Inbox() {
   const [sending, setSending] = useState(false);
   const [contextFilter, setContextFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("recent");
 
   const selectedId = searchParams.get("thread") || selectedThread?.id || "";
   const isAdmin = ["admin", "super_admin"].includes(user?.role);
@@ -77,14 +78,20 @@ export default function Inbox() {
   const contextTypes = useMemo(() => ["all", ...Array.from(new Set(threads.map((thread) => thread.contextType || "general")))], [threads]);
   const visibleThreads = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return threads.filter((thread) => {
+    const result = threads.filter((thread) => {
       const matchesContext = contextFilter === "all" || (thread.contextType || "general") === contextFilter;
       const text = `${thread.subject} ${participantName(thread, user)} ${thread.lastMessage?.body || ""}`.toLowerCase();
       return matchesContext && (!query || text.includes(query));
     });
-  }, [threads, contextFilter, search, user]);
-  const pagination = useSmartPagination(visibleThreads, { initialPageSize: 10, resetKey: `${contextFilter}-${search}` });
-  const adminPagination = useAdminPagination(visibleThreads, 10, [contextFilter, search]);
+    const activityTime = (thread) => new Date(thread.lastMessage?.createdAt || thread.updatedAt || thread.createdAt || 0).getTime();
+    return [...result].sort((left, right) => {
+      if (sort === "oldest") return activityTime(left) - activityTime(right);
+      if (sort === "unread") return Number(right.unreadCount || 0) - Number(left.unreadCount || 0) || activityTime(right) - activityTime(left);
+      return activityTime(right) - activityTime(left);
+    });
+  }, [threads, contextFilter, search, sort, user]);
+  const pagination = useSmartPagination(visibleThreads, { initialPageSize: 10, resetKey: `${contextFilter}-${search}-${sort}` });
+  const adminPagination = useAdminPagination(visibleThreads, 10, [contextFilter, search, sort]);
 
   async function loadThreads() {
     const { data } = await api.get("/communication/threads");
@@ -169,7 +176,7 @@ export default function Inbox() {
           value={search}
           onChange={setSearch}
           placeholder="Search subject, participant, or message..."
-          filters={<label className="admin-inbox-context-filter-v2"><span>Conversation type</span><select value={contextFilter} onChange={(event) => setContextFilter(event.target.value)}>{contextTypes.map((type) => <option key={type} value={type}>{type === "all" ? "All conversations" : contextLabel({ contextType: type })}</option>)}</select></label>}
+          filters={<><label className="admin-inbox-context-filter-v2"><span>Conversation type</span><select value={contextFilter} onChange={(event) => setContextFilter(event.target.value)}>{contextTypes.map((type) => <option key={type} value={type}>{type === "all" ? "All conversations" : contextLabel({ contextType: type })}</option>)}</select></label><label className="admin-inbox-context-filter-v2"><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort conversations"><option value="recent">Recent activity</option><option value="unread">Unread first</option><option value="oldest">Oldest activity</option></select></label></>}
           actions={<span className="admin-inbox-result-count-v2"><strong>{visibleThreads.length}</strong> matching</span>}
         />
 
@@ -256,6 +263,7 @@ export default function Inbox() {
         <aside className="ca-thread-panel">
           <div className="ca-thread-panel__head"><div><span className="ca-eyebrow">Conversations</span><h2>Messages</h2></div><b>{visibleThreads.length}</b></div>
           <AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search conversations..." />
+          <label className="ca-select-filter ca-inbox-sort"><AccountIcon name="arrow" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort conversations"><option value="recent">Recent activity</option><option value="unread">Unread first</option><option value="oldest">Oldest activity</option></select></label>
           <div className="ca-context-tabs" role="tablist">
             {contextTypes.map((type) => <button key={type} type="button" className={contextFilter === type ? "is-active" : ""} onClick={() => setContextFilter(type)}>{type === "all" ? "All" : contextLabel({ contextType: type })}</button>)}
           </div>

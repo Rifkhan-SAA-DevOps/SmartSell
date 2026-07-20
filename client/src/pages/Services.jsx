@@ -18,7 +18,7 @@ const initialFilters = {
 };
 
 function buildParams(filters) {
-  const params = {};
+  const params = { limit: 250 };
   Object.entries(filters).forEach(([key, value]) => {
     if (value === "" || value === false || value === "all") return;
     params[key] = value;
@@ -89,7 +89,31 @@ export default function Services() {
     };
   }, [filters]);
 
-  const visibleServices = useMemo(() => services.length ? services : demoServices, [services]);
+  const visibleServices = useMemo(() => {
+    const source = services.length ? services : demoServices;
+    const query = filters.q.trim().toLowerCase();
+    const normalize = (value) => String(value || "").toLowerCase().replaceAll(" ", "_");
+    const result = source.filter((item) => {
+      const category = typeof item.category === "object" ? item.category?.slug || item.category?.name : item.category;
+      const price = Number(item.priceFrom ?? item.price ?? 0);
+      const matchesSearch = !query || [item.title, item.description, category, item.serviceArea, item.location, item.provider?.businessName]
+        .some((value) => String(value || "").toLowerCase().includes(query));
+      const matchesCategory = filters.category === "all" || normalize(category) === normalize(filters.category);
+      const matchesMinimum = filters.minPrice === "" || price >= Number(filters.minPrice);
+      const matchesMaximum = filters.maxPrice === "" || price <= Number(filters.maxPrice);
+      const matchesFeatured = !filters.featured || Boolean(item.isFeatured ?? item.featured);
+      return matchesSearch && matchesCategory && matchesMinimum && matchesMaximum && matchesFeatured;
+    });
+    return [...result].sort((left, right) => {
+      const leftPrice = Number(left.priceFrom ?? left.price ?? 0);
+      const rightPrice = Number(right.priceFrom ?? right.price ?? 0);
+      if (filters.sort === "price_asc") return leftPrice - rightPrice;
+      if (filters.sort === "price_desc") return rightPrice - leftPrice;
+      if (filters.sort === "rating") return Number(right.ratingAverage || right.rating || 0) - Number(left.ratingAverage || left.rating || 0);
+      if (filters.sort === "featured") return Number(right.isFeatured || 0) - Number(left.isFeatured || 0);
+      return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+    });
+  }, [filters, services]);
   const activeFilterCount = useMemo(() => [
     filters.category !== "all",
     Boolean(filters.minPrice),

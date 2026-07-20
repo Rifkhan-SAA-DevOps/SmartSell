@@ -29,7 +29,7 @@ const initialFilters = {
 };
 
 function buildParams(filters) {
-  const params = {};
+  const params = { limit: 250 };
   Object.entries(filters).forEach(([key, value]) => {
     if (value === "" || value === false || value === "all") return;
     params[key] = value;
@@ -106,10 +106,31 @@ export default function Marketplace() {
   }, [filters]);
 
   const visibleProducts = useMemo(() => {
-    if (products.length) return products;
-    if (filters.type === "all") return featuredProducts;
-    return featuredProducts.filter((item) => item.type === filters.type || item.badge?.toLowerCase().includes(filters.type.split("_")[0]));
-  }, [filters.type, products]);
+    const source = products.length ? products : featuredProducts;
+    const query = filters.q.trim().toLowerCase();
+    const normalize = (value) => String(value || "").toLowerCase().replaceAll(" ", "_");
+    const result = source.filter((item) => {
+      const category = typeof item.category === "object" ? item.category?.slug || item.category?.name : item.category;
+      const itemType = item.type || item.productType || normalize(item.badge);
+      const matchesSearch = !query || [item.name, item.description, category, item.location, item.brand, item.model]
+        .some((value) => String(value || "").toLowerCase().includes(query));
+      const matchesType = filters.type === "all" || normalize(itemType).includes(filters.type.replace("_product", ""));
+      const matchesCategory = filters.category === "all" || normalize(category) === normalize(filters.category);
+      const matchesLocation = !filters.location || String(item.location || "").toLowerCase().includes(filters.location.trim().toLowerCase());
+      const matchesMinimum = filters.minPrice === "" || Number(item.price || 0) >= Number(filters.minPrice);
+      const matchesMaximum = filters.maxPrice === "" || Number(item.price || 0) <= Number(filters.maxPrice);
+      const matchesCondition = filters.condition === "all" || normalize(item.condition) === normalize(filters.condition);
+      const matchesFeatured = !filters.featured || Boolean(item.isFeatured ?? item.featured ?? item.badge);
+      return matchesSearch && matchesType && matchesCategory && matchesLocation && matchesMinimum && matchesMaximum && matchesCondition && matchesFeatured;
+    });
+    return [...result].sort((left, right) => {
+      if (filters.sort === "price_asc") return Number(left.price || 0) - Number(right.price || 0);
+      if (filters.sort === "price_desc") return Number(right.price || 0) - Number(left.price || 0);
+      if (filters.sort === "rating") return Number(right.ratingAverage || right.rating || 0) - Number(left.ratingAverage || left.rating || 0);
+      if (filters.sort === "featured") return Number(right.isFeatured || 0) - Number(left.isFeatured || 0);
+      return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+    });
+  }, [filters, products]);
 
   const activeFilterCount = useMemo(() => [
     filters.type !== "all",

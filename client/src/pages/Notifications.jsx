@@ -82,6 +82,7 @@ export default function Notifications() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState("newest");
 
   const isAdmin = ["admin", "super_admin"].includes(user?.role);
 
@@ -142,18 +143,23 @@ export default function Notifications() {
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return notifications.filter((item) => {
+    const result = notifications.filter((item) => {
       const matchesFilter = filter === "all"
         || (filter === "unread" ? !item.isRead : filter === "read" ? item.isRead : item.type === filter);
       return matchesFilter && (!query || `${item.title} ${item.message} ${item.type}`.toLowerCase().includes(query));
     });
-  }, [notifications, search, filter]);
+    return [...result].sort((left, right) => {
+      if (sort === "oldest") return new Date(left.createdAt || 0) - new Date(right.createdAt || 0);
+      if (sort === "unread") return Number(left.isRead) - Number(right.isRead) || new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+      return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+    });
+  }, [notifications, search, filter, sort]);
 
   const customerPagination = useSmartPagination(filtered, {
     initialPageSize: 10,
-    resetKey: `${search}-${filter}`,
+    resetKey: `${search}-${filter}-${sort}`,
   });
-  const adminPagination = useAdminPagination(filtered, 10, [search, filter]);
+  const adminPagination = useAdminPagination(filtered, 10, [search, filter, sort]);
 
   const operationalCount = notifications.filter((item) => [
     "approval", "listing", "order", "request", "support", "security", "delivery",
@@ -215,6 +221,7 @@ export default function Notifications() {
                 </select>
               </label>
             )}
+            actions={<label className="admin-select-control-v2"><AdminIcon name="activity" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort notifications"><option value="newest">Newest first</option><option value="unread">Unread first</option><option value="oldest">Oldest first</option></select></label>}
           />
 
           {error && <div className="admin-account-alert-v2 error">{error}</div>}
@@ -310,6 +317,7 @@ export default function Notifications() {
       <AccountToolbar resultText={`${filtered.length} notification${filtered.length === 1 ? "" : "s"}`}>
         <AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notification title or message..." />
         <label className="ca-select-filter"><AccountIcon name="filter" size={17} /><select value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">All updates</option><option value="unread">Unread</option><option value="read">Read</option><option value="order">Orders</option><option value="request">Requests</option><option value="message">Messages</option><option value="support">Support</option></select></label>
+        <label className="ca-select-filter"><AccountIcon name="arrow" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort notifications"><option value="newest">Newest first</option><option value="unread">Unread first</option><option value="oldest">Oldest first</option></select></label>
       </AccountToolbar>
 
       {error && <div className="ca-alert ca-alert--error">{error}</div>}

@@ -132,6 +132,7 @@ export default function Fulfillment() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("active");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
   const [selected, setSelected] = useState(null);
 
   async function loadData(nextFilter = filter) {
@@ -154,9 +155,15 @@ export default function Fulfillment() {
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return orders.filter((order) => !query || `${order.orderNo} ${order.customer?.name} ${order.deliveryName} ${order.deliveryPhone} ${order.deliveryAddress} ${order.deliveryPartner?.name}`.toLowerCase().includes(query));
-  }, [orders, search]);
-  const pagination = useAdminPagination(filtered, 10, [filter, search]);
+    const result = orders.filter((order) => !query || `${order.orderNo} ${order.customer?.name} ${order.deliveryName} ${order.deliveryPhone} ${order.deliveryAddress} ${order.deliveryPartner?.name}`.toLowerCase().includes(query));
+    return [...result].sort((left, right) => {
+      if (sort === "oldest") return new Date(left.updatedAt || left.createdAt || 0) - new Date(right.updatedAt || right.createdAt || 0);
+      if (sort === "value_high") return Number(right.totalAmount || 0) - Number(left.totalAmount || 0);
+      if (sort === "unassigned") return Number(Boolean(left.deliveryPartnerId || left.deliveryPartner)) - Number(Boolean(right.deliveryPartnerId || right.deliveryPartner));
+      return new Date(right.updatedAt || right.createdAt || 0) - new Date(left.updatedAt || left.createdAt || 0);
+    });
+  }, [orders, search, sort]);
+  const pagination = useAdminPagination(filtered, 10, [filter, search, sort]);
   const unassignedCount = orders.filter((order) => !order.deliveryPartnerId && !order.deliveryPartner && ["not_assigned", null, undefined].includes(order.deliveryStatus)).length;
 
   return (
@@ -183,7 +190,7 @@ export default function Fulfillment() {
           value={search}
           onChange={setSearch}
           placeholder="Search order, customer, phone, address, or partner..."
-          filters={<label className="admin-select-control-v2"><AdminIcon name="filter" size={17} /><select value={filter} onChange={(event) => changeFilter(event.target.value)}><option value="active">Active delivery</option><option value="unassigned">Unassigned</option><option value="assigned">Assigned</option><option value="picked_up">Picked up</option><option value="on_the_way">On the way</option><option value="completed">Delivered</option><option value="failed">Failed</option><option value="all">All orders</option></select></label>}
+          filters={<><label className="admin-select-control-v2"><AdminIcon name="filter" size={17} /><select value={filter} onChange={(event) => changeFilter(event.target.value)}><option value="active">Active delivery</option><option value="unassigned">Unassigned</option><option value="assigned">Assigned</option><option value="picked_up">Picked up</option><option value="on_the_way">On the way</option><option value="completed">Delivered</option><option value="failed">Failed</option><option value="all">All orders</option></select></label><label className="admin-select-control-v2"><AdminIcon name="activity" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort fulfillment"><option value="newest">Recently updated</option><option value="oldest">Oldest updated</option><option value="value_high">Highest order value</option><option value="unassigned">Unassigned first</option></select></label></>}
         />
 
         {loading ? <div className="admin-ops-loading-v2">Loading fulfillment queue...</div> : !filtered.length ? <AdminEmptyState icon="delivery" title="No fulfillment records found" description="Try another delivery stage or search term." /> : <>

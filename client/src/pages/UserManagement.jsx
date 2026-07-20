@@ -77,6 +77,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [filters, setFilters] = useState({ role: "all", status: "all", businessStatus: "all", search: "" });
+  const [sort, setSort] = useState("newest");
   const [newUser, setNewUser] = useState(cleanNewUser);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
@@ -123,7 +124,14 @@ export default function UserManagement() {
     admins: users.filter((item) => ["admin", "super_admin"].includes(item.role)).length,
   }), [users]);
 
-  const pagination = useAdminPagination(users, 10, [filters.role, filters.status, filters.businessStatus, filters.search]);
+  const sortedUsers = useMemo(() => [...users].sort((left, right) => {
+    if (sort === "oldest") return new Date(left.createdAt || 0) - new Date(right.createdAt || 0);
+    if (sort === "name") return String(left.name || "").localeCompare(String(right.name || ""));
+    if (sort === "role") return roleLabel(left.role).localeCompare(roleLabel(right.role)) || String(left.name || "").localeCompare(String(right.name || ""));
+    return new Date(right.createdAt || 0) - new Date(left.createdAt || 0);
+  }), [users, sort]);
+
+  const pagination = useAdminPagination(sortedUsers, 10, [filters.role, filters.status, filters.businessStatus, filters.search, sort]);
 
   async function applyFilters(event) {
     event?.preventDefault();
@@ -133,6 +141,7 @@ export default function UserManagement() {
   function clearFilters() {
     const clean = { role: "all", status: "all", businessStatus: "all", search: "" };
     setFilters(clean);
+    setSort("newest");
     loadAccounts(clean, false);
   }
 
@@ -235,6 +244,9 @@ export default function UserManagement() {
               </select>
               <select value={filters.businessStatus} onChange={(event) => setFilters((current) => ({ ...current, businessStatus: event.target.value }))} aria-label="Business approval">
                 {businessStatusOptions.map((status) => <option key={status} value={status}>{status === "all" ? "All business states" : titleCase(status)}</option>)}
+              </select>
+              <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort accounts">
+                <option value="newest">Newest accounts</option><option value="oldest">Oldest accounts</option><option value="name">Name A–Z</option><option value="role">Role then name</option>
               </select>
             </>
           )}

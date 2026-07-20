@@ -18,6 +18,7 @@ export default function Wishlist() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("saved_newest");
 
   useEffect(() => {
     let cancelled = false;
@@ -36,14 +37,19 @@ export default function Wishlist() {
     return () => { cancelled = true; };
   }, []);
 
-  const products = useMemo(() => items.map((item) => ({ ...item.product, saved: true })).filter(Boolean), [items]);
+  const products = useMemo(() => items.map((item) => ({ ...item.product, saved: true, savedAt: item.createdAt || item.updatedAt })).filter(Boolean), [items]);
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return products;
-    return products.filter((product) => [product.name, product.category, product.location, product.description]
-      .some((value) => String(value || "").toLowerCase().includes(query)));
-  }, [products, search]);
-  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: search });
+    const result = query ? products.filter((product) => [product.name, product.category, product.location, product.description]
+      .some((value) => String(value || "").toLowerCase().includes(query))) : products;
+    return [...result].sort((left, right) => {
+      if (sort === "price_low") return Number(left.price || 0) - Number(right.price || 0);
+      if (sort === "price_high") return Number(right.price || 0) - Number(left.price || 0);
+      if (sort === "name") return String(left.name || "").localeCompare(String(right.name || ""));
+      return new Date(right.savedAt || right.createdAt || 0) - new Date(left.savedAt || left.createdAt || 0);
+    });
+  }, [products, search, sort]);
+  const pagination = useSmartPagination(filtered, { initialPageSize: 10, resetKey: `${search}-${sort}` });
 
   return (
     <section className="ca-account-page ca-wishlist-page">
@@ -62,6 +68,7 @@ export default function Wishlist() {
 
       <AccountToolbar resultText={`${filtered.length} saved product${filtered.length === 1 ? "" : "s"}`}>
         <AccountSearch value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search saved products..." />
+        <label className="ca-select-filter"><AccountIcon name="arrow" size={17} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort saved products"><option value="saved_newest">Recently saved</option><option value="price_low">Price low to high</option><option value="price_high">Price high to low</option><option value="name">Name A–Z</option></select></label>
       </AccountToolbar>
 
       {error && <div className="ca-alert ca-alert--error">{error}</div>}
