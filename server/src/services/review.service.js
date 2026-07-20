@@ -74,6 +74,46 @@ export async function listPublicReviews(filters = {}) {
   return reviews.map(serializeReview);
 }
 
+
+export async function listBusinessReviews(user) {
+  const isAdmin = ["admin", "super_admin"].includes(user?.role);
+  const where = isAdmin
+    ? {}
+    : {
+        OR: [
+          {
+            product: {
+              is: {
+                OR: [
+                  { createdById: user.id },
+                  { seller: { is: { userId: user.id } } },
+                ],
+              },
+            },
+          },
+          {
+            service: {
+              is: {
+                OR: [
+                  { createdById: user.id },
+                  { provider: { is: { userId: user.id } } },
+                ],
+              },
+            },
+          },
+        ],
+      };
+
+  const reviews = await prisma.review.findMany({
+    where,
+    include: reviewInclude,
+    orderBy: { createdAt: "desc" },
+    take: 120,
+  });
+
+  return reviews.map(serializeReview);
+}
+
 export async function listMyReviews(user) {
   const reviews = await prisma.review.findMany({
     where: { userId: user.id },

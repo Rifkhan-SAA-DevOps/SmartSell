@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import api from "../utils/api.js";
+import api, { AUTH_EXPIRED_EVENT } from "../utils/api.js";
 
 const AuthContext = createContext(null);
 
@@ -19,6 +19,25 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(stored.user);
   const [token, setToken] = useState(stored.token);
   const [loading, setLoading] = useState(Boolean(stored.token));
+
+  useEffect(() => {
+    function handleExpiredSession(event) {
+      setUser(null);
+      setToken(null);
+      setLoading(false);
+      try {
+        sessionStorage.setItem(
+          "smartsell_auth_notice",
+          event?.detail?.message || "Your SmartSell session expired. Please sign in again."
+        );
+      } catch {
+        // Session storage can be unavailable in restrictive browser modes.
+      }
+    }
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleExpiredSession);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpiredSession);
+  }, []);
 
   useEffect(() => {
     if (token) {

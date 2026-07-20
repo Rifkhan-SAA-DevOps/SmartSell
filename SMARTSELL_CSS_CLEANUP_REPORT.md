@@ -1,12 +1,12 @@
 # SmartSell CSS Cleanup Report
 
-Generated: 2026-07-12T05:11:46.114Z
+Generated: 2026-07-20T07:31:27.837Z
 
 ## Summary
 
 - global.css selectors found: 817
 - risky broad selectors found: 54
-- class selectors that may be unused: 232
+- class selectors that may be unused: 337
 
 ## Risky broad selectors to migrate first
 
@@ -71,12 +71,26 @@ These selectors are broad and can accidentally affect many pages. Move them page
 
 These may be safe to remove later, but check manually first because dynamic class names are not always detected.
 
+- `.app-shell`
+- `.public-shell`
+- `.public-main-content`
 - `.management-shell`
+- `.management-main-content`
+- `.page-shell`
+- `.center-page`
 - `.management-page`
 - `.compact-page`
 - `.dashboard-page`
+- `.admin-ops-page`
 - `.um-page`
+- `.listing-management-page`
+- `.report-page`
 - `.support-page`
+- `.fulfillment-page`
+- `.delivery-dashboard-page`
+- `.settings-page`
+- `.seo-settings-page`
+- `.content-manager-page`
 - `.storefront-directory-page`
 - `.marketplace-discovery-page`
 - `.service-detail-page`
@@ -100,11 +114,16 @@ These may be safe to remove later, but check manually first because dynamic clas
 - `.nav-user`
 - `.nav-logout`
 - `.nav-cta`
+- `.btn`
+- `.ghost-btn`
+- `.danger-btn`
 - `.success-btn`
 - `.detail-mini-btn`
 - `.cart-mini-btn`
 - `.inline-action-link`
 - `.detail-primary-action`
+- `.btn-primary`
+- `.btn-outline`
 - `.btn-danger-soft`
 - `.btn-soft`
 - `.nav-action-icon`
@@ -115,9 +134,13 @@ These may be safe to remove later, but check manually first because dynamic clas
 - `.sidebar-collapsed`
 - `.hero`
 - `.admin-hero`
+- `.ops-hero`
 - `.cockpit-hero`
 - `.um-hero`
 - `.listing-hero`
+- `.report-hero`
+- `.content-manager-hero`
+- `.seo-manager-hero`
 - `.profile-settings-hero`
 - `.compact-hero`
 - `.offer-hero`
@@ -127,7 +150,10 @@ These may be safe to remove later, but check manually first because dynamic clas
 - `.hero-badge`
 - `.pro-badge`
 - `.status-pill`
+- `.soft-pill`
+- `.pill`
 - `.context-chip`
+- `.request-type-chip`
 - `.support-pill`
 - `.um-role-chip`
 - `.service-detail-badge`
@@ -154,83 +180,57 @@ These may be safe to remove later, but check manually first because dynamic clas
 - `.cockpit-action-icon`
 - `.ops-metric-card`
 - `.ops-action-tile`
+- `.stat-icon`
 - `.um-stat-icon`
+- `.finance-stat-icon`
+- `.security-check-icon`
+- `.feature-icon`
 - `.category-grid`
 - `.admin-grid`
+- `.stats-grid`
 - `.stat-grid`
 - `.compact-stat-grid`
 - `.compact-stats`
+- `.ops-metric-grid`
+- `.ops-action-grid`
 - `.cockpit-action-grid`
 - `.um-stat-grid`
 - `.um-command-grid`
+- `.management-grid`
+- `.business-stats-grid`
 - `.delivery-kpi-grid`
 - `.fulfillment-kpi-grid`
+- `.report-metric-grid`
+- `.security-stats-grid`
 - `.storefront-grid`
+- `.request-icon-grid`
 - `.request-workflow-grid`
 - `.pro-request-workflow-grid`
 - `.offer-stat-grid`
 - `.offer-grid`
 - `.support-stats-grid`
+- `.glass-card`
+- `.panel-card`
 - `.management-panel`
+- `.smart-form`
 - `.admin-card`
+- `.table-panel`
+- `.table-shell`
+- `.seller-panel`
+- `.business-panel`
 - `.product-card`
 - `.service-card`
 - `.category-card`
+- `.stat-card`
 - `.mini-stat-card`
+- `.icon-stat-card`
 - `.um-stat-card`
 - `.um-create-card`
 - `.um-directory-panel`
 - `.um-detail-panel`
 - `.listing-filter-panel`
 - `.listing-admin-card`
-- `.cockpit-action-card`
-- `.cockpit-profile-card`
-- `.support-create-panel`
-- `.support-ticket-card`
-- `.security-card`
-- `.profile-form-panel`
-- `.profile-progress-card`
-- `.storefront-card`
-- `.detail-gallery-card`
-- `.detail-info-card`
-- `.detail-price-panel`
-- `.detail-section-card`
-- `.detail-seller-card`
-- `.service-info-card`
-- `.service-gallery-card`
-- `.service-price-panel`
-- `.quote-form-card`
-- `.quote-summary-card`
-- `.notification-card`
-- `.inbox-panel`
-- `.thread-list-panel`
-- `.message-panel`
-- `.offer-card`
-- `.fulfillment-card`
-- `.cart-item`
-- `.cart-summary`
-- `.checkout-main-form`
-- `.checkout-offer-summary`
-- `.empty-state`
-- `.empty-cart-card`
-- `.premium-empty-state`
-- `.report-metric-card`
-- `.panel-header-row`
-- `.message-panel-header`
-- `.thread-list-head`
-- `.support-panel-head`
-- `.cockpit-section-head`
-- `.pro-listing-card`
-- `.pro-service-card`
-- `.product-image`
-- `.pro-listing-media`
-- `.pro-service-media`
-- `.business-list-media`
-- `.listing-admin-media`
-- `.product-body`
-- `.pro-listing-body`
-- `.pro-service-body`
-- `.listing-admin-main`
+- `.ops-table-card`
 
 ## Safe cleanup order
 

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CustomerIcon, CustomerPageHeader } from "../components/CustomerUi.jsx";
+import SmartConfirmDialog from "../components/SmartConfirmDialog.jsx";
 import { useCart } from "../context/CartContext.jsx";
 
 function money(value) {
@@ -9,11 +10,13 @@ function money(value) {
 
 export default function Cart() {
   const { items, totalAmount, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const deliveryEstimate = useMemo(() => (Number(totalAmount || 0) > 0 ? 450 : 0), [totalAmount]);
   const grandTotal = Number(totalAmount || 0) + deliveryEstimate;
 
   function handleClearCart() {
-    if (window.confirm("Remove every product from your cart?")) clearCart();
+    clearCart();
+    setClearConfirmOpen(false);
   }
 
   return (
@@ -47,7 +50,7 @@ export default function Cart() {
                 <span className="cx-eyebrow">Selected products</span>
                 <h2>{items.length} product{items.length === 1 ? "" : "s"} in your cart</h2>
               </div>
-              <button className="cx-text-button is-danger" type="button" onClick={handleClearCart}>
+              <button className="cx-text-button is-danger" type="button" onClick={() => setClearConfirmOpen(true)}>
                 <CustomerIcon name="trash" />Clear cart
               </button>
             </div>
@@ -116,6 +119,22 @@ export default function Cart() {
           </aside>
         </div>
       )}
+
+      <SmartConfirmDialog
+        open={clearConfirmOpen}
+        title="Clear every product from your cart?"
+        description="This removes all selected products and quantities from this browser. You can add them again later from Marketplace."
+        eyebrow="Cart cleanup"
+        confirmLabel="Clear cart"
+        cancelLabel="Keep products"
+        details={[
+          { label: "Products", value: `${items.length}` },
+          { label: "Quantity", value: `${totalItems || 0} item${Number(totalItems || 0) === 1 ? "" : "s"}` },
+          { label: "Cart value", value: `Rs. ${money(totalAmount)}` },
+        ]}
+        onConfirm={handleClearCart}
+        onClose={() => setClearConfirmOpen(false)}
+      />
     </section>
   );
 }

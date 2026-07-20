@@ -58,3 +58,6 @@
 
 /* Final application-wide accessibility, route-state, and dialog quality layer. */
 @import "./quality/ApplicationQuality.css";
+
+/* Modern shared confirmations and message actions. */
+@import "./components/SharedInteractions.css";

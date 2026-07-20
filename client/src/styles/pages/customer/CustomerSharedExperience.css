@@ -1101,6 +1101,17 @@
 
 @keyframes customerSpin { to { transform: rotate(360deg); } }
 
+.public-shell .customer-auth-notice {
+  padding: 11px 13px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .public-shell .customer-auth-error {
   padding: 11px 13px;
   border: 1px solid #fecdca;

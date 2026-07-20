@@ -8,7 +8,7 @@ import {
 } from "./notificationDelivery.service.js";
 
 const adminRoles = ["admin", "super_admin"];
-const businessRoles = ["seller", "shop", "service_provider", "delivery_partner"];
+const businessRoles = ["seller", "shop", "shop_seller", "service_provider", "delivery_partner"];
 
 function publicUser(user) {
   if (!user) return null;
@@ -222,10 +222,13 @@ export async function markAllNotificationsRead(user) {
 
 function threadWhereForUser(user) {
   if (adminRoles.includes(user.role)) return {};
-  if (businessRoles.includes(user.role)) {
-    return { OR: [{ businessUserId: user.id }, { adminId: user.id }] };
-  }
-  return { customerId: user.id };
+  return {
+    OR: [
+      { customerId: user.id },
+      { businessUserId: user.id },
+      { adminId: user.id },
+    ],
+  };
 }
 
 const threadIncludeList = {
@@ -447,13 +450,65 @@ function buildParticipantPayload({ sender, recipient, contextOwner = null, admin
     adminId: null,
   };
 
+  const seen = new Set();
   [sender, recipient, contextOwner, admin].filter(Boolean).forEach((participant) => {
-    if (adminRoles.includes(participant.role)) payload.adminId ||= participant.id;
-    else if (businessRoles.includes(participant.role)) payload.businessUserId ||= participant.id;
-    else payload.customerId ||= participant.id;
+    if (!participant?.id || seen.has(participant.id)) return;
+    seen.add(participant.id);
+
+    if (adminRoles.includes(participant.role) && !payload.adminId) {
+      payload.adminId = participant.id;
+      return;
+    }
+
+    if (businessRoles.includes(participant.role) && !payload.businessUserId) {
+      payload.businessUserId = participant.id;
+      return;
+    }
+
+    if (!payload.customerId) {
+      // MessageThread has one customer and one business slot. The customer slot can
+      // safely hold a second non-admin participant for business-to-business threads.
+      payload.customerId = participant.id;
+      return;
+    }
+
+    if (!payload.businessUserId) payload.businessUserId = participant.id;
   });
 
   return payload;
+}
+
+function identityValues(...values) {
+  return values
+    .flat()
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function hasIdentityMatch(value, identities) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return Boolean(normalized && identities.includes(normalized));
+}
+
+async function businessIdentityValues(user) {
+  if (!user?.id) return [];
+  const account = await prisma.user.findUnique({
+    where: { id: user.id },
+    include: { sellerProfile: true, serviceProviderProfile: true },
+  });
+  return identityValues(
+    user.id,
+    user.name,
+    user.email,
+    user.businessName,
+    account?.sellerProfile?.businessName,
+    account?.sellerProfile?.shopName,
+    account?.serviceProviderProfile?.businessName
+  );
+}
+
+function listingOwner(productOrService) {
+  return productOrService?.createdBy || productOrService?.seller?.user || productOrService?.provider?.user || null;
 }
 
 async function resolveContextTarget(payload, user) {
@@ -476,8 +531,12 @@ async function resolveContextTarget(payload, user) {
     if (!product) throw new Error("Product not found for message context.");
     contextLabel = product.name;
     link = `/products/${product.id}`;
-    contextOwner = product.createdBy || product.seller?.user || null;
-    recipient = isAdminUser(user) ? contextOwner : (contextOwner?.id === user.id ? defaultAdmin : contextOwner || defaultAdmin);
+    contextOwner = listingOwner(product);
+    recipient = isAdminUser(user)
+      ? contextOwner
+      : contextOwner?.id === user.id
+        ? defaultAdmin
+        : contextOwner || defaultAdmin;
     subject ||= `Question about product: ${product.name}`;
   } else if (contextType === "service") {
     const service = await prisma.service.findUnique({
@@ -487,24 +546,63 @@ async function resolveContextTarget(payload, user) {
     if (!service) throw new Error("Service not found for message context.");
     contextLabel = service.title;
     link = `/services/${service.id}`;
-    contextOwner = service.createdBy || service.provider?.user || null;
-    recipient = isAdminUser(user) ? contextOwner : (contextOwner?.id === user.id ? defaultAdmin : contextOwner || defaultAdmin);
+    contextOwner = listingOwner(service);
+    recipient = isAdminUser(user)
+      ? contextOwner
+      : contextOwner?.id === user.id
+        ? defaultAdmin
+        : contextOwner || defaultAdmin;
     subject ||= `Question about service: ${service.title}`;
   } else if (contextType === "order") {
-    const order = await prisma.order.findUnique({ where: { id: contextId }, include: { customer: true } });
+    const order = await prisma.order.findUnique({
+      where: { id: contextId },
+      include: {
+        customer: true,
+        deliveryPartner: true,
+        items: {
+          include: {
+            product: {
+              include: {
+                createdBy: true,
+                seller: { include: { user: true } },
+              },
+            },
+          },
+        },
+      },
+    });
     if (!order) throw new Error("Order not found for message context.");
     contextLabel = order.orderNo;
-    link = `/orders`;
+    link = "/orders";
     contextOwner = order.customer || null;
-    recipient = isAdminUser(user) ? contextOwner : defaultAdmin;
+
+    const sellerOwners = (order.items || []).map((item) => listingOwner(item.product)).filter(Boolean);
+    const isOrderSeller = sellerOwners.some((owner) => owner.id === user.id);
+    const isAssignedDelivery = order.deliveryPartnerId === user.id;
+    const isCustomer = order.customerId === user.id;
+
+    if (isAdminUser(user)) recipient = order.customer || order.deliveryPartner || sellerOwners[0] || null;
+    else if (isCustomer) recipient = defaultAdmin;
+    else if (isOrderSeller || isAssignedDelivery) recipient = order.customer || defaultAdmin;
+    else throw new Error("You do not have access to this order conversation.");
+
     subject ||= `Order discussion: ${order.orderNo}`;
   } else if (contextType === "request") {
     const request = await prisma.customRequest.findUnique({ where: { id: contextId }, include: { user: true } });
     if (!request) throw new Error("Request not found for message context.");
     contextLabel = readableContext(request.requestType || "Custom request");
-    link = `/my-requests`;
+    link = "/my-requests";
     contextOwner = request.user || null;
-    recipient = isAdminUser(user) ? contextOwner : defaultAdmin;
+
+    const isCustomer = request.userId === user.id;
+    const identities = isBusinessUser(user) ? await businessIdentityValues(user) : [];
+    const isAssignedBusiness = isBusinessUser(user) && hasIdentityMatch(request.assignedTo, identities);
+
+    if (isAdminUser(user)) recipient = request.user || null;
+    else if (isCustomer) recipient = defaultAdmin;
+    else if (isAssignedBusiness) recipient = request.user || defaultAdmin;
+    else throw new Error("You do not have access to this request conversation.");
+
     subject ||= `Request discussion: ${contextLabel}`;
   } else if (contextType === "offer") {
     const offer = await prisma.productOffer.findUnique({
@@ -513,20 +611,44 @@ async function resolveContextTarget(payload, user) {
     });
     if (!offer) throw new Error("Offer not found for message context.");
     contextLabel = offer.offerNo;
-    link = `/offers`;
+    link = "/offers";
     if (user.id === offer.buyerId) recipient = offer.seller || defaultAdmin;
     else if (user.id === offer.sellerId) recipient = offer.buyer || defaultAdmin;
     else if (isAdminUser(user)) recipient = offer.buyer || offer.seller || null;
-    else recipient = defaultAdmin;
+    else throw new Error("You do not have access to this offer conversation.");
     contextOwner = offer.seller || offer.buyer || null;
     subject ||= `Offer discussion: ${offer.offerNo} - ${offer.product?.name || "Product"}`;
+  } else if (contextType === "review") {
+    const review = await prisma.review.findUnique({
+      where: { id: contextId },
+      include: {
+        user: true,
+        product: { include: { createdBy: true, seller: { include: { user: true } } } },
+        service: { include: { createdBy: true, provider: { include: { user: true } } } },
+      },
+    });
+    if (!review) throw new Error("Review not found for message context.");
+
+    const owner = listingOwner(review.product || review.service);
+    contextLabel = review.product?.name || review.service?.title || "Customer review";
+    link = "/my-reviews";
+    contextOwner = owner || review.user || null;
+
+    if (isAdminUser(user)) recipient = review.user || owner || null;
+    else if (review.userId === user.id) recipient = owner || defaultAdmin;
+    else if (owner?.id === user.id) recipient = review.user || defaultAdmin;
+    else throw new Error("You do not have access to this review conversation.");
+
+    subject ||= `Review follow-up: ${contextLabel}`;
   } else if (contextType === "support") {
     const ticket = await prisma.supportTicket.findUnique({ where: { id: contextId }, include: { user: true, assignedAdmin: true } });
     if (!ticket) throw new Error("Support ticket not found for message context.");
     contextLabel = ticket.ticketNo;
-    link = `/support`;
+    link = "/support";
     contextOwner = ticket.user || null;
-    recipient = isAdminUser(user) ? contextOwner : ticket.assignedAdmin || defaultAdmin;
+    if (isAdminUser(user)) recipient = ticket.user || null;
+    else if (ticket.userId === user.id) recipient = ticket.assignedAdmin || defaultAdmin;
+    else throw new Error("You do not have access to this support conversation.");
     subject ||= `Support ticket discussion: ${ticket.ticketNo}`;
   } else {
     recipient = payload.recipientId ? await prisma.user.findUnique({ where: { id: String(payload.recipientId) } }) : defaultAdmin;
@@ -534,9 +656,7 @@ async function resolveContextTarget(payload, user) {
   }
 
   if (!recipient) throw new Error("No valid recipient found for this conversation.");
-  if (recipient.id === user.id) {
-    recipient = defaultAdmin?.id !== user.id ? defaultAdmin : null;
-  }
+  if (recipient.id === user.id) recipient = defaultAdmin?.id !== user.id ? defaultAdmin : null;
   if (!recipient) throw new Error("Cannot create a conversation with yourself.");
 
   return { contextType, contextId, subject, recipient, contextOwner, defaultAdmin, contextLabel, link };

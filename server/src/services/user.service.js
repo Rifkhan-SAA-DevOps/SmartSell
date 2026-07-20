@@ -8,6 +8,15 @@ const MANAGEABLE_ROLES = ["customer", "seller", "shop", "service_provider", "del
 const MANAGEABLE_STATUSES = ["active", "pending_approval", "blocked"];
 const PROFILE_STATUSES = ["pending", "approved", "rejected", "archived"];
 
+function normalizeManageableRole(value) {
+  const role = String(value || "").trim();
+  return role === "shop_seller" ? "shop" : role;
+}
+
+function roleDisplayName(role) {
+  return normalizeManageableRole(role) === "shop" ? "shop seller" : normalizeManageableRole(role).replaceAll("_", " ");
+}
+
 function cleanUser(user) {
   if (!user) return null;
   const sellerProfile = user.sellerProfile
@@ -135,7 +144,8 @@ export async function getUserManagementOverview(currentUser) {
 export async function listManagedUsers(currentUser, query = {}) {
   requireAdminUser(currentUser);
 
-  const role = String(query.role || "all");
+  const requestedRole = String(query.role || "all");
+  const role = requestedRole === "all" ? "all" : normalizeManageableRole(requestedRole);
   const status = String(query.status || "all");
   const search = String(query.search || "").trim();
   const businessStatus = String(query.businessStatus || "all");
@@ -192,7 +202,7 @@ export async function createAdminAccount(currentUser, payload) {
   const name = String(payload.name || "").trim();
   const email = normalizeEmail(payload.email);
   const password = String(payload.password || generateTemporaryPassword());
-  const role = String(payload.role || "customer");
+  const role = normalizeManageableRole(payload.role || "customer");
   const status = String(payload.status || "active");
   const phone = String(payload.phone || "").trim() || null;
   const businessName = String(payload.businessName || "").trim() || null;
@@ -271,7 +281,7 @@ export async function createAdminAccount(currentUser, payload) {
   await createNotification({
     userId: createdUser.id,
     title: "SmartSell account created",
-    message: `An account was created for you as ${role.replaceAll("_", " ")}. Please login and update your profile.`,
+    message: `An account was created for you as ${roleDisplayName(role)}. Please login and update your profile.`,
     type: "account",
     link: "/profile",
   });
@@ -337,7 +347,7 @@ export async function updateUserStatus(currentUser, userId, payload) {
 
 export async function updateUserRole(currentUser, userId, payload) {
   requireAdminUser(currentUser);
-  const role = String(payload.role || "");
+  const role = normalizeManageableRole(payload.role || "");
   if (!MANAGEABLE_ROLES.includes(role)) throw httpError(400, "Invalid role.");
 
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });

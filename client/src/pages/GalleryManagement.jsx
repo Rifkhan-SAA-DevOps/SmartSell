@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import SmartPagination from "../components/SmartPagination.jsx";
+import SmartConfirmDialog from "../components/SmartConfirmDialog.jsx";
 import {
   BusinessEmptyState,
   BusinessIcon,
@@ -28,6 +29,8 @@ export default function GalleryManagement() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageAlt, setImageAlt] = useState("");
   const [showAddImages, setShowAddImages] = useState(false);
+  const [removeConfirmImage, setRemoveConfirmImage] = useState(null);
+  const [removing, setRemoving] = useState(false);
   const [form, setForm] = useState(emptyForm());
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -110,10 +113,19 @@ export default function GalleryManagement() {
     try { const response = await api.post(`/gallery/${currentBase}/${selected.id}/images/${image.id}/primary`); setMessage("Primary image updated."); refreshSelected(response.data.data); }
     catch (requestError) { setError(requestError.smartSellMessage || requestError.response?.data?.message || "Could not update primary image."); }
   }
-  async function removeImage(image) {
-    if (!window.confirm("Remove this image from the listing gallery?")) return;
-    try { const response = await api.delete(`/gallery/${currentBase}/${selected.id}/images/${image.id}`); setMessage("Image removed."); setSelectedImage(null); refreshSelected(response.data.data); }
-    catch (requestError) { setError(requestError.smartSellMessage || requestError.response?.data?.message || "Could not remove image."); }
+  async function removeImage() {
+    const image = removeConfirmImage;
+    if (!image || !selected) return;
+    setRemoving(true); setError("");
+    try {
+      const response = await api.delete(`/gallery/${currentBase}/${selected.id}/images/${image.id}`);
+      setMessage("Image removed from the listing gallery.");
+      setSelectedImage(null);
+      setRemoveConfirmImage(null);
+      refreshSelected(response.data.data);
+    } catch (requestError) {
+      setError(requestError.smartSellMessage || requestError.response?.data?.message || "Could not remove image.");
+    } finally { setRemoving(false); }
   }
   async function moveImage(image, direction) {
     const images = [...(selected?.images || [])]; const index = images.findIndex((item) => item.id === image.id); const target = index + direction;
@@ -150,7 +162,24 @@ export default function GalleryManagement() {
     </BusinessModal>
 
     <BusinessModal open={Boolean(selectedImage)} title="Manage gallery image" eyebrow={titleOf(selected)} onClose={() => setSelectedImage(null)} size="medium">
-      {selectedImage && <><div className="bm-image-manager-preview-v2"><img src={selectedImage.url} alt={selectedImage.alt || titleOf(selected)} />{selected?.images?.[0]?.id === selectedImage.id && <BusinessStatusBadge status="approved" />}</div><label className="business-field-v2"><span>Alt text</span><input value={imageAlt} onChange={(event) => setImageAlt(event.target.value)} placeholder="Describe what customers see" /></label><div className="business-description-v2"><span>Image URL</span><p>{selectedImage.url}</p></div><div className="business-modal-action-row-v2 bm-image-actions-v2"><button className="business-danger-button-v2" type="button" onClick={() => removeImage(selectedImage)}>Remove</button><button className="business-ghost-button-v2" type="button" disabled={selected?.images?.findIndex((item) => item.id === selectedImage.id) === 0} onClick={() => moveImage(selectedImage, -1)}>Move earlier</button><button className="business-ghost-button-v2" type="button" disabled={selected?.images?.findIndex((item) => item.id === selectedImage.id) === (selected?.images?.length || 1) - 1} onClick={() => moveImage(selectedImage, 1)}>Move later</button><button className="business-secondary-button-v2" type="button" disabled={selected?.images?.[0]?.id === selectedImage.id} onClick={() => setPrimary(selectedImage)}>Set primary</button><button className="business-primary-button-v2" type="button" onClick={saveAlt}>Save alt text</button></div></>}
+      {selectedImage && <><div className="bm-image-manager-preview-v2"><img src={selectedImage.url} alt={selectedImage.alt || titleOf(selected)} />{selected?.images?.[0]?.id === selectedImage.id && <BusinessStatusBadge status="approved" />}</div><label className="business-field-v2"><span>Alt text</span><input value={imageAlt} onChange={(event) => setImageAlt(event.target.value)} placeholder="Describe what customers see" /></label><div className="business-description-v2"><span>Image URL</span><p>{selectedImage.url}</p></div><div className="business-modal-action-row-v2 bm-image-actions-v2"><button className="business-danger-button-v2" type="button" onClick={() => setRemoveConfirmImage(selectedImage)}>Remove</button><button className="business-ghost-button-v2" type="button" disabled={selected?.images?.findIndex((item) => item.id === selectedImage.id) === 0} onClick={() => moveImage(selectedImage, -1)}>Move earlier</button><button className="business-ghost-button-v2" type="button" disabled={selected?.images?.findIndex((item) => item.id === selectedImage.id) === (selected?.images?.length || 1) - 1} onClick={() => moveImage(selectedImage, 1)}>Move later</button><button className="business-secondary-button-v2" type="button" disabled={selected?.images?.[0]?.id === selectedImage.id} onClick={() => setPrimary(selectedImage)}>Set primary</button><button className="business-primary-button-v2" type="button" onClick={saveAlt}>Save alt text</button></div></>}
     </BusinessModal>
+
+    <SmartConfirmDialog
+      open={Boolean(removeConfirmImage)}
+      title="Remove this gallery image?"
+      description="The image will disappear from the public listing gallery. This action does not delete the original uploaded file from storage."
+      eyebrow="Gallery cleanup"
+      confirmLabel="Remove image"
+      cancelLabel="Keep image"
+      busy={removing}
+      details={[
+        { label: "Listing", value: titleOf(selected) },
+        { label: "Image role", value: selected?.images?.[0]?.id === removeConfirmImage?.id ? "Primary image" : "Gallery image" },
+        { label: "Alt text", value: removeConfirmImage?.alt || "Not provided" },
+      ]}
+      onConfirm={removeImage}
+      onClose={() => !removing && setRemoveConfirmImage(null)}
+    />
   </section>;
 }

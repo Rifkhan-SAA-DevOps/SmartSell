@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth, requireRoles } from "../middleware/auth.js";
 import {
   createReview,
+  listBusinessReviews,
   listMyReviews,
   listPublicReviews,
   updateReviewStatus,
@@ -17,6 +18,16 @@ router.get("/", async (req, res, next) => {
       serviceId: req.query.serviceId,
     });
 
+    res.json({ success: true, data: reviews });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+router.get("/business", requireAuth, requireRoles("seller", "shop", "shop_seller", "service_provider", "admin", "super_admin"), async (req, res, next) => {
+  try {
+    const reviews = await listBusinessReviews(req.user);
     res.json({ success: true, data: reviews });
   } catch (error) {
     next(error);

@@ -43,6 +43,7 @@ function contextLink(thread) {
   if (thread.contextType === "request") return "/my-requests";
   if (thread.contextType === "offer") return "/offers";
   if (thread.contextType === "support") return "/support";
+  if (thread.contextType === "review") return "/my-reviews";
   return null;
 }
 function participantName(thread, currentUser) {

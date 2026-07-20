@@ -15,13 +15,18 @@ import { useAuth } from "../context/AuthContext.jsx";
 import api from "../utils/api.js";
 import "../styles/pages/admin/AdminWorkspaceV2.css";
 
-const roleOptions = ["all", "customer", "seller", "shop", "shop_seller", "service_provider", "delivery_partner", "admin", "super_admin"];
+const roleOptions = ["all", "customer", "seller", "shop", "service_provider", "delivery_partner", "admin", "super_admin"];
 const statusOptions = ["all", "active", "pending_approval", "blocked"];
 const businessStatusOptions = ["all", "pending", "approved", "rejected", "archived"];
-const accountCreateRoles = ["customer", "seller", "shop", "shop_seller", "service_provider", "delivery_partner", "admin", "super_admin"];
+const accountCreateRoles = ["customer", "seller", "shop", "service_provider", "delivery_partner", "admin", "super_admin"];
 
 function titleCase(value) {
   return String(value || "").replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function roleLabel(role) {
+  if (role === "shop" || role === "shop_seller") return "Shop Seller";
+  return titleCase(role);
 }
 
 function formatDate(value) {
@@ -223,7 +228,7 @@ export default function UserManagement() {
           filters={(
             <>
               <select value={filters.role} onChange={(event) => setFilters((current) => ({ ...current, role: event.target.value }))} aria-label="Role">
-                {roleOptions.map((role) => <option key={role} value={role}>{role === "all" ? "All roles" : titleCase(role)}</option>)}
+                {roleOptions.map((role) => <option key={role} value={role}>{role === "all" ? "All roles" : roleLabel(role)}</option>)}
               </select>
               <select value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} aria-label="Account status">
                 {statusOptions.map((status) => <option key={status} value={status}>{status === "all" ? "All statuses" : titleCase(status)}</option>)}
@@ -260,7 +265,7 @@ export default function UserManagement() {
                     <span className="admin-user-avatar-v2">{getInitials(account.name)}</span>
                     <span><strong>{account.name}</strong><small>{account.email}</small></span>
                   </span>
-                  <div><strong>{titleCase(account.role)}</strong><small>{getBusinessName(account)}</small></div>
+                  <div><strong>{roleLabel(account.role)}</strong><small>{getBusinessName(account)}</small></div>
                   <div><strong>{account.phone || "No phone"}</strong><small>Joined {formatDate(account.createdAt)}</small></div>
                   <div><strong>{formatNumber((account.counts?.products || 0) + (account.counts?.services || 0))} listings</strong><small>{formatNumber(account.counts?.orders)} orders · {formatNumber(account.counts?.supportTickets)} tickets</small></div>
                   <span className="admin-user-statuses-v2"><AdminStatusBadge status={account.status} />{businessStatus !== "none" && <AdminStatusBadge status={businessStatus} label={`Business ${titleCase(businessStatus)}`} />}</span>
@@ -287,7 +292,7 @@ export default function UserManagement() {
               <label>Name<input name="name" value={newUser.name} onChange={updateNewUser} required placeholder="Full name" /></label>
               <label>Email<input name="email" type="email" value={newUser.email} onChange={updateNewUser} required placeholder="user@example.com" /></label>
               <label>Phone<input name="phone" value={newUser.phone} onChange={updateNewUser} placeholder="Optional" /></label>
-              <label>Role<select name="role" value={newUser.role} onChange={updateNewUser}>{accountCreateRoles.filter((role) => isSuperAdmin || role !== "super_admin").map((role) => <option key={role} value={role}>{titleCase(role)}</option>)}</select></label>
+              <label>Role<select name="role" value={newUser.role} onChange={updateNewUser}>{accountCreateRoles.filter((role) => isSuperAdmin || role !== "super_admin").map((role) => <option key={role} value={role}>{roleLabel(role)}</option>)}</select></label>
               <label>Status<select name="status" value={newUser.status} onChange={updateNewUser}><option value="active">Active</option><option value="pending_approval">Pending approval</option><option value="blocked">Blocked</option></select></label>
               <label>Password<input name="password" type="text" value={newUser.password} onChange={updateNewUser} placeholder="Leave blank to auto-generate" /></label>
             </div>
@@ -303,7 +308,7 @@ export default function UserManagement() {
         </form>
       </AdminModal>
 
-      <AdminModal open={Boolean(selectedUser)} onClose={() => setSelectedUser(null)} title={selectedUser?.name || "User details"} eyebrow={selectedUser ? titleCase(selectedUser.role) : "Account"} size="wide" footer={(
+      <AdminModal open={Boolean(selectedUser)} onClose={() => setSelectedUser(null)} title={selectedUser?.name || "User details"} eyebrow={selectedUser ? roleLabel(selectedUser.role) : "Account"} size="wide" footer={(
         <button className="admin-ghost-button-v2" type="button" onClick={() => setSelectedUser(null)}>Close</button>
       )}>
         {selectedUser && (
@@ -313,7 +318,7 @@ export default function UserManagement() {
               <div>
                 <h3>{selectedUser.name}</h3>
                 <p>{selectedUser.email}</p>
-                <div className="admin-user-action-buttons-v2"><AdminStatusBadge status={selectedUser.status} /><AdminStatusBadge status={roleTone(selectedUser.role)} label={titleCase(selectedUser.role)} />{selectedBusinessStatus !== "none" && <AdminStatusBadge status={selectedBusinessStatus} label={`Business ${titleCase(selectedBusinessStatus)}`} />}</div>
+                <div className="admin-user-action-buttons-v2"><AdminStatusBadge status={selectedUser.status} /><AdminStatusBadge status={roleTone(selectedUser.role)} label={roleLabel(selectedUser.role)} />{selectedBusinessStatus !== "none" && <AdminStatusBadge status={selectedBusinessStatus} label={`Business ${titleCase(selectedBusinessStatus)}`} />}</div>
               </div>
             </div>
 
@@ -340,7 +345,7 @@ export default function UserManagement() {
 
               <article className="admin-user-action-card-v2 admin-form-v2">
                 <h3>Role control</h3><p>Change workspace permissions and the operational role assigned to this account.</p>
-                <select value={selectedUser.role} onChange={(event) => updateAccount("role", { role: event.target.value }, "User role updated.")}>{roleOptions.filter((role) => role !== "all" && (isSuperAdmin || role !== "super_admin")).map((role) => <option key={role} value={role}>{titleCase(role)}</option>)}</select>
+                <select value={selectedUser.role} onChange={(event) => updateAccount("role", { role: event.target.value }, "User role updated.")}>{roleOptions.filter((role) => role !== "all" && (isSuperAdmin || role !== "super_admin")).map((role) => <option key={role} value={role}>{roleLabel(role)}</option>)}</select>
               </article>
 
               <article className="admin-user-action-card-v2">

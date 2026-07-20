@@ -28,13 +28,13 @@ const initialFilters = {
   featured: false,
 };
 
-function buildQuery(filters) {
-  const params = new URLSearchParams();
+function buildParams(filters) {
+  const params = {};
   Object.entries(filters).forEach(([key, value]) => {
     if (value === "" || value === false || value === "all") return;
-    params.set(key, String(value));
+    params[key] = value;
   });
-  return params.toString() ? `?${params.toString()}` : "";
+  return params;
 }
 
 function LocationIcon() {
@@ -80,23 +80,29 @@ export default function Marketplace() {
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
     async function loadProducts() {
       try {
         setLoading(true);
         setError("");
-        const { data } = await api.get(`/products${buildQuery(filters)}`);
+        const { data } = await api.get("/products", { params: buildParams(filters), signal: controller.signal });
         if (!cancelled) setProducts(data.data || []);
-      } catch {
+      } catch (error) {
+        if (error?.code === "ERR_CANCELED" || error?.name === "CanceledError") return;
         if (!cancelled) {
-          setError("Backend products could not load, so demo products are shown.");
+          setError(error.smartSellMessage || "Backend products could not load, so demo products are shown.");
           setProducts([]);
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
-    loadProducts();
-    return () => { cancelled = true; };
+    const timeout = window.setTimeout(loadProducts, 180);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
   }, [filters]);
 
   const visibleProducts = useMemo(() => {

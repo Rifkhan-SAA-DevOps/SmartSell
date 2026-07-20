@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import logo from "../assets/smartsell-logo-full.png";
@@ -25,15 +25,29 @@ export default function Login() {
   const location = useLocation();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
 
   const from = location.state?.from?.pathname || "/dashboard";
 
+  useEffect(() => {
+    try {
+      const storedNotice = sessionStorage.getItem("smartsell_auth_notice");
+      if (storedNotice) {
+        setNotice(storedNotice);
+        sessionStorage.removeItem("smartsell_auth_notice");
+      }
+    } catch {
+      // Continue normally when session storage is unavailable.
+    }
+  }, []);
+
   function updateField(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
     if (error) setError("");
+    if (notice) setNotice("");
   }
 
   function fillDemo(account) {
@@ -50,7 +64,7 @@ export default function Login() {
       const user = await login(form);
       navigate(user.role === "admin" || user.role === "super_admin" ? "/admin" : from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please check your email and password.");
+      setError(err.smartSellMessage || err.response?.data?.message || "Login failed. Please check your email and password.");
     } finally {
       setSubmitting(false);
     }
@@ -81,6 +95,7 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="customer-auth-form">
+          {notice && <div className="customer-auth-notice" role="status">{notice}</div>}
           {error && <div className="customer-auth-error" role="alert">{error}</div>}
 
           <label>

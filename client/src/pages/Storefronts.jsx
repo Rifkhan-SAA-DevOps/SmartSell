@@ -42,6 +42,7 @@ export default function Storefronts() {
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
     async function loadStorefronts() {
       try {
         setLoading(true);
@@ -50,9 +51,10 @@ export default function Storefronts() {
         if (type !== "all") params.set("type", type);
         if (q.trim()) params.set("q", q.trim());
         if (location.trim()) params.set("location", location.trim());
-        const { data } = await api.get(`/storefronts${params.toString() ? `?${params.toString()}` : ""}`);
+        const { data } = await api.get("/storefronts", { params, signal: controller.signal });
         if (!cancelled) setStorefronts(data.data || []);
       } catch (err) {
+        if (err?.code === "ERR_CANCELED" || err?.name === "CanceledError") return;
         if (!cancelled) {
           setError(err.response?.data?.message || "Could not load storefronts.");
           setStorefronts([]);
@@ -61,8 +63,12 @@ export default function Storefronts() {
         if (!cancelled) setLoading(false);
       }
     }
-    loadStorefronts();
-    return () => { cancelled = true; };
+    const timeout = window.setTimeout(loadStorefronts, 180);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
   }, [type, q, location]);
 
   const stats = useMemo(() => ({

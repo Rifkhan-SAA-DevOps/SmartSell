@@ -8,7 +8,12 @@
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "server": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
-     "check": "npm --prefix .. run check"
+    "audit": "node scripts/smartsell-audit.mjs",
+    "audit:css": "node scripts/smartsell-css-audit.mjs",
+    "audit:api": "node scripts/smartsell-api-contract.mjs",
+    "audit:workflow": "node scripts/smartsell-workflow-audit.mjs",
+    "audit:server": "node scripts/smartsell-server-check.mjs",
+    "check": "npm run audit && npm run audit:css && npm run audit:api && npm run audit:workflow && npm run audit:server && npm run build --prefix client"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
